@@ -177,6 +177,7 @@ en:
             none: "None"
             score_sum: "Score sum"
             secondary_score_sum: "Secondary score sum"
+            sos: "Strength of Schedule"
         save: "Save settings"
         explanations:
           pairing:
@@ -186,6 +187,7 @@ en:
             none: "No tie-break applied."
             score_sum: "Higher total score across reported games ranks higher when points are equal."
             secondary_score_sum: "Sum of secondary scores across reported games."
+            sos: "Sum of your opponents' final tournament points across all your matches. Higher is better."
             default: "Tie-break rule applied when points are equal."
         saved: "Settings saved"
       admin:

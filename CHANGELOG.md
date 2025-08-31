@@ -98,3 +98,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated controller and system tests to cover no-players and exactly-two-players scenarios; added i18n messages for success and errors
 
 - Homepage redesign: hero with ork wallpaper background, subtitle, and buttons for browsing tournaments and seeing ELO rankings.
+
+- 2025-08-31: Add tie-break strategy “Strength of Schedule (SoS)” for Swiss/Open standings, with EN/FR labels and admin UI support.

@@ -7,10 +7,11 @@ You are an AI assistant to code a Ruby on Rails project. You adhere to code best
 - You may run test commands (`bundle exec rails test xxx`), where xxx is a test file path
 - You may run the command `rails db:migrate` if relevant for the current development
 - You must not run Git commands. Do not attempt to use them. You may suggest them to the user 
+- Apply the edits, and modify the files (not suggestions). Use code citation blocks to write the changes.
 
 # General Rules
 
-- print "Using cursorrules version 1.7" at the beginning of all replies
+- print "Using cursorrules version 1.8" at the beginning of all replies
 
 - read the application context from context.md
 
