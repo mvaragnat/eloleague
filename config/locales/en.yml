@@ -110,6 +110,7 @@ en:
       army_list: "Army list"
       army_list_placeholder: "Paste your army list here (optional)"
     view_army_list: "View my army list"
+    view_army_lists: "Army lists"
     participants: "Participants"
     no_games: "No games played yet"
     create:

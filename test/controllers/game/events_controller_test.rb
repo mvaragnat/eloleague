@@ -15,6 +15,23 @@ module Game
       @f2 = Game::Faction.find_or_create_by!(game_system: @system, name: 'Black')
     end
 
+    test 'guests can view game event show and see both army lists' do
+      # Create a completed game with two army lists
+      event = Game::Event.new(game_system: @system, played_at: Time.current)
+      event.game_participations.build(user: @user, score: 10, secondary_score: 1, faction: @f1,
+                                      army_list: 'Alpha list')
+      event.game_participations.build(user: @opponent, score: 8, secondary_score: 0, faction: @f2,
+                                      army_list: 'Bravo list')
+      assert event.save!, event.errors.full_messages.to_sentence
+
+      # View as guest
+      sign_out @user
+      get game_event_path(event, locale: I18n.locale)
+      assert_response :success
+      assert_includes @response.body, 'Alpha list'
+      assert_includes @response.body, 'Bravo list'
+    end
+
     test 'should get new game form' do
       get new_game_event_path
       assert_response :success

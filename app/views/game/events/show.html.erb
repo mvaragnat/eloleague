@@ -1,13 +1,22 @@
 <%= turbo_frame_tag "modal" do %>
   <div class="modal-overlay" data-controller="modal">
     <div class="modal-card">
-      <h2><%= t('games.view_army_list', default: 'View my army list') %></h2>
+      <h2><%= t('games.view_army_lists', default: 'Army lists') %></h2>
 
-      <% my = @game.game_participations.find { |p| p.user_id == Current.user.id } %>
-      <% if my&.army_list.present? %>
-        <pre style="white-space:pre-wrap; background:#f9fafb; padding:1rem; border-radius:6px;"> <%= my.army_list %> </pre>
-      <% else %>
-        <p class="card-date"><%= t('tournaments.show.no_army_list', default: 'No army list provided') %></p>
+      <% parts = @game.game_participations.includes(:user).to_a %>
+      <% parts.each do |p| %>
+        <div class="card" style="margin-bottom:0.75rem;">
+          <div class="card-header">
+            <h3 style="margin:0; font-size:1rem;"><%= p.user.username %></h3>
+          </div>
+          <div class="card-body">
+            <% if p.army_list.present? %>
+              <pre style="white-space:pre-wrap; background:#f9fafb; padding:1rem; border-radius:6px;"> <%= p.army_list %> </pre>
+            <% else %>
+              <p class="card-date"><%= t('tournaments.show.no_army_list', default: 'No army list provided') %></p>
+            <% end %>
+          </div>
+        </div>
       <% end %>
 
       <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
@@ -16,5 +25,3 @@
     </div>
   </div>
 <% end %>
-
-

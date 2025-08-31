@@ -698,4 +698,55 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     first_row = body.split('<tbody>')[1].split('</tbody>')[0].split('<tr>')[1]
     assert_includes first_row, users(:player_one).username
   end
+
+  test "running tournament shows 'Army list' link only when list present" do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Army View', description: 'X', game_system_id: game_systems(:chess).id, format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    # Register two users
+    post register_tournament_path(t, locale: I18n.locale)
+    f1 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
+    t.registrations.find_by(user: @user).update!(faction: f1)
+
+    sign_out @user
+    sign_in users(:player_two)
+    post register_tournament_path(t, locale: I18n.locale)
+    f2 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'Black')
+    reg2 = t.registrations.find_by(user: users(:player_two))
+    reg2.update!(faction: f2)
+
+    # Check-in both
+    sign_out users(:player_two)
+    sign_in @user
+    post check_in_tournament_path(t, locale: I18n.locale)
+    sign_out @user
+    sign_in users(:player_two)
+    post check_in_tournament_path(t, locale: I18n.locale)
+
+    # Start tournament (running)
+    sign_out users(:player_two)
+    sign_in @user
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+
+    # Initially, no army lists set: link should not be present for either registration
+    get tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_response :success
+    body = @response.body
+    assert_not_includes body, I18n.t('tournaments.show.view_army_list', default: 'Army list'),
+                        'Army list link should be hidden when no list present'
+
+    # Add list for second registration only
+    reg2.reload.update!(army_list: 'XYZ')
+
+    get tournament_path(t, locale: I18n.locale, tab: 1)
+    body = @response.body
+    # Link visible at least once (for reg2)
+    assert_includes body, I18n.t('tournaments.show.view_army_list', default: 'Army list')
+
+    # But not twice (first user still has no list)
+    assert_operator body.scan(I18n.t('tournaments.show.view_army_list', default: 'Army list')).size, :<, 2
+  end
 end

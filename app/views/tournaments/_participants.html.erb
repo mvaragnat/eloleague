@@ -22,7 +22,7 @@
         <div class="card-date" style="text-align:right; display:flex; gap:0.5rem; justify-content:flex-end; align-items:center;">
           <span><%= r.status %></span>
           <%# Army list button/modal visibility %>
-          <% can_view_list = tournament.running? %>
+          <% can_view_list = tournament.running? && r.army_list.present? %>
           <% if can_view_list %>
             <%= link_to t('tournaments.show.view_army_list', default: 'Army list'),
                         tournament_tournament_registration_path(tournament, r),

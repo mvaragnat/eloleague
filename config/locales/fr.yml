@@ -80,7 +80,8 @@ fr:
       select_faction: "Sélectionnez une faction"
       army_list: "Liste d'armée"
       army_list_placeholder: "Collez votre liste d'armée ici (optionnel)"
-    view_army_list: "Voir ma liste d'armée"
+    view_army_list: "Voir les listes d'armée"
+    view_army_lists: "Listes d'armée"
     participants: "Participants"
     no_games: "Aucune partie jouée"
     create:
