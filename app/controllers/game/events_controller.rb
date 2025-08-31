@@ -2,7 +2,14 @@
 
 module Game
   class EventsController < ApplicationController
-    before_action :authenticate_user!
+    before_action :authenticate_user!, except: %i[show]
+
+    def show
+      # Allow guests to view event details (including army lists)
+      Current.user = current_user
+      @game = Event.includes(game_participations: :user).find(params[:id])
+    end
+
     def new
       @game = Event.new
       @game.game_participations.build(user: Current.user)
@@ -23,7 +30,7 @@ module Game
       key = params.key?(:event) ? :event : :game_event
       params.require(key).permit(
         :game_system_id,
-        game_participations_attributes: %i[user_id score secondary_score faction_id]
+        game_participations_attributes: %i[user_id score secondary_score faction_id army_list]
       )
     end
     # rubocop:enable Rails/StrongParametersExpect

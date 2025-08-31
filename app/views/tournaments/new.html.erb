@@ -32,6 +32,10 @@
           <%= f.label :ends_at, t('tournaments.new.ends_at') %>
           <%= f.text_field :ends_at, placeholder: t('tournaments.new.datetime_placeholder', default: 'YYYY-MM-DD HH:MM'), data: { controller: 'datetime-picker' } %>
         </div>
+        <div>
+          <%= f.label :require_army_list_for_check_in, t('tournaments.new.require_army_list_for_check_in', default: 'Require army list at check-in') %>
+          <%= f.check_box :require_army_list_for_check_in %>
+        </div>
       </div>
       <div class="card-footer">
         <%= f.submit t('tournaments.new.create'), class: 'btn btn-primary' %>

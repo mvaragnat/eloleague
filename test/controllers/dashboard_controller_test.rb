@@ -21,7 +21,8 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should show game history' do
-    get dashboard_path(locale: I18n.locale)
+    # Use English locale to match the expected header text in assertions
+    get dashboard_path(locale: :en)
     assert_response :success
     assert_select '#games-list'
     assert_select 'h3', /Game of\s*#{Regexp.escape(game_events(:chess_game).game_system.localized_name)}/

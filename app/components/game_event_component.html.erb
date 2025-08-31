@@ -36,5 +36,11 @@ end %>
         <% end %>
       </div>
     </div>
+    <%# Army list view button for my participation if provided %>
+    <% if my&.army_list.present? %>
+      <div style="margin-top:0.5rem; text-align:center;">
+        <%= link_to t('games.view_army_list', default: 'View my army list'), game_event_path(@event), class: 'btn', data: { turbo_frame: 'modal' } %>
+      </div>
+    <% end %>
   </div>
 </div> 
