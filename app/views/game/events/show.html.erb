@@ -1,0 +1,27 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-overlay" data-controller="modal">
+    <div class="modal-card">
+      <h2><%= t('games.view_army_lists', default: 'Army lists') %></h2>
+
+      <% parts = @game.game_participations.includes(:user).to_a %>
+      <% parts.each do |p| %>
+        <div class="card" style="margin-bottom:0.75rem;">
+          <div class="card-header">
+            <h3 style="margin:0; font-size:1rem;"><%= p.user.username %></h3>
+          </div>
+          <div class="card-body">
+            <% if p.army_list.present? %>
+              <pre style="white-space:pre-wrap; background:#f9fafb; padding:1rem; border-radius:6px;"> <%= p.army_list %> </pre>
+            <% else %>
+              <p class="card-date"><%= t('tournaments.show.no_army_list', default: 'No army list provided') %></p>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
+        <%= link_to t('layouts.shared.close', default: 'Close'), '#', data: { action: 'click->modal#close' }, class: 'btn' %>
+      </div>
+    </div>
+  </div>
+<% end %>

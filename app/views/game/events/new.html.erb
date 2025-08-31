@@ -36,6 +36,8 @@
                 <%= p_form.label :secondary_score, t('games.new.secondary_score', default: 'Secondary score'), class: "form-label text-light", style: 'margin-top:0.25rem;' %>
                 <%= p_form.number_field :secondary_score, min: 0, class: "form-input" %>
                 <%= p_form.hidden_field :user_id %>
+                <%= p_form.label :army_list, t('games.new.army_list', default: 'Army list'), class: "form-label text-light", style: 'margin-top:0.5rem;' %>
+                <%= p_form.text_area :army_list, rows: 10, class: "form-input", placeholder: t('games.new.army_list_placeholder', default: 'Paste your army list here (optional)') %>
               </div>
               <div class="faction-input">
                 <%= p_form.label :faction_id, t('games.new.your_faction'), class: "form-label" %>
@@ -50,6 +52,8 @@
               <input type="number" min="0" name="game_event[game_participations_attributes][1][score]" class="form-input" />
               <label class="form-label text-light" style="margin-top:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary score') %></label>
               <input type="number" min="0" name="game_event[game_participations_attributes][1][secondary_score]" class="form-input" />
+              <label class="form-label text-light" style="margin-top:0.5rem;"><%= t('games.new.opponent_army_list', default: 'Opponent army list') %></label>
+              <textarea name="game_event[game_participations_attributes][1][army_list]" rows="10" class="form-input" placeholder="<%= t('games.new.army_list_placeholder', default: 'Paste your army list here (optional)') %>"></textarea>
             </div>
             <div class="faction-input">
               <label class="form-label"><%= t('games.new.opponent_faction') %></label>

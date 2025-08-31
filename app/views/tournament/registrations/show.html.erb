@@ -1,0 +1,28 @@
+<%= turbo_frame_tag "modal" do %>
+  <div class="modal-overlay" data-controller="modal">
+    <div class="modal-card">
+      <h2><%= t('tournaments.show.army_list_title', default: 'Army list') %> — <%= @registration.user.username %></h2>
+
+      <% can_edit = (Current.user && (Current.user.id == @registration.user_id || Current.user.id == @tournament.creator_id)) %>
+      <% if can_edit %>
+        <%= form_with(model: @registration, url: tournament_tournament_registration_path(@tournament, @registration), method: :patch, scope: :tournament_registration) do |f| %>
+          <div class="form-group">
+            <%= f.label :army_list, t('tournaments.show.army_list_label', default: 'Your army list') %>
+            <%= f.text_area :army_list, rows: 16, style: 'width:100%;' %>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
+            <%= link_to t('layouts.shared.cancel'), '#', data: { action: 'click->modal#close' }, class: 'btn' %>
+            <%= f.submit t('layouts.shared.save', default: 'Save'), class: 'btn btn-primary' %>
+          </div>
+        <% end %>
+      <% else %>
+        <pre style="white-space:pre-wrap; background:#f9fafb; padding:1rem; border-radius:6px;"> <%= @registration.army_list.presence || t('tournaments.show.no_army_list', default: 'No army list provided') %> </pre>
+        <div style="display:flex;justify-content:flex-end;gap:0.5rem;">
+          <%= link_to t('layouts.shared.close', default: 'Close'), '#', data: { action: 'click->modal#close' }, class: 'btn' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_22_120010) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_31_120020) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -77,6 +77,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_120010) do
     t.integer "score"
     t.bigint "faction_id"
     t.integer "secondary_score"
+    t.text "army_list"
     t.index ["faction_id"], name: "index_game_participations_on_faction_id"
     t.index ["game_event_id", "user_id"], name: "index_game_participations_on_game_event_id_and_user_id", unique: true
     t.index ["game_event_id"], name: "index_game_participations_on_game_event_id"
@@ -121,6 +122,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_120010) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "faction_id"
+    t.text "army_list"
     t.index ["faction_id"], name: "index_tournament_registrations_on_faction_id"
     t.index ["tournament_id", "user_id"], name: "index_tournament_registrations_on_tournament_id_and_user_id", unique: true
     t.index ["tournament_id"], name: "index_tournament_registrations_on_tournament_id"
@@ -156,6 +158,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_22_120010) do
     t.string "pairing_strategy_key", default: "by_points_random_within_group", null: false
     t.string "tiebreak1_strategy_key", default: "score_sum", null: false
     t.string "tiebreak2_strategy_key", default: "none", null: false
+    t.boolean "require_army_list_for_check_in", default: false, null: false
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"

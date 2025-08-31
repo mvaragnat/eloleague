@@ -6,6 +6,7 @@ class GameEventComponent < ViewComponent::Base
     @event = event
     @current_user = current_user
     @participation = event.game_participations.find { |p| p.user_id == current_user.id }
+    @participation ||= event.game_participations.first
   end
 
   private

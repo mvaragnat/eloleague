@@ -15,7 +15,7 @@ Rails.application.routes.draw do
 
     # Game events and factions
     namespace :game do
-      resources :events, only: %i[new create]
+      resources :events, only: %i[new create show]
       resources :factions, only: %i[index]
     end
 
@@ -40,7 +40,7 @@ Rails.application.routes.draw do
       namespace :tournament do
         resources :rounds, only: %i[index show]
         resources :matches, only: %i[index show update new create]
-        resources :registrations, only: %i[update]
+        resources :registrations, only: %i[show update]
       end
     end
   end

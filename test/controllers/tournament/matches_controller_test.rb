@@ -37,7 +37,7 @@ class TournamentMatchesControllerTest < ActionDispatch::IntegrationTest
     patch tournament_tournament_match_path(@tournament, m, locale: I18n.locale),
           params: { tournament_match: { a_score: 1, b_score: 1, a_secondary_score: 10, b_secondary_score: 5 } }
 
-    assert_redirected_to tournament_path(@tournament, locale: I18n.locale, tab: 0)
+    assert_redirected_to tournament_path(@tournament, locale: I18n.locale, tab: 1)
     m.reload
     assert_equal 'draw', m.result
     assert_not_nil m.game_event
@@ -114,7 +114,7 @@ module Tournament
       sign_in [match.a_user, match.b_user].first
       patch tournament_tournament_match_path(t, match, locale: I18n.locale),
             params: { tournament_match: { a_score: 5, b_score: 3 } }
-      assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 0)
+      assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
 
       match.reload
       parent = match.parent_match
