@@ -8,10 +8,10 @@ module Tournament
     before_action :set_registration, only: %i[show update]
 
     def show
-      unless can_view?(@registration)
-        return redirect_back(fallback_location: tournament_path(@tournament),
-                             alert: t('tournaments.unauthorized', default: 'Not authorized'))
-      end
+      return if can_view?(@registration)
+
+      redirect_back(fallback_location: tournament_path(@tournament),
+                    alert: t('tournaments.unauthorized', default: 'Not authorized'))
     end
 
     def update
@@ -57,7 +57,7 @@ module Tournament
     end
 
     def registration_params
-      params.expect(tournament_registration: [:faction_id, :army_list])
+      params.expect(tournament_registration: %i[faction_id army_list])
     end
   end
 end

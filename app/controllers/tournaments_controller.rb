@@ -111,7 +111,8 @@ class TournamentsController < ApplicationController
     if @tournament.require_army_list_for_check_in && reg.army_list.blank?
       return redirect_back(
         fallback_location: tournament_path(@tournament, tab: 1),
-        alert: t('tournaments.army_list_required_to_check_in', default: 'Please provide your army list before checking in')
+        alert: t('tournaments.army_list_required_to_check_in',
+                 default: 'Please provide your army list before checking in')
       )
     end
 

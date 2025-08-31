@@ -69,5 +69,3 @@ module Tournament
     end
   end
 end
-
-

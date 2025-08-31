@@ -100,6 +100,7 @@ en:
       secondary_score: "Secondary score"
       opponent_score: "Opponent score"
       opponent_secondary_score: "Opponent secondary score"
+      opponent_army_list: "Opponent army list"
       participants: "Add participants"
       search_placeholder: "Search players by username"
       submit: "Create game"

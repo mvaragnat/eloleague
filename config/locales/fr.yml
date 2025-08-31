@@ -71,6 +71,7 @@ fr:
       secondary_score: "Score secondaire"
       opponent_score: "Score de l'adversaire"
       opponent_secondary_score: "Score secondaire de l'adversaire"
+      opponent_army_list: "Liste d'armée de l'adversaire"
       participants: "Ajouter des participants"
       search_placeholder: "Rechercher des joueurs par nom"
       submit: "Créer la partie"
