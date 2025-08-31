@@ -19,7 +19,22 @@
             <span class="card-date"><%= r.faction&.localized_name || t('tournaments.show.no_faction', default: 'No faction') %></span>
           <% end %>
         </div>
-        <div class="card-date" style="text-align:right;"><%= r.status %></div>
+        <div class="card-date" style="text-align:right; display:flex; gap:0.5rem; justify-content:flex-end; align-items:center;">
+          <span><%= r.status %></span>
+          <%# Army list button/modal visibility %>
+          <% can_view_list = tournament.running? %>
+          <% if can_view_list %>
+            <%= link_to t('tournaments.show.view_army_list', default: 'Army list'),
+                        tournament_tournament_registration_path(tournament, r),
+                        class: 'btn',
+                        data: { turbo_frame: 'modal' } %>
+          <% elsif Current.user && (Current.user.id == r.user_id || Current.user.id == tournament.creator_id) %>
+            <%= link_to t('tournaments.show.edit_army_list', default: 'Edit list'),
+                        tournament_tournament_registration_path(tournament, r),
+                        class: 'btn',
+                        data: { turbo_frame: 'modal' } %>
+          <% end %>
+        </div>
       <% end %>
     </div>
   </div>

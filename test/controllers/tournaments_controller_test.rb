@@ -111,6 +111,29 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 'checked_in', reg.reload.status
   end
 
+  test 'cannot check-in if army list required and missing; allowed after adding' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'ArmyReq', description: 'X', game_system_id: game_systems(:chess).id, format: 'open', require_army_list_for_check_in: true }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    post register_tournament_path(t, locale: I18n.locale)
+    f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
+    reg = t.registrations.find_by(user: @user)
+    reg.update!(faction: f)
+
+    # Attempt check-in should be blocked due to missing army list
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
+
+    # Add army list then check-in works
+    reg.update!(army_list: 'My secret list')
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+    assert_equal 'checked_in', reg.reload.status
+  end
+
   test 'admin-only and state guards on admin actions' do
     # Creator
     sign_in @user

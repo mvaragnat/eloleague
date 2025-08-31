@@ -28,6 +28,8 @@
 							<%= p_form.label :secondary_score, t('games.new.secondary_score', default: 'Secondary score'), style: 'display:block; margin-top:0.25rem;' %>
 							<%= p_form.number_field :secondary_score, min: 0 %>
 							<%= p_form.hidden_field :user_id %>
+							<%= p_form.label :army_list, t('games.new.army_list', default: 'Army list'), style: 'display:block; margin-top:0.5rem;' %>
+							<%= p_form.text_area :army_list, rows: 10, style: 'width:100%;', placeholder: t('games.new.army_list_placeholder', default: 'Paste your army list here (optional)') %>
 						</div>
 						<div>
 							<%= p_form.label :faction_id, t('games.new.your_faction', default: 'Your faction') %>

@@ -4,6 +4,9 @@
       <% if my_registration.faction_id.blank? %>
         <p class="card-date" style="color:#b45309;"><%= t('tournaments.faction_required_hint') %></p>
       <% end %>
+      <% if tournament.require_army_list_for_check_in && my_registration.army_list.blank? %>
+        <p class="card-date" style="color:#b45309;"><%= t('tournaments.army_list_required_hint', default: 'Army list is required to check in') %></p>
+      <% end %>
       <%= button_to t('tournaments.show.check_in'), check_in_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
     <% end %>
     <%= button_to t('tournaments.show.unregister'), unregister_tournament_path(tournament), method: :delete, class: 'btn' %>

@@ -27,8 +27,8 @@ module Game
           event: {
             game_system_id: @system.id,
             game_participations_attributes: [
-              { user_id: @user.id, score: 21, faction_id: @f1.id },
-              { user_id: @opponent.id, score: 18, faction_id: @f2.id }
+              { user_id: @user.id, score: 21, faction_id: @f1.id, army_list: 'A list' },
+              { user_id: @opponent.id, score: 18, faction_id: @f2.id, army_list: 'B list' }
             ]
           }
         }

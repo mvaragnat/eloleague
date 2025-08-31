@@ -27,6 +27,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Has many players (through participations)
 - Tracks the outcome of the game
  - Each participation now supports a secondary score used for tie-breaks
+ - Each participation can include an optional army list (text)
 
 ### Tournament Domain
 - `Tournament::Tournament`
@@ -34,6 +35,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Associations: `has_many :registrations` (participants), `has_many :rounds`, `has_many :matches`.
 - `Tournament::Registration`
   - Join between a `Tournament::Tournament` and a `User` with optional `seed` (Elo snapshot), `status` (`pending|approved|checked_in`), and optional `faction_id`.
+  - Optional `army_list` (text) per registration.
   - Unique per (tournament, user).
 - `Tournament::Round`
   - Represents a numbered round within a tournament (`number`, `state`), mainly used by Swiss/Open formats.
@@ -76,6 +78,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - View tournament rounds and matches; update match results
 - Admin actions for the tournament creator: lock registration, generate pairings, close round, finalize
 - Tournament games integrate with Elo the same way as casual games
+
+#### Army Lists
+- Players can attach an optional army list when submitting a game; visible to the player via a modal from their game card.
+- Tournament registrations support an optional army list editable by the participant and the organizer.
+- Tournaments can require an army list at check-in; if enabled, players must provide a list before checking in.
+- Visibility: before the tournament starts, only the organizer and the owner can view/edit their list. Once the tournament is running, all visitors (including guests) can view lists from the Participants tab.
 
 #### Elimination Bracket
 - On lock, elimination tournaments generate a full bracket tree using `Tournament::BracketBuilder` (Elo-based seeding, power-of-two sizing, byes to top seeds).

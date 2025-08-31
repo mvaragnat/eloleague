@@ -77,6 +77,9 @@ fr:
       your_faction: "Votre faction"
       opponent_faction: "Faction de l'adversaire"
       select_faction: "Sélectionnez une faction"
+      army_list: "Liste d'armée"
+      army_list_placeholder: "Collez votre liste d'armée ici (optionnel)"
+    view_army_list: "Voir ma liste d'armée"
     participants: "Participants"
     no_games: "Aucune partie jouée"
     create:
@@ -99,6 +102,7 @@ fr:
       starts_at: "Début"
       ends_at: "Fin"
       datetime_placeholder: "AAAA-MM-JJ HH:MM"
+      require_army_list_for_check_in: "Exiger une liste d'armée au check-in"
     formats:
       open: "Open"
       swiss: "Suisse"
@@ -132,6 +136,11 @@ fr:
       ranking: "Classement"
       no_standings: "Pas encore de résultats"
       move_to_next_round: "Passer à la ronde suivante"
+      view_army_list: "Liste d'armée"
+      edit_army_list: "Modifier la liste"
+      army_list_title: "Liste d'armée"
+      army_list_label: "Votre liste d'armée"
+      no_army_list: "Aucune liste d'armée fournie"
       standings:
         games_played: "Matchs joués"
         points: "Points"
@@ -181,6 +190,8 @@ fr:
     cannot_advance_pending: "Tous les matchs doivent être terminés pour passer à la ronde suivante"
     faction_required_hint: "Veuillez sélectionner votre faction dans l'onglet Participants avant le check-in."
     faction_required_to_check_in: "Veuillez sélectionner votre faction avant l'enregistrement"
+    army_list_required_hint: "La liste d'armée est requise pour le check-in"
+    army_list_required_to_check_in: "Veuillez fournir votre liste d'armée avant le check-in"
     registration_updated: "Inscription mise à jour"
     errors:
       already_registered: "Vous êtes déjà inscrit"

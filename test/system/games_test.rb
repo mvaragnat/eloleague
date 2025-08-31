@@ -25,6 +25,8 @@ class GamesTest < ApplicationSystemTestCase
 
     fill_in 'game_event[game_participations_attributes][1][score]', with: '18'
 
+    # Fill optional army list
+    fill_in 'game_event[game_participations_attributes][0][army_list]', with: 'My list'
     click_on I18n.t('games.new.submit')
 
     assert_current_path dashboard_path

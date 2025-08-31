@@ -108,6 +108,13 @@ class TournamentsController < ApplicationController
       )
     end
 
+    if @tournament.require_army_list_for_check_in && reg.army_list.blank?
+      return redirect_back(
+        fallback_location: tournament_path(@tournament, tab: 1),
+        alert: t('tournaments.army_list_required_to_check_in', default: 'Please provide your army list before checking in')
+      )
+    end
+
     reg.update!(status: 'checked_in')
     redirect_to tournament_path(@tournament), notice: t('tournaments.checked_in', default: 'Checked in')
   end
@@ -235,7 +242,8 @@ class TournamentsController < ApplicationController
   def tournament_params
     params.require(:tournament).permit(:name, :description, :game_system_id, :format, :rounds_count, :starts_at,
                                        :ends_at,
-                                       :pairing_strategy_key, :tiebreak1_strategy_key, :tiebreak2_strategy_key)
+                                       :pairing_strategy_key, :tiebreak1_strategy_key, :tiebreak2_strategy_key,
+                                       :require_army_list_for_check_in)
   end
 
   def can_register?
