@@ -79,6 +79,14 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Admin actions for the tournament creator: lock registration, generate pairings, close round, finalize
 - Tournament games integrate with Elo the same way as casual games
 
+#### Overview Tab
+- All tournament formats include an Overview tab summarizing key details:
+  - Description
+  - Dates (start/end)
+  - Ranking tie-break strategies (primary and secondary)
+  - Whether an army list is required at check-in
+- The organizer can toggle the "Require army list at check-in" option from the Admin tab; changes apply immediately.
+
 #### Army Lists
 - Players can attach an optional army list when submitting a game; visible to the player via a modal from their game card.
 - Tournament registrations support an optional army list editable by the participant and the organizer.

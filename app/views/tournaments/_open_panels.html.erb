@@ -1,5 +1,10 @@
-<!-- Matches panel for Open format -->
+<!-- Overview panel -->
 <div data-tabs-target="panel">
+  <%= render 'tournament_overview', tournament: tournament %>
+  </div>
+
+<!-- Matches panel for Open format -->
+<div data-tabs-target="panel" style="display:none;">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
     <h3 style="margin:0;"><%= t('tournaments.show.matches', default: 'Matches') %></h3>
     <% if tournament.running? && (is_registered || (tournament.creator == Current.user)) %>

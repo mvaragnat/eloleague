@@ -77,7 +77,9 @@ class TournamentsController < ApplicationController
     end
 
     @tournament.registrations.find_or_create_by!(user: Current.user)
-    redirect_to tournament_path(@tournament, tab: 1), notice: t('tournaments.registered', default: 'Registered')
+    # Participants tab index shifts by +1 due to new Overview tab
+    redirect_to tournament_path(@tournament, tab: 2),
+                notice: t('tournaments.registered', default: 'Registered')
   end
 
   def unregister
@@ -103,14 +105,14 @@ class TournamentsController < ApplicationController
     reg = @tournament.registrations.find_by!(user: Current.user)
     if reg.faction_id.blank?
       return redirect_back(
-        fallback_location: tournament_path(@tournament, tab: 1),
+        fallback_location: tournament_path(@tournament, tab: 2),
         alert: t('tournaments.faction_required_to_check_in', default: 'Please select your faction before checking in')
       )
     end
 
     if @tournament.require_army_list_for_check_in && reg.army_list.blank?
       return redirect_back(
-        fallback_location: tournament_path(@tournament, tab: 1),
+        fallback_location: tournament_path(@tournament, tab: 2),
         alert: t('tournaments.army_list_required_to_check_in',
                  default: 'Please provide your army list before checking in')
       )
@@ -182,7 +184,7 @@ class TournamentsController < ApplicationController
       @tournament.matches.create!(round: new_round, a_user: result.bye_user, b_user: nil, result: 'a_win')
     end
 
-    redirect_to tournament_path(@tournament, tab: 0),
+    redirect_to tournament_path(@tournament, tab: 1),
                 notice: t('tournaments.round_advanced', default: 'Moved to next round')
   end
 
@@ -199,7 +201,7 @@ class TournamentsController < ApplicationController
   end
 
   def update
-    admin_tab_index = @tournament.elimination? ? 2 : 3
+    admin_tab_index = @tournament.elimination? ? 3 : 4
     if @tournament.update(tournament_params)
       respond_to do |format|
         format.html do

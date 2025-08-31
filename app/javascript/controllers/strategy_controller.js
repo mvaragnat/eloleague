@@ -12,9 +12,14 @@ export default class extends Controller {
   static targets = ["pairingExplanation", "tiebreak1Explanation", "tiebreak2Explanation"]
 
   async changed(event) {
-    const select = event.currentTarget
-    const field = select.dataset.field
-    const value = select.value
+    const element = event.currentTarget
+    const field = element.dataset.field
+    let value
+    if (element.type === "checkbox") {
+      value = element.checked ? "1" : "0"
+    } else {
+      value = element.value
+    }
 
     const formData = new FormData()
     formData.append(`tournament[${field}]`, value)

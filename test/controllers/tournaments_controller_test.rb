@@ -99,7 +99,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     # Attempt check-in should be blocked
     post check_in_tournament_path(t, locale: I18n.locale)
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 2)
 
     # Now set faction and allow check-in
     f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
@@ -113,9 +113,16 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
   test 'cannot check-in if army list required and missing; allowed after adding' do
     sign_in @user
-    post tournaments_path(locale: I18n.locale), params: {
-      tournament: { name: 'ArmyReq', description: 'X', game_system_id: game_systems(:chess).id, format: 'open', require_army_list_for_check_in: true }
-    }
+    post tournaments_path(locale: I18n.locale),
+         params: {
+           tournament: {
+             name: 'ArmyReq',
+             description: 'X',
+             game_system_id: game_systems(:chess).id,
+             format: 'open',
+             require_army_list_for_check_in: true
+           }
+         }
     t = Tournament::Tournament.order(:created_at).last
 
     post register_tournament_path(t, locale: I18n.locale)
@@ -125,7 +132,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     # Attempt check-in should be blocked due to missing army list
     post check_in_tournament_path(t, locale: I18n.locale)
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 2)
 
     # Add army list then check-in works
     reg.update!(army_list: 'My secret list')
@@ -251,10 +258,10 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     # Register
     post register_tournament_path(t, locale: I18n.locale)
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 2)
 
     # Visit the participants tab page and ensure register button is not present
-    get tournament_path(t, locale: I18n.locale, tab: 1)
+    get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     assert_no_match(/\b#{Regexp.escape(I18n.t('tournaments.show.register'))}\b/, @response.body)
   end
@@ -306,13 +313,13 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     sign_in users(:player_two)
     patch tournament_tournament_match_path(t, match, locale: I18n.locale),
           params: { tournament_match: { a_score: 1, b_score: 0 } }
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 0)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
 
     # Now moving to next round should work
     sign_out @user
     sign_in @user
     post next_round_tournament_path(t, locale: I18n.locale)
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 0)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
     assert_equal 2, t.rounds.order(:number).last.number
   end
 
@@ -346,13 +353,13 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     post next_round_tournament_path(t, locale: I18n.locale)
 
     # Participants see Open link
-    get tournament_path(t, locale: I18n.locale, tab: 0)
+    get tournament_path(t, locale: I18n.locale, tab: 1)
     assert_includes @response.body, 'Open'
 
     # Organizer sees Open as well
     sign_out @user
     sign_in @user
-    get tournament_path(t, locale: I18n.locale, tab: 0)
+    get tournament_path(t, locale: I18n.locale, tab: 1)
     assert_includes @response.body, 'Open'
   end
 
@@ -392,7 +399,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     sign_in match.a_user
     patch tournament_tournament_match_path(t, match, locale: I18n.locale),
           params: { tournament_match: { a_score: 0, b_score: 1 } }
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 0)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
 
     match.reload
     assert_equal 'b_win', match.result
@@ -667,7 +674,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     # Choose secondary score sum as primary tiebreak
     patch tournament_path(t, locale: I18n.locale),
           params: { tournament: { tiebreak1_strategy_key: 'secondary_score_sum' } }
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 3)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
 
     # Register players and check-in
     [users(:player_one), users(:player_two)].each do |u|
@@ -732,7 +739,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     post lock_registration_tournament_path(t, locale: I18n.locale)
 
     # Initially, no army lists set: link should not be present for either registration
-    get tournament_path(t, locale: I18n.locale, tab: 1)
+    get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
     assert_not_includes body, I18n.t('tournaments.show.view_army_list', default: 'Army list'),

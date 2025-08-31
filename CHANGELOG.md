@@ -1,4 +1,7 @@
-- 2025-08-31: Feature — Army lists for games and tournaments. Optional army list per game participation; tournament registrations can include an army list. New tournament option to require army list at check-in. Army lists hidden before start (except organizer and owner); visible to all once running. UI uses modals; localized in EN/FR.
+## 2025-08-31
+
+- Feature — Army lists for games and tournaments. Optional army list per game participation; tournament registrations can include an army list. New tournament option to require army list at check-in. Army lists hidden before start (except organizer and owner); visible to all once running. UI uses modals; localized in EN/FR.
+- Tournaments: Added Overview tab across all formats (description, dates), shows ranking/tie-break strategies and whether army list is required at check-in. Admin can toggle "Require army list at check-in" directly from the Admin tab.
 ## 2025-08-22
 
 - Add secondary score support for games and tournament matches

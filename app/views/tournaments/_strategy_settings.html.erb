@@ -1,6 +1,6 @@
 <%# frozen_string_literal: true %>
 <% show_pairing = local_assigns.fetch(:show_pairing, false) %>
-<% admin_tab_index = @tournament.elimination? ? 2 : 3 %>
+<% admin_tab_index = @tournament.elimination? ? 3 : 4 %>
 <% pairing_explanations = Tournament::StrategyRegistry.pairing_strategies.transform_values { |v| t("tournaments.show.strategies.explanations.pairing.#{v.last.name.demodulize.underscore}", default: t("tournaments.show.strategies.explanations.pairing.#{v.first.parameterize(separator: '_')}", default: t('tournaments.show.strategies.explanations.pairing.default'))) } %>
 <%# Fallback keys: by_points_random_within_group explicitly %>
 <% pairing_explanations['by_points_random_within_group'] ||= t('tournaments.show.strategies.explanations.pairing.by_points_random_within_group', default: t('tournaments.show.strategies.explanations.pairing.default')) %>

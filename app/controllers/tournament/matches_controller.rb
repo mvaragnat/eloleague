@@ -48,7 +48,8 @@ module Tournament
             ]
           end
           format.html do
-            redirect_to tournament_path(@tournament, tab: 0),
+            # After creating match, redirect to Matches tab (index 1 due to Overview at 0)
+            redirect_to tournament_path(@tournament, tab: 1),
                         notice: t('tournaments.match_updated', default: 'Match updated')
           end
         end
@@ -94,7 +95,8 @@ module Tournament
 
         propagate_winner_to_parent!(@match)
 
-        redirect_to tournament_path(@tournament, tab: 0),
+        # After reporting, redirect to Rounds/Matches tab (index 1 due to Overview at 0)
+        redirect_to tournament_path(@tournament, tab: 1),
                     notice: t('tournaments.match_updated', default: 'Match updated')
       else
         flash.now[:alert] = event.errors.full_messages.to_sentence

@@ -1,0 +1,60 @@
+<div class="card">
+  <div class="card-body" style="display:grid; gap:0.75rem;">
+    <div>
+      <div style="font-weight:600;">
+        Jeu : <%= @tournament.game_system.localized_name %></span>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-weight:600;">
+        <span class="card-date" style="font-weight:600;"><%= @tournament.state_label %></span>
+      </div>
+    </div>
+
+    <% if tournament.description.present? %>
+      <div>
+        <div class="card-date" style="font-style:normal; font-weight:600;"><%= t('tournaments.new.description') %></div>
+        <div><%= simple_format(tournament.description) %></div>
+      </div>
+    <% end %>
+
+
+    <div>
+      <div style="font-weight:600;">
+        Format : <%= @tournament.format %></span>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:0.5rem;">
+      <div class="card-date" style="font-style:normal;">
+        <strong><%= t('tournaments.new.starts_at') %>:</strong>
+        <%= tournament.starts_at&.strftime(I18n.t('time.formats.long')) || '-' %>
+      </div>
+      <div class="card-date" style="font-style:normal;">
+        <strong><%= t('tournaments.new.ends_at') %>:</strong>
+        <%= tournament.ends_at&.strftime(I18n.t('time.formats.long')) || '-' %>
+      </div>
+    </div>
+
+    <div>
+      <div class="card-date" style="font-style:normal; font-weight:600;"><%= t('tournaments.show.settings', default: 'Settings') %></div>
+      <div style="display:flex; flex-direction:column; gap:0.25rem;">
+        <div class="card-date" style="font-style:normal;">
+          <strong><%= t('tournaments.show.strategies.tiebreak1', default: 'Tie-break #1') %>:</strong>
+          <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: Tournament::StrategyRegistry.tiebreak_strategies[tournament.tiebreak1_key].first) %>
+        </div>
+        <div class="card-date" style="font-style:normal;">
+          <strong><%= t('tournaments.show.strategies.tiebreak2', default: 'Tie-break #2') %>:</strong>
+          <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: Tournament::StrategyRegistry.tiebreak_strategies[tournament.tiebreak2_key].first) %>
+        </div>
+        <div class="card-date" style="font-style:normal;">
+          <strong><%= t('tournaments.new.require_army_list_for_check_in') %>:</strong>
+          <%= tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

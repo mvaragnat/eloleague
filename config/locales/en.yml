@@ -62,6 +62,8 @@ en:
       fr: "Français"
     shared:
       cancel: "Cancel"
+  yes: "Yes"
+  no: "No"
   footer:
     made_by_html: "Made by %{name} with %{heart}. A bug, a suggestion, a new game to add?"
     contact_title: "A bug, a suggestion, a new game to add?"
@@ -203,13 +205,15 @@ en:
         actions: "Actions"
         strategies: "Strategies"
       tabs:
+        overview: "Overview"
         bracket: "Bracket"
         participants: "Participants"
         admin: "Admin"
-        overview: "Overview"
         rounds: "Rounds"
         ranking: "Ranking"
         matches: "Matches"
+      type: "Tournament"
+      settings: "Settings"
     state:
       draft: "Draft"
       registration: "Registration"
