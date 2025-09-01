@@ -3,7 +3,7 @@
 		<div class="modal-card" style="max-height:90vh; overflow-y:auto; width:90vw; max-width:800px;">
 			<h2><%= t('tournaments.show.matches', default: 'Matches') %> — <%= @tournament.name %></h2>
 
-			<%= form_with(model: @game, url: tournament_tournament_matches_path(@tournament), scope: :game_event, data: { controller: "game-form", action: "submit->game-form#validate player-selected->game-form#showScores player-removed->game-form#toggleScores", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
+			<%= form_with(model: @game, url: tournament_tournament_matches_path(@tournament), scope: :game_event, data: { controller: "game-form", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
 				<div data-game-form-target="error" class="hidden" style="color:#dc2626;font-size:0.875rem;"></div>
 
 				<!-- Hidden system select to trigger faction loading -->
@@ -11,32 +11,31 @@
 					<option value="<%= @tournament.game_system_id %>" selected="selected"></option>
 				</select>
 
-				<!-- Player selector -->
-				<div data-controller="player-search" data-player-search-max-selections-value="2" data-player-search-preselected-user-id-value="<%= @preselected_user&.id %>" data-player-search-preselected-username-value="<%= @preselected_user&.username %>">
-					<label><%= t('games.new.participants') %></label>
-					<div data-player-search-target="container">
-						<input type="text"
-								 data-player-search-target="input"
-								 data-action="input->player-search#search"
-								 data-tournament-id="<%= @tournament.id %>"
-								 placeholder="<%= t('games.new.search_placeholder') %>">
-						<div data-player-search-target="results" class="card" style="padding:0.25rem; margin-top:0.25rem; max-height: 220px; overflow:auto;"></div>
-					</div>
-					<div data-player-search-target="selected" style="margin-top: 0.5rem;"></div>
-				</div>
-
-				<div data-game-form-target="scores" class="hidden" style="margin-top: 1rem; display:grid; gap:0.75rem;">
+				<div style="margin-top: 1rem; display:grid; gap:0.75rem;">
+					<% i = 0 %>
 					<%= form.fields_for :game_participations do |p_form| %>
-						<div class="participation-block" style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; align-items:start;">
-							<div style="grid-column: 1 / -1; margin-bottom: 0.25rem;">
-								<strong data-player-name></strong>
+						<% i += 1 %>
+						<div class="participation-block" style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; align-items:start; border:1px solid #e5e7eb; border-radius:0.5rem; padding:0.75rem;">
+							<div style="grid-column: 1 / -1;">
+								<div data-controller="player-search" data-player-search-max-selections-value="1" <%= (@preselected_user.present? && i == 1) ? "data-player-search-preselected-user-id-value=\"#{@preselected_user.id}\" data-player-search-preselected-username-value=\"#{@preselected_user.username}\"" : "" %>>
+									<label><%= t('games.new.select_player', default: 'Select player') %></label>
+									<div data-player-search-target="container">
+										<input type="text"
+												 data-player-search-target="input"
+												 data-action="input->player-search#search"
+												 data-tournament-id="<%= @tournament.id %>"
+												 placeholder="<%= t('games.new.search_placeholder') %>">
+										<div data-player-search-target="results" class="card" style="padding:0.25rem; margin-top:0.25rem; max-height: 220px; overflow:auto;"></div>
+									</div>
+									<div data-player-search-target="selected" style="margin-top: 0.5rem;"></div>
+								</div>
 							</div>
 							<div>
-								<%= p_form.label :score, t('games.new.your_score') %>
+								<%= p_form.label :score, t('games.new.score', default: 'Score') %>
 								<%= p_form.number_field :score, min: 0 %>
 								<%= p_form.label :secondary_score, t('games.new.secondary_score', default: 'Secondary score'), style: 'display:block; margin-top:0.25rem;' %>
 								<%= p_form.number_field :secondary_score, min: 0 %>
-								<%= p_form.label :faction_id, t('games.new.your_faction', default: 'Your faction'), style: 'display:block; margin-top:0.5rem;' %>
+								<%= p_form.label :faction_id, t('games.new.faction', default: 'Faction'), style: 'display:block; margin-top:0.5rem;' %>
 								<%= p_form.select :faction_id, [], { prompt: t('games.new.select_faction', default: 'Select faction') }, { data: { faction_select: true } } %>
 								<%= p_form.hidden_field :user_id %>
 							</div>

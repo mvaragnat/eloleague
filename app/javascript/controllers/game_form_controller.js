@@ -16,19 +16,21 @@ export default class extends Controller {
 
   validate(event) {
     const form = this.element
-    const selectedContainer = form.querySelector('[data-player-search-target="selected"]')
-    const selected = selectedContainer ? selectedContainer.querySelectorAll('.selected-player') : []
 
-    // In tournament flow, we need exactly two players selected (A and B)
+    // Two independent player selectors (one per participation block)
+    const blocks = Array.from(form.querySelectorAll('.participation-block'))
+    const selectionsPerBlock = blocks.map(block => block.querySelectorAll('[data-player-search-target="selected"] .selected-player').length)
+
     if (this.twoPlayersValue) {
-      if (!selected || selected.length !== 2) {
+      const allHaveOne = selectionsPerBlock.length === 2 && selectionsPerBlock.every(n => n === 1)
+      if (!allHaveOne) {
         event.preventDefault()
         this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players')
         return
       }
     } else {
-      // Casual game flow: current user + one selected opponent
-      if (!selected || selected.length !== 1) {
+      // Fallback: at least one selected in the first block
+      if (selectionsPerBlock[0] !== 1) {
         event.preventDefault()
         this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players')
         return
@@ -44,23 +46,13 @@ export default class extends Controller {
       return
     }
 
-    // Sync selected user_ids into nested fields when in two-player mode
-    if (this.twoPlayersValue) {
-      // Remove previous user_id inputs to avoid duplicates
-      form.querySelectorAll('input[name$="[user_id]"]').forEach(n => n.remove())
-      // Ensure we have two nested participation slots [0] and [1]
-      const aUserId = selected[0].getAttribute('data-user-id')
-      const bUserId = selected[1].getAttribute('data-user-id')
-      const aHidden = document.createElement('input')
-      aHidden.type = 'hidden'
-      aHidden.name = 'game_event[game_participations_attributes][0][user_id]'
-      aHidden.value = aUserId
-      const bHidden = document.createElement('input')
-      bHidden.type = 'hidden'
-      bHidden.name = 'game_event[game_participations_attributes][1][user_id]'
-      bHidden.value = bUserId
-      form.appendChild(aHidden)
-      form.appendChild(bHidden)
+    // Hidden user_id fields are inside each participation block; ensure they are set
+    const userInputs = Array.from(form.querySelectorAll('input[name^="game_event[game_participations_attributes]"][name$="[user_id]"]'))
+    const allUsersPresent = userInputs.length >= 2 && userInputs.every(i => (i.value || '').trim() !== '')
+    if (!allUsersPresent) {
+      event.preventDefault()
+      this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players')
+      return
     }
 
     // Require factions for both
@@ -135,13 +127,7 @@ export default class extends Controller {
   }
 
   toggleScores() {
-    const selectedContainer = this.element.querySelector('[data-player-search-target="selected"]')
-    const hasOpponent = selectedContainer && selectedContainer.querySelectorAll('.selected-player').length === 1
-    if (this.hasScoresTarget) {
-      this.scoresTarget.classList.toggle('hidden', !hasOpponent)
-    }
-
-    this.updatePlayerNames()
+    // No-op in two-selector layout; retain for backward compatibility
   }
 
   showError(message) {
@@ -173,5 +159,22 @@ export default class extends Controller {
         node.textContent = ''
       }
     }
+  }
+
+  // Map selection events to the correct hidden input within the same participation block
+  onPlayerSelected(event) {
+    const { userId } = event.detail || {}
+    if (!userId) return
+    const block = event.target?.closest('.participation-block')
+    if (!block) return
+    const input = block.querySelector('input[name^="game_event[game_participations_attributes]"][name$="[user_id]"]')
+    if (input) input.value = String(userId)
+  }
+
+  onPlayerRemoved(event) {
+    const block = event.target?.closest('.participation-block')
+    if (!block) return
+    const input = block.querySelector('input[name^="game_event[game_participations_attributes]"][name$="[user_id]"]')
+    if (input) input.value = ''
   }
 } 

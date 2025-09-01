@@ -111,6 +111,10 @@ en:
       select_faction: "Select faction"
       army_list: "Army list"
       army_list_placeholder: "Paste your army list here (optional)"
+      # Neutral labels for tournament open-match modal
+      score: "Score"
+      faction: "Faction"
+      select_player: "Select player"
     view_army_list: "View my army list"
     view_army_lists: "Army lists"
     participants: "Participants"
