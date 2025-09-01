@@ -101,7 +101,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 #### Swiss/Open Tournaments
 Swiss/Open tournaments run in rounds. Closing a round validates all results and generates the next-round pairings from checked-in players (or all registrants if none are checked in). Pairings group players by current points and draw opponents within each group while avoiding repeats when possible. If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
 
-Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by points with tie-breakers applied. Tie-break strategies include primary score sum and secondary score sum. Tournament pages display primary scores prominently; secondary scores are shown compactly where appropriate (e.g., match detail and open format modal).
+Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by points with tie-breakers applied. Tournament pages display primary scores prominently; secondary scores are shown compactly where appropriate (e.g., match detail and open format modal).
+
+- Tie-break strategies in standings:
+  - Score sum: sums your reported game scores.
+  - Secondary score sum: sums secondary scores across reported games.
+  - Strength of Schedule (SoS): sums the final tournament points of your opponents across all your matches. Higher is better.
 
 ### Homepage
 - Hero section with background image (`public/ork-wallpaper.jpg`), localized subtitle, and buttons to browse tournaments and see ELO rankings.

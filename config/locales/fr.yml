@@ -161,6 +161,7 @@ fr:
             none: "Aucun"
             score_sum: "Somme des scores"
             secondary_score_sum: "Somme des scores secondaires"
+            sos: "Force de l'opposition"
         save: "Enregistrer"
         explanations:
           pairing:
@@ -170,6 +171,7 @@ fr:
             none: "Aucun départage appliqué."
             score_sum: "La somme des scores sur les parties jouées départage en cas d'égalité de points."
             secondary_score_sum: "Somme des scores secondaires sur les parties jouées."
+            sos: "Somme des points finaux de vos adversaires sur l'ensemble du tournoi."
             default: "Règle de départage appliquée en cas d'égalité de points."
         saved: "Paramètres enregistrés"
       admin:

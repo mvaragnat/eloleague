@@ -706,6 +706,72 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_includes first_row, users(:player_one).username
   end
 
+  test 'ranking can use strength of schedule as tie-break' do
+    # Create an open tournament and set SoS as primary tie-break
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Open SoS', description: 'S', game_system_id: game_systems(:chess).id, format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    patch tournament_path(t, locale: I18n.locale),
+          params: { tournament: { tiebreak1_strategy_key: 'sos' } }
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
+
+    # Register two players who will be ranked
+    [users(:player_one), users(:player_two)].each do |u|
+      sign_out @user
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+      f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: "F-#{u.username}")
+      t.registrations.find_by(user: u).update!(faction: f)
+      post check_in_tournament_path(t, locale: I18n.locale)
+    end
+
+    a = users(:player_one)
+    b = users(:player_two)
+
+    # Create additional users to serve as opponents
+    o1 = User.create!(username: 'o1', email: 'o1@example.com', password: 'password')
+    o2 = User.create!(username: 'o2', email: 'o2@example.com', password: 'password')
+    o3 = User.create!(username: 'o3', email: 'o3@example.com', password: 'password')
+    p1 = User.create!(username: 'p1', email: 'p1@example.com', password: 'password')
+    p2 = User.create!(username: 'p2', email: 'p2@example.com', password: 'password')
+    p3 = User.create!(username: 'p3', email: 'p3@example.com', password: 'password')
+    r1 = User.create!(username: 'r1', email: 'r1@example.com', password: 'password')
+    r2 = User.create!(username: 'r2', email: 'r2@example.com', password: 'password')
+    r3 = User.create!(username: 'r3', email: 'r3@example.com', password: 'password')
+    r4 = User.create!(username: 'r4', email: 'r4@example.com', password: 'password')
+
+    # A plays three matches: two wins, one loss => 2.0 points
+    t.matches.create!(a_user: a, b_user: o1, result: 'a_win')
+    t.matches.create!(a_user: a, b_user: o2, result: 'a_win')
+    t.matches.create!(a_user: a, b_user: o3, result: 'b_win')
+
+    # B plays three matches: one win, two draws => 2.0 points
+    t.matches.create!(a_user: b, b_user: p1, result: 'a_win')
+    t.matches.create!(a_user: b, b_user: p2, result: 'draw')
+    t.matches.create!(a_user: b, b_user: p3, result: 'draw')
+
+    # Boost opponents' final points to differentiate SoS
+    # A's opponents: o1 (0), o2 (0), o3 (+1 win vs r1 -> total 2 incl. win vs A)
+    t.matches.create!(a_user: o3, b_user: r1, result: 'a_win')
+
+    # B's opponents: p1 (+1 win vs r2 -> 1), p2 (+1 win vs r3 -> 1.5), p3 (+1 win vs r4 -> 1.5)
+    t.matches.create!(a_user: p1, b_user: r2, result: 'a_win')
+    t.matches.create!(a_user: p2, b_user: r3, result: 'a_win')
+    t.matches.create!(a_user: p3, b_user: r4, result: 'a_win')
+
+    # Visit ranking tab and ensure B ranks first due to higher SoS
+    sign_out @user
+    sign_in @user
+    get tournament_path(t, locale: I18n.locale, tab: 2)
+    assert_response :success
+    body = @response.body
+    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split('<tr>')[1]
+    assert_includes first_row, b.username
+  end
+
   test "running tournament shows 'Army list' link only when list present" do
     sign_in @user
     post tournaments_path(locale: I18n.locale), params: {

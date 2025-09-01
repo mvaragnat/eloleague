@@ -258,16 +258,23 @@ class TournamentsController < ApplicationController
     points = Hash.new(0.0)
     score_sum = Hash.new(0.0)
     secondary_score_sum = Hash.new(0.0)
+    opponents = Hash.new { |h, k| h[k] = [] }
 
     users = tournament.registrations.includes(:user).map(&:user)
     users.each do |u|
       points[u.id] ||= 0.0
       score_sum[u.id] ||= 0.0
+      opponents[u.id] ||= []
     end
 
-    aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum)
+    aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents)
 
-    agg = { score_sum_by_user_id: score_sum, secondary_score_sum_by_user_id: secondary_score_sum }
+    agg = {
+      score_sum_by_user_id: score_sum,
+      secondary_score_sum_by_user_id: secondary_score_sum,
+      points_by_user_id: points,
+      opponents_by_user_id: opponents
+    }
 
     t1 = Tournament::StrategyRegistry.tiebreak_strategies[tournament.tiebreak1_key]
     t2 = Tournament::StrategyRegistry.tiebreak_strategies[tournament.tiebreak2_key]
@@ -283,10 +290,12 @@ class TournamentsController < ApplicationController
 
     rows.sort_by! { |h| [-h[:points], -h[:tiebreak1], -h[:tiebreak2], h[:user].username] }
 
-    { rows: rows, tiebreak1_label: t1.first, tiebreak2_label: t2.first }
+    t1_label = t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: t1.first)
+    t2_label = t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: t2.first)
+    { rows: rows, tiebreak1_label: t1_label, tiebreak2_label: t2_label }
   end
 
-  def aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum)
+  def aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents)
     tournament.matches.includes(:a_user, :b_user, :game_event).find_each do |m|
       if bye_win_for_single_participant?(m)
         apply_bye_points(points, m)
@@ -294,6 +303,10 @@ class TournamentsController < ApplicationController
       end
 
       next unless m.a_user && m.b_user
+
+      # Track opponents for SoS
+      opponents[m.a_user.id] << m.b_user.id
+      opponents[m.b_user.id] << m.a_user.id
 
       apply_normal_result_points(points, m)
 
