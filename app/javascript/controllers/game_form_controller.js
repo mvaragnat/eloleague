@@ -9,6 +9,9 @@ export default class extends Controller {
     if (systemSelect && systemSelect.value) {
       this.loadFactions({ currentTarget: systemSelect })
     }
+
+    // Keep player names visible above each participation block
+    this.updatePlayerNames()
   }
 
   validate(event) {
@@ -137,6 +140,8 @@ export default class extends Controller {
     if (this.hasScoresTarget) {
       this.scoresTarget.classList.toggle('hidden', !hasOpponent)
     }
+
+    this.updatePlayerNames()
   }
 
   showError(message) {
@@ -149,5 +154,24 @@ export default class extends Controller {
     if (!this.hasErrorTarget) return
     this.errorTarget.textContent = ''
     this.errorTarget.classList.add('hidden')
+  }
+
+  // Update player name headings based on selected players
+  updatePlayerNames() {
+    const selected = Array.from(this.element.querySelectorAll('[data-player-search-target="selected"] .selected-player'))
+    const nameNodes = Array.from(this.element.querySelectorAll('[data-player-name]'))
+    if (nameNodes.length === 0) return
+
+    // Fill names for up to two players; leave blank if missing
+    for (let i = 0; i < nameNodes.length; i += 1) {
+      const node = nameNodes[i]
+      const sel = selected[i]
+      if (sel) {
+        const usernameEl = sel.querySelector('strong')
+        node.textContent = usernameEl ? usernameEl.textContent : ''
+      } else {
+        node.textContent = ''
+      }
+    }
   }
 } 
