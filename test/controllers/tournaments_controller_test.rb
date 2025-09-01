@@ -22,6 +22,22 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'show tolerates unknown tiebreak keys for accepting tournament' do
+    # Create a tournament in accepting signups with bogus tie-break keys
+    t = ::Tournament::Tournament.create!(
+      name: 'Legacy TB', description: 'Broken keys',
+      game_system: game_systems(:chess), format: 'open', creator: @user
+    )
+    # Bypass validations to simulate legacy bad data
+    # rubocop:disable Rails/SkipsModelValidations
+    t.update_columns(tiebreak1_strategy_key: 'bogus_key', tiebreak2_strategy_key: 'another_bogus')
+    # rubocop:enable Rails/SkipsModelValidations
+
+    # Visiting the show page should not crash
+    get tournament_path(t, locale: I18n.locale)
+    assert_response :success
+  end
+
   test 'creates tournament with valid params from form' do
     # Sign in
     sign_in @user

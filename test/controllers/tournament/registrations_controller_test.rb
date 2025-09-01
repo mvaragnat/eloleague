@@ -30,6 +30,25 @@ module Tournament
       @reg_p2 = @t.registrations.find_by(user: @p2)
     end
 
+    test 'organizer can toggle participant status regardless of requirements and preserves tab' do
+      # Organizer signs in and toggles p2 to checked_in
+      sign_out @p2
+      sign_in @creator
+      reg = @t.registrations.find_by(user: @p2)
+      patch tournament_tournament_registration_path(@t, reg, locale: I18n.locale), params: {
+        tournament_registration: { status: 'checked_in' }, tab: 2
+      }
+      assert_redirected_to tournament_path(@t, locale: I18n.locale, tab: 2)
+      assert_equal 'checked_in', reg.reload.status
+
+      # Toggle back to pending
+      patch tournament_tournament_registration_path(@t, reg, locale: I18n.locale), params: {
+        tournament_registration: { status: 'pending' }, tab: 2
+      }
+      assert_redirected_to tournament_path(@t, locale: I18n.locale, tab: 2)
+      assert_equal 'pending', reg.reload.status
+    end
+
     test 'before running: participant cannot view other participant army list' do
       # p2 tries to view creator list
       get tournament_tournament_registration_path(@t, @reg_creator, locale: I18n.locale)

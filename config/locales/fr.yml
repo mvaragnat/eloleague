@@ -185,6 +185,9 @@ fr:
         rounds: "Rondes"
         ranking: "Classement"
         matches: "Matchs"
+      actions:
+        toggle_status_to_checked_in: "Valider le check-in"
+        toggle_status_to_pending: "Marquer en attente"
       type: "Tournoi"
       settings: "Paramètres"
     state:

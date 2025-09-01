@@ -42,11 +42,11 @@
       <div style="display:flex; flex-direction:column; gap:0.25rem;">
         <div class="card-date" style="font-style:normal;">
           <strong><%= t('tournaments.show.strategies.tiebreak1', default: 'Tie-break #1') %>:</strong>
-          <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: Tournament::StrategyRegistry.tiebreak_strategies[tournament.tiebreak1_key].first) %>
+          <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: @tiebreak1_label) %>
         </div>
         <div class="card-date" style="font-style:normal;">
           <strong><%= t('tournaments.show.strategies.tiebreak2', default: 'Tie-break #2') %>:</strong>
-          <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: Tournament::StrategyRegistry.tiebreak_strategies[tournament.tiebreak2_key].first) %>
+          <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: @tiebreak2_label) %>
         </div>
         <div class="card-date" style="font-style:normal;">
           <strong><%= t('tournaments.new.require_army_list_for_check_in') %>:</strong>
