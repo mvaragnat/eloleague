@@ -1,25 +1,25 @@
 <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
-  <a href="#" data-action="click->tabs#select" data-index="0" data-tabs-target="tab" class="btn btn-primary" aria-selected="true"><%= t('tournaments.show.tabs.overview', default: 'Overview') %></a>
+  <a href="<%= tournament_path(tournament, tab: 0) %>" data-action="click->tabs#select" data-index="0" data-tabs-target="tab" class="btn btn-primary" aria-selected="true"><%= t('tournaments.show.tabs.overview', default: 'Overview') %></a>
   <% if tournament.elimination? %>
-    <a href="#" data-action="click->tabs#select" data-index="1" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.bracket', default: 'Bracket') %></a>
-    <a href="#" data-action="click->tabs#select" data-index="2" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.participants', default: 'Participants') %></a>
+    <a href="<%= tournament_path(tournament, tab: 1) %>" data-action="click->tabs#select" data-index="1" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.bracket', default: 'Bracket') %></a>
+    <a href="<%= tournament_path(tournament, tab: 2) %>" data-action="click->tabs#select" data-index="2" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.participants', default: 'Participants') %></a>
     <% if tournament.creator == Current.user %>
-      <a href="#" data-action="click->tabs#select" data-index="3" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.admin', default: 'Admin') %></a>
+      <a href="<%= tournament_path(tournament, tab: 3) %>" data-action="click->tabs#select" data-index="3" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.admin', default: 'Admin') %></a>
     <% end %>
   <% else %>
     <% if tournament.open? %>
-      <a href="#" data-action="click->tabs#select" data-index="1" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.matches', default: 'Matches') %></a>
-      <a href="#" data-action="click->tabs#select" data-index="2" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.participants', default: 'Participants') %></a>
-      <a href="#" data-action="click->tabs#select" data-index="3" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.ranking', default: 'Ranking') %></a>
+      <a href="<%= tournament_path(tournament, tab: 1) %>" data-action="click->tabs#select" data-index="1" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.matches', default: 'Matches') %></a>
+      <a href="<%= tournament_path(tournament, tab: 2) %>" data-action="click->tabs#select" data-index="2" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.participants', default: 'Participants') %></a>
+      <a href="<%= tournament_path(tournament, tab: 3) %>" data-action="click->tabs#select" data-index="3" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.ranking', default: 'Ranking') %></a>
       <% if tournament.creator == Current.user %>
-        <a href="#" data-action="click->tabs#select" data-index="4" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.admin', default: 'Admin') %></a>
+        <a href="<%= tournament_path(tournament, tab: 4) %>" data-action="click->tabs#select" data-index="4" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.admin', default: 'Admin') %></a>
       <% end %>
     <% else %>
-      <a href="#" data-action="click->tabs#select" data-index="1" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.rounds', default: 'Rounds') %></a>
-      <a href="#" data-action="click->tabs#select" data-index="2" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.participants', default: 'Participants') %></a>
-      <a href="#" data-action="click->tabs#select" data-index="3" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.ranking', default: 'Ranking') %></a>
+      <a href="<%= tournament_path(tournament, tab: 1) %>" data-action="click->tabs#select" data-index="1" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.rounds', default: 'Rounds') %></a>
+      <a href="<%= tournament_path(tournament, tab: 2) %>" data-action="click->tabs#select" data-index="2" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.participants', default: 'Participants') %></a>
+      <a href="<%= tournament_path(tournament, tab: 3) %>" data-action="click->tabs#select" data-index="3" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.ranking', default: 'Ranking') %></a>
       <% if tournament.creator == Current.user %>
-        <a href="#" data-action="click->tabs#select" data-index="4" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.admin', default: 'Admin') %></a>
+        <a href="<%= tournament_path(tournament, tab: 4) %>" data-action="click->tabs#select" data-index="4" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.admin', default: 'Admin') %></a>
       <% end %>
     <% end %>
   <% end %>

@@ -1,3 +1,7 @@
+## 2025-09-01
+
+- Feature — Tournament admin can toggle participant status (pending/checked-in) directly from the Participants tab, regardless of participant requirements (faction or army list). Tab state is now persisted in the URL via `?tab=` and preserved on redirects/updates, so you return to the same tab after actions. Localized labels added.
+
 ## 2025-08-31
 
 - Feature — Army lists for games and tournaments. Optional army list per game participation; tournament registrations can include an army list. New tournament option to require army list at check-in. Army lists hidden before start (except organizer and owner); visible to all once running. UI uses modals; localized in EN/FR.

@@ -212,6 +212,9 @@ en:
         rounds: "Rounds"
         ranking: "Ranking"
         matches: "Matches"
+      actions:
+        toggle_status_to_checked_in: "Check-in"
+        toggle_status_to_pending: "Mark pending"
       type: "Tournament"
       settings: "Settings"
     state:

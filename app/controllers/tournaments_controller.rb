@@ -269,8 +269,10 @@ class TournamentsController < ApplicationController
 
     agg = { score_sum_by_user_id: score_sum, secondary_score_sum_by_user_id: secondary_score_sum }
 
-    t1 = Tournament::StrategyRegistry.tiebreak_strategies[tournament.tiebreak1_key]
-    t2 = Tournament::StrategyRegistry.tiebreak_strategies[tournament.tiebreak2_key]
+    strategies = Tournament::StrategyRegistry.tiebreak_strategies
+    # Be tolerant to legacy/invalid keys by falling back to defaults
+    t1 = strategies[tournament.tiebreak1_key] || strategies[Tournament::StrategyRegistry.default_tiebreak1_key]
+    t2 = strategies[tournament.tiebreak2_key] || strategies[Tournament::StrategyRegistry.default_tiebreak2_key]
 
     rows = users.map do |u|
       {

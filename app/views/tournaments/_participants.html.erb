@@ -7,6 +7,7 @@
           <% can_edit = (Current.user && (Current.user.id == r.user_id || Current.user.id == tournament.creator_id)) %>
           <% if can_edit %>
             <%= form_with(model: r, url: tournament_tournament_registration_path(tournament, r), method: :patch, scope: :tournament_registration) do |f| %>
+              <%= hidden_field_tag :tab, 2 %>
               <%= f.select :faction_id,
                            Game::Faction.where(game_system_id: tournament.game_system_id)
                              .to_a
@@ -21,6 +22,18 @@
         </div>
         <div class="card-date" style="text-align:right; display:flex; gap:0.5rem; justify-content:flex-end; align-items:center;">
           <span><%= r.status %></span>
+          <% if Current.user && Current.user.id == tournament.creator_id %>
+            <%# Admin can toggle status regardless of faction/list requirements %>
+            <% new_status = r.status == 'checked_in' ? 'pending' : 'checked_in' %>
+            <%= form_with(model: r,
+                          url: tournament_tournament_registration_path(tournament, r),
+                          method: :patch,
+                          scope: :tournament_registration) do |f| %>
+              <%= f.hidden_field :status, value: new_status %>
+              <%= hidden_field_tag :tab, 2 %>
+              <%= f.submit(new_status == 'checked_in' ? t('tournaments.show.actions.toggle_status_to_checked_in') : t('tournaments.show.actions.toggle_status_to_pending'), class: 'btn') %>
+            <% end %>
+          <% end %>
           <%# Army list button/modal visibility %>
           <% can_view_list = tournament.running? && r.army_list.present? %>
           <% if can_view_list %>

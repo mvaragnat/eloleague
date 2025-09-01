@@ -22,10 +22,10 @@ module Tournament
       end
 
       if registration.update(registration_params)
-        redirect_to tournament_path(@tournament, tab: 1),
+        redirect_to tournament_path(@tournament, tab: params[:tab].presence || 2),
                     notice: t('tournaments.registration_updated', default: 'Registration updated')
       else
-        redirect_to tournament_path(@tournament, tab: 1),
+        redirect_to tournament_path(@tournament, tab: params[:tab].presence || 2),
                     alert: registration.errors.full_messages.to_sentence
       end
     end
@@ -57,7 +57,7 @@ module Tournament
     end
 
     def registration_params
-      params.expect(tournament_registration: %i[faction_id army_list])
+      params.expect(tournament_registration: %i[faction_id army_list status])
     end
   end
 end

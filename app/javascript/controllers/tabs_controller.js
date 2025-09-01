@@ -15,6 +15,15 @@ export default class extends Controller {
     event.preventDefault()
     const index = Number(event.currentTarget.dataset.index)
     this.show(index)
+
+    // Persist tab in URL without reloading
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.set('tab', index)
+      window.history.replaceState({}, '', url)
+    } catch (_) {
+      // No-op if URL API not available
+    }
   }
 
   show(index) {
