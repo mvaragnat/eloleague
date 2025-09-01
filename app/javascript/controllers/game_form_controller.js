@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["error", "scores"]
-  static values = { factionsUrl: String }
+  static values = { factionsUrl: String, twoPlayers: Boolean }
 
   connect() {
     const systemSelect = this.element.querySelector('select[name="game_event[game_system_id]"]')
@@ -16,49 +16,54 @@ export default class extends Controller {
     const selectedContainer = form.querySelector('[data-player-search-target="selected"]')
     const selected = selectedContainer ? selectedContainer.querySelectorAll('.selected-player') : []
 
-    // We always have current user as one participant; require exactly one opponent selected
-    if (!selected || selected.length !== 1) {
-      event.preventDefault()
-      this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly one opponent')
-      return
+    // In tournament flow, we need exactly two players selected (A and B)
+    if (this.twoPlayersValue) {
+      if (!selected || selected.length !== 2) {
+        event.preventDefault()
+        this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players')
+        return
+      }
+    } else {
+      // Casual game flow: current user + one selected opponent
+      if (!selected || selected.length !== 1) {
+        event.preventDefault()
+        this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players')
+        return
+      }
     }
 
-    // Verify both scores are present
-    const myScoreInput = form.querySelector('input[name="game_event[game_participations_attributes][0][score]"]')
-    const myScore = myScoreInput?.value?.trim()
-    const selectedNode = selected[0]
-    const opponentScoreName = 'game_event[game_participations_attributes][1][score]'
-
-    // Ensure opponent user_id hidden
-    form.querySelectorAll('input[name="game_event[game_participations_attributes][1][user_id]"]').forEach(n => n.remove())
-    const userId = selectedNode.getAttribute('data-user-id')
-    const hiddenUser = document.createElement('input')
-    hiddenUser.type = 'hidden'
-    hiddenUser.name = 'game_event[game_participations_attributes][1][user_id]'
-    hiddenUser.value = userId
-    form.appendChild(hiddenUser)
-
-    // Ensure opponent score exists
-    let opponentScoreInput = form.querySelector(`input[name="${opponentScoreName}"]`)
-    if (!opponentScoreInput) {
-      opponentScoreInput = document.createElement('input')
-      opponentScoreInput.type = 'hidden'
-      opponentScoreInput.name = opponentScoreName
-      form.appendChild(opponentScoreInput)
-    }
-
-    const opponentScore = opponentScoreInput.value?.trim()
-
-    if (!myScore || !opponentScore) {
+    // Verify scores present for both participations
+    const scoreInputs = form.querySelectorAll('input[name^="game_event[game_participations_attributes]"][name$="[score]"]')
+    const allScoresPresent = Array.from(scoreInputs).every(i => (i.value || '').trim() !== '')
+    if (!allScoresPresent) {
       event.preventDefault()
       this.showError(window.I18n?.t('games.errors.both_scores_required') || 'Both scores are required')
       return
     }
 
+    // Sync selected user_ids into nested fields when in two-player mode
+    if (this.twoPlayersValue) {
+      // Remove previous user_id inputs to avoid duplicates
+      form.querySelectorAll('input[name$="[user_id]"]').forEach(n => n.remove())
+      // Ensure we have two nested participation slots [0] and [1]
+      const aUserId = selected[0].getAttribute('data-user-id')
+      const bUserId = selected[1].getAttribute('data-user-id')
+      const aHidden = document.createElement('input')
+      aHidden.type = 'hidden'
+      aHidden.name = 'game_event[game_participations_attributes][0][user_id]'
+      aHidden.value = aUserId
+      const bHidden = document.createElement('input')
+      bHidden.type = 'hidden'
+      bHidden.name = 'game_event[game_participations_attributes][1][user_id]'
+      bHidden.value = bUserId
+      form.appendChild(aHidden)
+      form.appendChild(bHidden)
+    }
+
     // Require factions for both
-    const myFaction = form.querySelector('select[name="game_event[game_participations_attributes][0][faction_id]"]')?.value
-    const oppFaction = form.querySelector('select[name="game_event[game_participations_attributes][1][faction_id]"]')?.value
-    if (!myFaction || !oppFaction) {
+    const factionSelects = form.querySelectorAll('select[name^="game_event[game_participations_attributes]"][name$="[faction_id]"]')
+    const allFactionsPresent = Array.from(factionSelects).every(s => (s.value || '').trim() !== '')
+    if (!allFactionsPresent) {
       event.preventDefault()
       this.showError(window.I18n?.t('games.errors.both_factions_required') || 'Both players must select a faction')
       return
