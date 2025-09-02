@@ -23,21 +23,23 @@
     <% end %>
   </div>
 
-  <%# For Swiss/Open, keep strategies partial under admin; for elimination, we skip it per request %>
-  <% unless tournament.elimination? %>
-    <div style="flex-basis:100%; height:1px;"></div>
-    <div style="width:100%;">
-      <p class="card-date" style="font-style:normal;"><%= t('tournaments.show.strategies.explanation', default: 'Ranking uses Points, then Tie-break #1, then Tie-break #2. Pairings avoid repeat matches when possible.') %></p>
-      <%= render 'strategy_settings', show_pairing: !tournament.open? %>
-    </div>
-  <% end %>
+
 
   <div style="flex-basis:100%; height:1px;"></div>
   <div style="width:100%;">
-    <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
-      <%= t('tournaments.show.settings', default: 'Settings') %>
-    </h3>
     <div class="card" style="margin-bottom:0.5rem;">
+      <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
+        <%= t('tournaments.show.settings', default: 'Settings') %>
+      </h3>
+
+      <%# For Swiss/Open, keep strategies partial under admin; for elimination, we skip it per request %>
+      <% unless tournament.elimination? %>
+        <div style="width:100%;">
+          <p class="card-date" style="font-style:normal;"><%= t('tournaments.show.strategies.explanation', default: 'Ranking uses Points, then Tie-break #1, then Tie-break #2. Pairings avoid repeat matches when possible.') %></p>
+          <%= render 'strategy_settings', show_pairing: !tournament.open? %>
+        </div>
+      <% end %>
+    
       <div class="card-body" style="display:grid; gap:0.5rem;">
         <div>
           <label for="tournament_description" class="card-date" style="font-style:normal; font-weight:600;">
