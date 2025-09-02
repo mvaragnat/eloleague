@@ -89,7 +89,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Dates (start/end)
   - Ranking tie-break strategies (primary and secondary)
   - Whether an army list is required at check-in
-- The organizer can toggle the "Require army list at check-in" option from the Admin tab; changes apply immediately.
+- The organizer can edit the tournament Description from the Admin tab and toggle the "Require army list at check-in" option; changes apply immediately (autosaved on blur).
 
 #### Army Lists
 - Players can attach an optional army list when submitting a game; visible to the player via a modal from their game card.
