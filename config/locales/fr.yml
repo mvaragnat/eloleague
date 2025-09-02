@@ -181,6 +181,7 @@ fr:
       admin:
         actions: "Actions"
         strategies: "Stratégies"
+        description_hint: "Ceci apparaîtra dans l'onglet Vue d'ensemble."
       tabs:
         overview: "Vue d'ensemble"
         bracket: "Arbre"

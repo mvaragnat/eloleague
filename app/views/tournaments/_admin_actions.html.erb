@@ -34,6 +34,30 @@
 
   <div style="flex-basis:100%; height:1px;"></div>
   <div style="width:100%;">
+    <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
+      <%= t('tournaments.show.settings', default: 'Settings') %>
+    </h3>
+    <div class="card" style="margin-bottom:0.5rem;">
+      <div class="card-body" style="display:grid; gap:0.5rem;">
+        <div>
+          <label for="tournament_description" class="card-date" style="font-style:normal; font-weight:600;">
+            <%= t('tournaments.new.description') %>
+          </label>
+          <textarea id="tournament_description"
+                    name="tournament[description]"
+                    rows="3"
+                    data-controller="strategy"
+                    data-action="blur->strategy#changed"
+                    data-strategy-update-url-value="<%= tournament_path(@tournament, tab: (@tournament.elimination? ? 3 : 4), locale: I18n.locale) %>"
+                    data-strategy-saved-text-value="<%= t('tournaments.show.strategies.saved', default: 'Settings saved') %>"
+                    data-field="description"
+                    style="width:100%;"><%= @tournament.description %></textarea>
+          <p class="card-date" style="font-style:normal;">
+            <%= t('tournaments.show.admin.description_hint') %>
+          </p>
+        </div>
+      </div>
+    </div>
     <div
       data-controller="strategy"
       data-strategy-update-url-value="<%= tournament_path(@tournament, tab: (@tournament.elimination? ? 2 : 3), locale: I18n.locale) %>"

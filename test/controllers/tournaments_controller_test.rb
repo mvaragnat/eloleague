@@ -788,6 +788,40 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_includes first_row, b.username
   end
 
+  test 'organizer can update description in open tournament' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Open Desc',
+        description: 'Initial',
+        game_system_id: game_systems(:chess).id,
+        format: 'open'
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { description: 'Updated description' } }
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
+    assert_equal 'Updated description', t.reload.description
+  end
+
+  test 'organizer can update description in elimination tournament' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Elim Desc',
+        description: 'Initial',
+        game_system_id: game_systems(:chess).id,
+        format: 'elimination'
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { description: 'Updated elimination desc' } }
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 3)
+    assert_equal 'Updated elimination desc', t.reload.description
+  end
+
   test "running tournament shows 'Army list' link only when list present" do
     sign_in @user
     post tournaments_path(locale: I18n.locale), params: {
