@@ -46,6 +46,14 @@ class TournamentMatchesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 10, a.secondary_score
     assert_equal 5, b.secondary_score
   end
+
+  test 'new preselects organizer as player A if also registered' do
+    sign_out @tournament.creator
+    sign_in @tournament.creator
+    get new_tournament_tournament_match_path(@tournament, locale: I18n.locale)
+    assert_response :success
+    assert_select 'div[data-controller="player-search"][data-player-search-preselected-user-id-value]', true
+  end
 end
 
 # frozen_string_literal: true

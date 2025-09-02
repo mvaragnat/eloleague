@@ -20,8 +20,15 @@ module Tournament
       end
 
       @game = Game::Event.new
-      # Prebuild current user participation for convenience
-      @game.game_participations.build(user: Current.user)
+      # Prebuild two participations. If current user is registered, default them as player A
+      if Current.user && @tournament.registrations.exists?(user_id: Current.user.id)
+        @game.game_participations.build(user: Current.user)
+        @preselected_user = Current.user
+      else
+        @game.game_participations.build
+      end
+      # Always build the second slot
+      @game.game_participations.build
     end
 
     def create

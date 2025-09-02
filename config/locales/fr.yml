@@ -82,6 +82,10 @@ fr:
       select_faction: "Sélectionnez une faction"
       army_list: "Liste d'armée"
       army_list_placeholder: "Collez votre liste d'armée ici (optionnel)"
+      # Libellés neutres pour le modal d'ouverture de match
+      score: "Score"
+      faction: "Faction"
+      select_player: "Sélectionner un joueur"
     view_army_list: "Voir les listes d'armée"
     view_army_lists: "Listes d'armée"
     participants: "Participants"

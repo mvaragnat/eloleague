@@ -107,6 +107,11 @@ Swiss/Open tournaments run in rounds. Closing a round validates all results and 
 
 Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by points with tie-breakers applied. Tournament pages display primary scores prominently; secondary scores are shown compactly where appropriate (e.g., match detail and open format modal).
 
+#### Open match reporting
+- In Open format, the organizer (or any registered participant when allowed) can add games from the Matches panel. The modal now lets you select Player A and Player B from registered participants.
+- If the organizer is also a registered participant, they are preselected as Player A by default but can be removed to enter a different pairing.
+- The form uses Stimulus controllers: `player-search` supports selecting two players and `game-form` validates that both players, scores, and factions are provided. Factions are populated dynamically based on the tournament's game system.
+
 - Tie-break strategies in standings:
   - Score sum: sums your reported game scores.
   - Secondary score sum: sums secondary scores across reported games.

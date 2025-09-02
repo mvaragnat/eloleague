@@ -2,9 +2,22 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "results", "selected", "container"]
+  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String }
 
   connect() {
-    this.selectedPlayers = new Set()
+    this.selectedPlayers = []
+
+    // Optional preselection (e.g., default current user as Player A)
+    if (this.hasPreselectedUserIdValue && this.preselectedUserIdValue) {
+      const id = String(this.preselectedUserIdValue)
+      const name = this.preselectedUsernameValue || ''
+      if (!this.selectedPlayers.includes(id)) {
+        this.selectedPlayers.push(id)
+        this.selectedTarget.insertAdjacentHTML('beforeend', this.selectedPlayerTemplate(id, name))
+      }
+    }
+
+    this.updateContainerVisibility()
   }
 
   search() {
@@ -25,11 +38,12 @@ export default class extends Controller {
 
   showResults(users) {
     const filtered = users
-      .filter(user => !this.selectedPlayers.has(String(user.id)))
+      .filter(user => !this.selectedPlayers.includes(String(user.id)))
       .slice(0, 10)
 
     if (filtered.length === 0) {
-      this.resultsTarget.innerHTML = `<div style="padding:0.75rem;color:#6b7280;">No results found</div>`
+      const msg = (window.I18n && window.I18n.t && window.I18n.t('games.search.no_results')) || 'No results found'
+      this.resultsTarget.innerHTML = `<div style="padding:0.75rem;color:#6b7280;">${msg}</div>`
       return
     }
 
@@ -41,31 +55,35 @@ export default class extends Controller {
   selectPlayer(event) {
     const userId = event.currentTarget.dataset.playerSearchUserId
     const username = event.currentTarget.dataset.playerSearchUsername
-    if (this.selectedPlayers.has(String(userId))) return
+    if (this.selectedPlayers.includes(String(userId))) return
 
-    // Allow only one opponent selection
-    if (this.selectedPlayers.size >= 1) return
+    const maxSel = this.hasMaxSelectionsValue ? this.maxSelectionsValue : 1
+    if (this.selectedPlayers.length >= maxSel) return
 
-    this.selectedPlayers.add(String(userId))
+    this.selectedPlayers.push(String(userId))
     this.selectedTarget.insertAdjacentHTML('beforeend', this.selectedPlayerTemplate(userId, username))
     this.resultsTarget.innerHTML = ''
     this.inputTarget.value = ''
 
-    // Hide selector when chosen
-    if (this.hasContainerTarget) this.containerTarget.style.display = 'none'
+    this.updateContainerVisibility()
 
     this.element.dispatchEvent(new CustomEvent('player-selected', { bubbles: true, detail: { userId, username } }))
   }
 
   removePlayer(event) {
     const { userId } = event.currentTarget.dataset
-    this.selectedPlayers.delete(String(userId))
+    this.selectedPlayers = this.selectedPlayers.filter(id => id !== String(userId))
     event.currentTarget.closest('.selected-player').remove()
 
-    // Show selector again
-    if (this.hasContainerTarget) this.containerTarget.style.display = ''
+    this.updateContainerVisibility()
 
     this.element.dispatchEvent(new CustomEvent('player-removed', { bubbles: true, detail: { userId } }))
+  }
+
+  updateContainerVisibility() {
+    if (!this.hasContainerTarget) return
+    const maxSel = this.hasMaxSelectionsValue ? this.maxSelectionsValue : 1
+    this.containerTarget.style.display = this.selectedPlayers.length >= maxSel ? 'none' : ''
   }
 
   userTemplate(user) {
@@ -81,7 +99,7 @@ export default class extends Controller {
   selectedPlayerTemplate(userId, username) {
     return `
       <div class="selected-player" data-user-id="${userId}">
-        <span><strong>${username}</strong> (opponent)</span>
+        <span><strong>${username}</strong></span>
         <button type="button"
                 data-action="click->player-search#removePlayer"
                 data-user-id="${userId}">
@@ -90,4 +108,4 @@ export default class extends Controller {
       </div>
     `
   }
-} 
+}
