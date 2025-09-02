@@ -8,9 +8,9 @@ class UsersController < ApplicationController
       ids = Tournament::Registration.where(tournament_id: params[:tournament_id]).pluck(:user_id)
       @users = @users.where(id: ids)
       # In tournament context, include the current user if registered (e.g., organizer who is checked in)
-    else
+    elsif Current.user
       # Outside tournament context (e.g., casual games), exclude the current user from results
-      @users = @users.where.not(id: Current.user.id) if Current.user
+      @users = @users.where.not(id: Current.user.id)
     end
 
     @users = @users.limit(10)
