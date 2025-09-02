@@ -38,8 +38,12 @@ game_systems:
       - "Tyranides"
       - "Squats"
       - "Empire T'au"
-      - "Orks"
+      - "Orks de Ghazghkull"
+      - "Orks Evil Sunz"
       - "Nécrons"
+      - en: "Grey Knights"
+        fr: "Chevaliers Gris"
+      - "Adeptus Custodes"
 
   - name: "Warhammer 40k"
     description: "The best known Games Workshop game"
