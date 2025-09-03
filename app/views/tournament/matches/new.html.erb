@@ -17,7 +17,8 @@
 						<% i += 1 %>
 						<div class="participation-block" style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; align-items:start; border:1px solid #e5e7eb; border-radius:0.5rem; padding:0.75rem;">
 							<div style="grid-column: 1 / -1;">
-								<div data-controller="player-search" data-player-search-max-selections-value="1" <%= (@preselected_user.present? && i == 1) ? "data-player-search-preselected-user-id-value=\"#{@preselected_user.id}\" data-player-search-preselected-username-value=\"#{@preselected_user.username}\"" : "" %>>
+								<% removable = (@preselected_user.present? && i == 1) ? (@preselected_removable ? 'true' : 'false') : 'true' %>
+								<div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="<%= removable %>" <%= (@preselected_user.present? && i == 1) ? "data-player-search-preselected-user-id-value=\"#{@preselected_user.id}\" data-player-search-preselected-username-value=\"#{@preselected_user.username}\"" : "" %>>
 									<label><%= t('games.new.select_player', default: 'Select player') %></label>
 									<div data-player-search-target="container">
 										<input type="text"

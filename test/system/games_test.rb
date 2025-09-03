@@ -7,15 +7,21 @@ class GamesTest < ApplicationSystemTestCase
     @user = users(:player_one)
     @other_user = users(:player_two)
     @system = game_systems(:chess)
+    @faction = game_factions(:chess_white)
 
     login_as(@user)
   end
 
-  test 'creating a new game' do
+  # This test currently reflects the intended behavior, but the app is regressed
+  # and will likely fail (cannot select two players). Keeping as the desired spec.
+  test 'creating a new game (intended: two players including current user)' do
     visit dashboard_path
 
     click_on I18n.t('games.add')
     assert_selector 'h2', text: I18n.t('games.new.title')
+
+    # Assert two independent participation blocks exist (intended UI)
+    assert_selector '.participation-block', count: 2
 
     select @system.name, from: 'game_event[game_system_id]'
     fill_in 'game_event[game_participations_attributes][0][score]', with: '21'
@@ -25,12 +31,39 @@ class GamesTest < ApplicationSystemTestCase
 
     fill_in 'game_event[game_participations_attributes][1][score]', with: '18'
 
+    # Select factions for both players
+    select @faction.name, from: 'game_event[game_participations_attributes][0][faction_id]'
+    select @faction.name, from: 'game_event[game_participations_attributes][1][faction_id]'
+
+    # Hidden user_id fields should exist for both participations (intended)
+    assert_selector "input[name='game_event[game_participations_attributes][0][user_id]']", count: 1
+    assert_selector "input[name='game_event[game_participations_attributes][1][user_id]']", count: 1
+
     # Fill optional army list
     fill_in 'game_event[game_participations_attributes][0][army_list]', with: 'My list'
     click_on I18n.t('games.new.submit')
 
     assert_current_path dashboard_path
     assert_text I18n.t('games.create.success')
+  end
+
+  # Reflect current regression: selecting only one player (opponent) shows validation error
+  test 'regression: cannot submit with only one selected player (current behavior)' do
+    visit dashboard_path
+
+    click_on I18n.t('games.add')
+    assert_selector 'h2', text: I18n.t('games.new.title')
+
+    select @system.name, from: 'game_event[game_system_id]'
+    fill_in 'game_event[game_participations_attributes][0][score]', with: '10'
+
+    fill_in I18n.t('games.new.search_placeholder'), with: @other_user.username
+    find("[data-player-search-username='#{@other_user.username}']").click
+
+    # Do not fill opponent score or factions to trigger the client-side validation first
+    click_on I18n.t('games.new.submit')
+
+    assert_text I18n.t('games.errors.exactly_two_players')
   end
 
   test 'new game modal is shown when clicking add a game' do
@@ -74,8 +107,10 @@ class GamesTest < ApplicationSystemTestCase
 
   def login_as(user)
     visit new_user_session_path
-    fill_in 'Email', with: user.email
-    fill_in 'Password', with: 'password'
-    click_on I18n.t('auth.login')
+    within('form') do
+      fill_in 'Email', with: user.email
+      fill_in 'Password', with: 'password'
+      click_button I18n.t('auth.login')
+    end
   end
 end

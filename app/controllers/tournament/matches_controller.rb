@@ -24,8 +24,12 @@ module Tournament
       if Current.user && @tournament.registrations.exists?(user_id: Current.user.id)
         @game.game_participations.build(user: Current.user)
         @preselected_user = Current.user
+        # Organizer can unselect themselves; regular participant cannot
+        @preselected_removable = (@tournament.creator_id == Current.user.id)
       else
         @game.game_participations.build
+        @preselected_user = nil
+        @preselected_removable = true
       end
       # Always build the second slot
       @game.game_participations.build
@@ -180,7 +184,7 @@ module Tournament
     def game_params
       key = params.key?(:event) ? :event : :game_event
       params.require(key).permit(
-        game_participations_attributes: %i[user_id score secondary_score faction_id]
+        game_participations_attributes: %i[user_id score secondary_score faction_id army_list]
       )
     end
     # rubocop:enable Rails/StrongParametersExpect
