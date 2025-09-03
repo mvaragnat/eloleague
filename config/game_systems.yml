@@ -44,6 +44,7 @@ game_systems:
       - en: "Grey Knights"
         fr: "Chevaliers Gris"
       - "Adeptus Custodes"
+      - "Hérésie d'Horus 30k"
 
   - name: "Warhammer 40k"
     description: "The best known Games Workshop game"

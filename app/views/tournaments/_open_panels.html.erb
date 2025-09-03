@@ -11,11 +11,11 @@
       <%= link_to t('games.add'), new_tournament_tournament_match_path(tournament), class: "btn btn-primary", data: { turbo_frame: "modal" } %>
     <% end %>
   </div>
-  <ul id="matches-list" style="list-style:none; padding:0;">
+  <ul id="matches-list">
     <% if matches.any? %>
       <% matches.each do |m| %>
-        <li style="margin:0 0 0.5rem 0; display:flex; justify-content:center;">
-          <%= content_tag :svg, width: 240, height: 68 do %>
+        <li>
+          <%= content_tag :svg, width: 240, height: 88 do %>
             <%= small_match_box(tournament, m, 0, 0, width: 240, show_seeds: false) %>
           <% end %>
         </li>
