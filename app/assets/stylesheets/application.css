@@ -140,6 +140,13 @@ input:focus, select:focus, textarea:focus {
 .page-header h1 { color: var(--text-strong); }
 .games-container { width: 100%; max-width: 720px; margin: 0 auto; padding: 0 1rem; }
 
+/* Wider container for tournament pages to allow up to 4 match columns */
+.tournament-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+
+/* Open tournament matches grid */
+#matches-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.5rem; }
+#matches-list > li { margin: 0; display: flex; justify-content: center; }
+
 /***** Hero (Home) *****/
 .hero {
   position: relative;

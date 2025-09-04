@@ -1,4 +1,4 @@
-<div class="games-container">
+<div class="tournament-container">
   <h1><%= @tournament.name %></h1>
   <p class="card-date"><%= @tournament.game_system.localized_name %> · <%= @tournament.format %> · <strong><%= @tournament.state_label %></strong></p>
   <p class="card-date"><%= t('tournaments.show.organizer', default: 'Organizer') %>: <%= @tournament.creator.username %></p>

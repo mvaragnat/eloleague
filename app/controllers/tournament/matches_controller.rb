@@ -169,8 +169,8 @@ module Tournament
     end
 
     def svg_match_list_item(match)
-      view_context.content_tag(:li, style: 'margin:0 0 0.5rem 0; display:flex; justify-content:center;') do
-        view_context.content_tag(:svg, width: 240, height: 68) do
+      view_context.content_tag(:li, style: 'margin:0; display:flex; justify-content:center;') do
+        view_context.content_tag(:svg, width: 240, height: 88) do
           view_context.small_match_box(@tournament, match, 0, 0, width: 240, show_seeds: false)
         end
       end
