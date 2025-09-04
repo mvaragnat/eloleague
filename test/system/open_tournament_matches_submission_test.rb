@@ -68,7 +68,7 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
     register!(tournament, @organizer) # Opponent also registered
 
     login_as(@participant)
-    visit tournament_path(tournament)
+    visit tournament_path(tournament, locale: I18n.locale)
     click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
 
     click_on I18n.t('games.add')
@@ -108,13 +108,15 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
     register!(tournament, @participant)
 
     login_as(@organizer)
-    visit tournament_path(tournament)
+    visit tournament_path(tournament, locale: I18n.locale)
     click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
     click_on I18n.t('games.add')
     assert_selector 'h2', text: I18n.t('tournaments.show.matches', default: 'Matches')
 
-    # Organizer selects themselves explicitly to ensure hidden field is set
-    select_in_first_block(@organizer.username)
+    # Organizer is preselected and can remove themselves
+    within first('.participation-block') do
+      assert_selector '.selected-player button'
+    end
     select_in_second_block(@participant.username)
 
     fill_in 'game_event[game_participations_attributes][0][score]', with: '12'
@@ -136,7 +138,7 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
     register!(tournament, @player_b)
 
     login_as(@organizer)
-    visit tournament_path(tournament)
+    visit tournament_path(tournament, locale: I18n.locale)
     click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
     click_on I18n.t('games.add')
 
@@ -166,7 +168,7 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
     register!(tournament, @player_b)
 
     login_as(@organizer)
-    visit tournament_path(tournament)
+    visit tournament_path(tournament, locale: I18n.locale)
     click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
     click_on I18n.t('games.add')
 

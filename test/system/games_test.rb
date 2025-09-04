@@ -15,7 +15,7 @@ class GamesTest < ApplicationSystemTestCase
   # This test currently reflects the intended behavior, but the app is regressed
   # and will likely fail (cannot select two players). Keeping as the desired spec.
   test 'creating a new game (intended: two players including current user)' do
-    visit dashboard_path
+    visit dashboard_path(locale: I18n.locale)
 
     click_on I18n.t('games.add')
     assert_selector 'h2', text: I18n.t('games.new.title')
@@ -49,7 +49,7 @@ class GamesTest < ApplicationSystemTestCase
 
   # Reflect current regression: selecting only one player (opponent) shows validation error
   test 'regression: cannot submit with only one selected player (current behavior)' do
-    visit dashboard_path
+    visit dashboard_path(locale: I18n.locale)
 
     click_on I18n.t('games.add')
     assert_selector 'h2', text: I18n.t('games.new.title')
@@ -67,14 +67,14 @@ class GamesTest < ApplicationSystemTestCase
   end
 
   test 'new game modal is shown when clicking add a game' do
-    visit dashboard_path
+    visit dashboard_path(locale: I18n.locale)
     click_on I18n.t('games.add')
     assert_selector 'turbo-frame#modal' # modal frame exists
     assert_selector 'h2', text: I18n.t('games.new.title')
   end
 
   test 'cannot submit without selecting exactly one opponent' do
-    visit dashboard_path
+    visit dashboard_path(locale: I18n.locale)
 
     click_on I18n.t('games.add')
     assert_selector 'h2', text: I18n.t('games.new.title')
@@ -88,7 +88,7 @@ class GamesTest < ApplicationSystemTestCase
   end
 
   test 'cannot submit without both scores' do
-    visit dashboard_path
+    visit dashboard_path(locale: I18n.locale)
 
     click_on I18n.t('games.add')
     select @system.name, from: 'game_event[game_system_id]'
