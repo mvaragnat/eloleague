@@ -1,5 +1,7 @@
 ## 2025-09-02
 
+- 2025-09-04: Refactor New Game and Tournament Match forms to share participation fields partial; ensure New Game supports two-player entry and submission; add system test for dashboard game creation.
+
 - Feature — Tournament admin can toggle participant status (pending/checked-in) directly from the Participants tab, regardless of participant requirements (faction or army list). Tab state is now persisted in the URL via `?tab=` and preserved on redirects/updates, so you return to the same tab after actions. Localized labels added.
 - Feature — Open tournaments: when organizer clicks "Add game", they can now select Player A and Player B from participants. If the organizer is also registered, they are preselected as Player A by default (can be removed). Form uses Stimulus to select two players, validates factions and scores for both, and populates factions dynamically.
 

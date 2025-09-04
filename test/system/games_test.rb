@@ -12,15 +12,13 @@ class GamesTest < ApplicationSystemTestCase
     login_as(@user)
   end
 
-  # This test currently reflects the intended behavior, but the app is regressed
-  # and will likely fail (cannot select two players). Keeping as the desired spec.
-  test 'creating a new game (intended: two players including current user)' do
+  test 'creating a new game with two players from dashboard' do
     visit dashboard_path(locale: I18n.locale)
 
     click_on I18n.t('games.add')
     assert_selector 'h2', text: I18n.t('games.new.title')
 
-    # Assert two independent participation blocks exist (intended UI)
+    # Assert two independent participation blocks exist
     assert_selector '.participation-block', count: 2
 
     select @system.name, from: 'game_event[game_system_id]'
@@ -35,7 +33,7 @@ class GamesTest < ApplicationSystemTestCase
     select @faction.name, from: 'game_event[game_participations_attributes][0][faction_id]'
     select @faction.name, from: 'game_event[game_participations_attributes][1][faction_id]'
 
-    # Hidden user_id fields should exist for both participations (intended)
+    # Hidden user_id fields should exist for both participations
     assert_selector "input[name='game_event[game_participations_attributes][0][user_id]']", count: 1
     assert_selector "input[name='game_event[game_participations_attributes][1][user_id]']", count: 1
 
@@ -47,8 +45,7 @@ class GamesTest < ApplicationSystemTestCase
     assert_text I18n.t('games.create.success')
   end
 
-  # Reflect current regression: selecting only one player (opponent) shows validation error
-  test 'regression: cannot submit with only one selected player (current behavior)' do
+  test 'cannot submit with only one selected player' do
     visit dashboard_path(locale: I18n.locale)
 
     click_on I18n.t('games.add')
