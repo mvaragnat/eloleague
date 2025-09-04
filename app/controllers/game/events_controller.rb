@@ -12,7 +12,9 @@ module Game
 
     def new
       @game = Event.new
+      # Build two participations; preselect current user for the first slot
       @game.game_participations.build(user: Current.user)
+      @game.game_participations.build
     end
 
     def create

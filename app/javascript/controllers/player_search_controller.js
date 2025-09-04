@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "results", "selected", "container"]
-  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String }
+  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String, removable: Boolean }
 
   connect() {
     this.selectedPlayers = []
@@ -97,14 +97,17 @@ export default class extends Controller {
   }
 
   selectedPlayerTemplate(userId, username) {
+    const canRemove = this.hasRemovableValue ? this.removableValue : true
+    const removeButton = canRemove ? `
+        <button type="button"
+                data-action="click->player-search#removePlayer"
+                data-user-id="${userId}">×</button>
+      ` : ''
+
     return `
       <div class="selected-player" data-user-id="${userId}">
         <span><strong>${username}</strong></span>
-        <button type="button"
-                data-action="click->player-search#removePlayer"
-                data-user-id="${userId}">
-          ×
-        </button>
+        ${removeButton}
       </div>
     `
   }

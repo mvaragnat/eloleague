@@ -54,13 +54,13 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Password reset and change pages styled consistently with `AuthCardComponent` and localized texts
 
 ### Game Management
-- Create new games with multiple participants
+- Create new games with exactly two participants via a unified two-block form shared with Tournament Open matches
 - Real-time player search by username
 - Track game results (win/loss/draw)
 - Associate games with specific game systems
 - Display game history with participants and results
 - Use ViewComponent for modular game display
-- Exactly two players are required for each game (current user + one opponent). Front-end prevents submission and back-end validates this rule.
+- Exactly two players are required for each game. The form provides two independent player selectors; front-end prevents submission unless both players, scores, and factions are provided; back-end enforces the same validations.
 
 ### Factions System
 - Each game system can define multiple factions (e.g., White/Black for Chess, different armies for war games)
