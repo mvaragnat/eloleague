@@ -62,8 +62,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_05_071500) do
     t.datetime "updated_at", null: false
     t.boolean "elo_applied", default: false, null: false
     t.bigint "tournament_id"
+    t.boolean "non_competitive", default: false, null: false
     t.index ["elo_applied"], name: "index_game_events_on_elo_applied"
     t.index ["game_system_id"], name: "index_game_events_on_game_system_id"
+    t.index ["non_competitive"], name: "index_game_events_on_non_competitive"
     t.index ["played_at"], name: "index_game_events_on_played_at"
     t.index ["tournament_id"], name: "index_game_events_on_tournament_id"
   end
@@ -114,9 +116,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_05_071500) do
     t.datetime "updated_at", null: false
     t.bigint "parent_match_id"
     t.string "child_slot"
+    t.boolean "non_competitive", default: false, null: false
     t.index ["a_user_id"], name: "index_tournament_matches_on_a_user_id"
     t.index ["b_user_id"], name: "index_tournament_matches_on_b_user_id"
     t.index ["game_event_id"], name: "index_tournament_matches_on_game_event_id"
+    t.index ["non_competitive"], name: "index_tournament_matches_on_non_competitive"
     t.index ["parent_match_id"], name: "index_tournament_matches_on_parent_match_id"
     t.index ["tournament_id", "tournament_round_id"], name: "idx_on_tournament_id_tournament_round_id_e9fc8dbd6c"
     t.index ["tournament_id"], name: "index_tournament_matches_on_tournament_id"
@@ -168,9 +172,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_05_071500) do
     t.string "tiebreak1_strategy_key", default: "score_sum", null: false
     t.string "tiebreak2_strategy_key", default: "none", null: false
     t.boolean "require_army_list_for_check_in", default: false, null: false
+    t.boolean "non_competitive", default: false, null: false
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"
+    t.index ["non_competitive"], name: "index_tournaments_on_non_competitive"
     t.index ["slug"], name: "index_tournaments_on_slug", unique: true
   end
 
