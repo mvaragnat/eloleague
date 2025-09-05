@@ -19,5 +19,16 @@ module Tournament
 
     validates :result, inclusion: { in: RESULTS }
     validates :child_slot, inclusion: { in: %w[a b], allow_nil: true }
+
+    scope :competitive, -> { where(non_competitive: false) }
+    scope :non_competitive, -> { where(non_competitive: true) }
+
+    before_validation :copy_non_competitive_from_tournament, on: :create
+
+    private
+
+    def copy_non_competitive_from_tournament
+      self.non_competitive = tournament&.non_competitive || false
+    end
   end
 end

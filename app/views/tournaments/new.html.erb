@@ -36,6 +36,10 @@
           <%= f.label :require_army_list_for_check_in, t('tournaments.new.require_army_list_for_check_in', default: 'Require army list at check-in') %>
           <%= f.check_box :require_army_list_for_check_in %>
         </div>
+        <div>
+          <%= f.label :non_competitive, t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %>
+          <%= f.check_box :non_competitive %>
+        </div>
       </div>
       <div class="card-footer">
         <%= f.submit t('tournaments.new.create'), class: 'btn btn-primary' %>

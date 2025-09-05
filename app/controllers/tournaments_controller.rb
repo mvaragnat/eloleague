@@ -246,7 +246,7 @@ class TournamentsController < ApplicationController
     params.require(:tournament).permit(:name, :description, :game_system_id, :format, :rounds_count, :starts_at,
                                        :ends_at,
                                        :pairing_strategy_key, :tiebreak1_strategy_key, :tiebreak2_strategy_key,
-                                       :require_army_list_for_check_in)
+                                       :require_army_list_for_check_in, :non_competitive)
   end
 
   def can_register?

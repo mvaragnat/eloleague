@@ -3,6 +3,7 @@
 module Game
   class Event < ApplicationRecord
     belongs_to :game_system, class_name: 'Game::System'
+    belongs_to :tournament, class_name: 'Tournament::Tournament', optional: true
     has_many :game_participations,
              class_name: 'Game::Participation',
              foreign_key: 'game_event_id',
@@ -17,7 +18,11 @@ module Game
     validate :both_scores_present
     validate :both_factions_present
 
+    before_validation :apply_tournament_competitiveness, on: :create
     after_commit :enqueue_elo_update, on: :create
+
+    scope :competitive, -> { where(non_competitive: false) }
+    scope :non_competitive, -> { where(non_competitive: true) }
 
     def winner_user
       participations = game_participations.to_a
@@ -30,6 +35,11 @@ module Game
     end
 
     private
+
+    def apply_tournament_competitiveness
+      # Default events are competitive; copy tournament flag when present
+      self.non_competitive = tournament&.non_competitive || false
+    end
 
     def must_have_exactly_two_players
       return if game_participations.reject(&:marked_for_destruction?).size == 2

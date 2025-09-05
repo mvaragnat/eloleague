@@ -140,6 +140,7 @@ en:
       ends_at: "Ends at"
       datetime_placeholder: "YYYY-MM-DD HH:MM"
       require_army_list_for_check_in: "Require army list at check-in"
+      non_competitive: "Non-competitive (no Elo impact)"
     formats:
       open: "Open"
       swiss: "Swiss"

@@ -95,6 +95,21 @@ class TournamentBracketBuilderTest < ActiveSupport::TestCase
     assert_equal 0, bye_leafs
   end
 
+  test 'non-competitive tournament propagates flag to all created matches' do
+    t = Tournament::Tournament.create!(
+      name: 'NC', description: 'x', game_system: @system, format: :elimination, creator: @creator,
+      state: :registration, non_competitive: true
+    )
+    users = create_users(4)
+    register_users(t, users)
+
+    build_and_return_levels(t)
+
+    assert t.matches.any?
+    assert_equal 0, t.matches.where(non_competitive: false).count
+    assert_equal t.matches.count, t.matches.where(non_competitive: true).count
+  end
+
   test '33 players -> 64-size bracket, 31 byes, match counts, Elo bye' do
     t = build_tournament
     users = create_users(33)

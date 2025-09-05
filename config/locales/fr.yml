@@ -111,6 +111,7 @@ fr:
       ends_at: "Fin"
       datetime_placeholder: "AAAA-MM-JJ HH:MM"
       require_army_list_for_check_in: "Exiger une liste d'armée au check-in"
+      non_competitive: "Non-compétitif (sans impact Elo)"
     formats:
       open: "Open"
       swiss: "Suisse"

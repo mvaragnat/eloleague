@@ -41,12 +41,20 @@ module Tournament
                              alert: t('tournaments.unauthorized', default: 'Not authorized'))
       end
 
-      game = Game::Event.new(game_params.merge(played_at: Time.current, game_system: @tournament.game_system))
+      game = Game::Event.new(
+        game_params.merge(
+          played_at: Time.current,
+          game_system: @tournament.game_system,
+          tournament: @tournament,
+          non_competitive: @tournament.non_competitive
+        )
+      )
       if game.save
         match = @tournament.matches.create!(
           a_user_id: game.game_participations.first.user_id,
           b_user_id: game.game_participations.second.user_id,
           game_event: game,
+          non_competitive: @tournament.non_competitive,
           result: deduce_result(game.game_participations.first.score.to_i, game.game_participations.second.score.to_i)
         )
 
@@ -90,7 +98,9 @@ module Tournament
 
       event = Game::Event.new(
         game_system: @tournament.game_system,
-        played_at: Time.current
+        played_at: Time.current,
+        tournament: @tournament,
+        non_competitive: @tournament.non_competitive
       )
       a_reg = @tournament.registrations.find_by(user: @match.a_user)
       b_reg = @tournament.registrations.find_by(user: @match.b_user)
@@ -101,6 +111,7 @@ module Tournament
 
       if event.save
         @match.game_event = event
+        @match.non_competitive = @tournament.non_competitive
         @match.result = deduce_result(a_score.to_i, b_score.to_i)
         @match.save!
 

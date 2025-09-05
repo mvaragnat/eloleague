@@ -47,6 +47,26 @@ class TournamentMatchesControllerTest < ActionDispatch::IntegrationTest
     assert_equal 5, b.secondary_score
   end
 
+  test 'reported match in non-competitive tournament creates non-competitive game event' do
+    # Prepare elimination-like reporting in an open tournament
+    sign_out @tournament.creator
+    sign_in @tournament.creator
+    @tournament.update!(non_competitive: true, state: 'running')
+
+    r = @tournament.rounds.create!(number: 1, state: 'pending')
+    m = @tournament.matches.create!(round: r, a_user: @user, b_user: @opponent)
+
+    sign_out @tournament.creator
+    sign_in @user
+    patch tournament_tournament_match_path(@tournament, m, locale: I18n.locale),
+          params: { tournament_match: { a_score: 2, b_score: 1 } }
+    assert_redirected_to tournament_path(@tournament, locale: I18n.locale, tab: 1)
+    m.reload
+    assert m.game_event.present?
+    assert m.non_competitive
+    assert m.game_event.non_competitive
+  end
+
   test 'new preselects organizer as player A if also registered' do
     sign_out @tournament.creator
     sign_in @tournament.creator

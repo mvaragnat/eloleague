@@ -73,7 +73,7 @@ module Tournament
       (0...(leaf_slots.size / 2)).each do |i|
         a = leaf_slots[i * 2]
         b = leaf_slots[(i * 2) + 1]
-        matches << tournament.matches.create!(a_user: a, b_user: b)
+        matches << tournament.matches.create!(a_user: a, b_user: b, non_competitive: tournament.non_competitive)
       end
       matches
     end
@@ -84,7 +84,7 @@ module Tournament
       while prev_level.size > 1
         next_level = []
         prev_level.each_slice(2) do |left, right|
-          parent = tournament.matches.create!
+          parent = tournament.matches.create!(non_competitive: tournament.non_competitive)
           left&.update!(parent_match: parent, child_slot: 'a')
           right&.update!(parent_match: parent, child_slot: 'b')
           next_level << parent
