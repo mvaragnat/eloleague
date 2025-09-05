@@ -11,7 +11,7 @@ class AvoAuthIntegrationTest < ActionDispatch::IntegrationTest
 
   test 'admin can access avo after login' do
     admin = Admin.create!(email: 'admin@example.com', password: 'password123', password_confirmation: 'password123')
-    sign_in admin
+    sign_in admin, scope: :admin
     get '/avo'
     assert_response :redirect
     follow_redirect!
