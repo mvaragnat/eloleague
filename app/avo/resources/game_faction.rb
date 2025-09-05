@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+module Avo
+  module Resources
+    class GameFaction < Avo::BaseResource
+      self.model_class = ::Game::Faction
+      self.title = :name
+
+      def fields
+        field :id, as: :id
+        field :name, as: :text, required: true
+        field :game_system, as: :belongs_to, resource: Avo::Resources::GameSystem
+
+        field :game_participations, as: :has_many, resource: Avo::Resources::GameParticipation
+      end
+    end
+  end
+end
