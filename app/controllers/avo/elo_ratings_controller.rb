@@ -4,5 +4,3 @@ module Avo
   class EloRatingsController < Avo::ResourcesController
   end
 end
-
-

@@ -4,5 +4,3 @@ module Avo
   class EloChangesController < Avo::ResourcesController
   end
 end
-
-

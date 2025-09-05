@@ -4,5 +4,3 @@ module Avo
   class TournamentMatchesController < Avo::ResourcesController
   end
 end
-
-
