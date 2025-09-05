@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  mount_avo
   scope '(:locale)', locale: /en|fr/ do
     devise_for :users, controllers: { sessions: 'users/sessions' }
     root to: 'pages#home'
