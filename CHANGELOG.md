@@ -7,6 +7,14 @@
 
 - Feature — Admin tab now includes a Description editor available to the organizer for all tournament formats. Updates auto-save on blur via Stimulus and reflect immediately in the Overview tab. Localized in EN/FR.
 
+## 2025-09-05
+- Admin dashboard with Avo
+  - Added Devise-backed `Admin` model (login/logout only; no registrations or password flows)
+  - `/avo` restricted to authenticated admins via `authenticate :admin` in routes
+  - Avo configured to use `current_admin`, with sign-out pointing to `destroy_admin_session_path`
+  - Created resources for Game, Tournament, and Elo models; added corresponding Avo controllers
+  - Added integration test ensuring `/avo` is protected and accessible after admin login
+
 ## 2025-08-31
 
 - Feature — Army lists for games and tournaments. Optional army list per game participation; tournament registrations can include an army list. New tournament option to require army list at check-in. Army lists hidden before start (except organizer and owner); visible to all once running. UI uses modals; localized in EN/FR.

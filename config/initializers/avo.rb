@@ -18,9 +18,13 @@ Avo.configure do |config|
   end
 
   ## == Authentication ==
-  # config.current_user_method = :current_user
-  # config.authenticate_with do
-  # end
+  # Use Devise admin for Avo auth per docs
+  config.current_user_method = :current_admin
+  config.authenticate_with do
+    redirect_to Rails.application.routes.url_helpers.new_admin_session_path unless current_admin.present?
+  end
+  # Ensure the sidebar sign-out points to admin logout, not user logout
+  config.sign_out_path_name = :destroy_admin_session_path
 
   ## == Authorization ==
   # config.is_admin_method = :is_admin
