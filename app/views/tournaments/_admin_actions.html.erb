@@ -57,6 +57,7 @@
         </div>
       </div>
     </div>
+    <div class="card-body" style="display:grid; gap:0.5rem;">
     <div
       data-controller="strategy"
       data-strategy-update-url-value="<%= tournament_path(@tournament, tab: (@tournament.elimination? ? 2 : 3), locale: I18n.locale) %>"
@@ -70,6 +71,16 @@
                  data-field="require_army_list_for_check_in"
                  <%= 'checked' if @tournament.require_army_list_for_check_in %> />
           <span><%= @tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
+        </label>
+      </div>
+      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %></div>
+        <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+          <input type="checkbox"
+                 data-action="change->strategy#changed"
+                 data-field="non_competitive"
+                 <%= 'checked' if @tournament.non_competitive %> />
+          <span><%= @tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
         </label>
       </div>
     </div>

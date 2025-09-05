@@ -7,6 +7,8 @@
 
 - Feature — Admin tab now includes a Description editor available to the organizer for all tournament formats. Updates auto-save on blur via Stimulus and reflect immediately in the Overview tab. Localized in EN/FR.
 
+- 2025-09-05: Feature — Non-competitive tournaments. Organizer can toggle a tournament as non-competitive (default off). When enabled, tournament games do not affect ELO. Flag propagates to `Tournament::Match` and created `Game::Event` records. Added scopes and UI toggle (new and admin), and overview display. Localized EN/FR. Tests included.
+
 ## 2025-08-31
 
 - Feature — Army lists for games and tournaments. Optional army list per game participation; tournament registrations can include an army list. New tournament option to require army list at check-in. Army lists hidden before start (except organizer and owner); visible to all once running. UI uses modals; localized in EN/FR.

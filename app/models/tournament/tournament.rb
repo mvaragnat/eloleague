@@ -32,6 +32,9 @@ module Tournament
 
     validate :strategy_keys_are_known
 
+    scope :competitive, -> { where(non_competitive: false) }
+    scope :non_competitive, -> { where(non_competitive: true) }
+
     def registrations_open?
       state.in?(%w[draft registration])
     end
