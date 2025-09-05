@@ -9,13 +9,15 @@
     <% end %>
 
     <% if tournament.running? %>
-      <%# Only show next-round button section where relevant; open/swiss admin uses this, elimination too %>
-      <% if can_move_to_next_round %>
-        <%= button_to t('tournaments.show.move_to_next_round', default: 'Move to next round'), next_round_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
-      <% else %>
-        <button class="btn" disabled title="<%= move_block_reason %>"><%= t('tournaments.show.move_to_next_round', default: 'Move to next round') %></button>
-        <% if move_block_reason %>
-          <span class="card-date" style="font-style:normal;"><%= move_block_reason %></span>
+      <%# Only show next-round button section where relevant; only swiss admin need this %>
+      <% if tournament.swiss? %>
+        <% if can_move_to_next_round %>
+          <%= button_to t('tournaments.show.move_to_next_round', default: 'Move to next round'), next_round_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
+        <% else %>
+          <button class="btn" disabled title="<%= move_block_reason %>"><%= t('tournaments.show.move_to_next_round', default: 'Move to next round') %></button>
+          <% if move_block_reason %>
+            <span class="card-date" style="font-style:normal;"><%= move_block_reason %></span>
+          <% end %>
         <% end %>
       <% end %>
 

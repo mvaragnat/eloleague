@@ -52,10 +52,12 @@
           <strong><%= t('tournaments.new.require_army_list_for_check_in') %>:</strong>
           <%= tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %>
         </div>
-        <div class="card-date" style="font-style:normal;">
-          <strong><%= t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %>:</strong>
-          <%= tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %>
-        </div>
+        <% if tournament.non_competitive %>
+          <div class="card-date" style="font-style:normal;">
+            <strong><%= t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %>:</strong>
+            <%= tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
