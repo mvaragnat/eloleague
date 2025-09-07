@@ -57,5 +57,38 @@ module Elo
       assert_equal r1_after_first, r1_after_second
       assert_equal r2_after_first, r2_after_second
     end
+
+    test 'non-competitive tournament event does not update ratings and is marked applied' do
+      # Create a non-competitive tournament and an event attached to it
+      t = ::Tournament::Tournament.create!(
+        name: 'NC', description: 'no elo', creator: @user1, game_system: @system,
+        format: 'open', non_competitive: true
+      )
+
+      # Ensure factions exist for validations
+      event = Game::Event.new(game_system: @system, played_at: Time.current, tournament: t)
+      event.game_participations.build(user: @user1, score: 10, faction: @f1)
+      event.game_participations.build(user: @user2, score: 5, faction: @f2)
+      event.save!
+
+      # Seed ratings so we can assert no change
+      r1 = EloRating.find_or_create_by!(user: @user1, game_system: @system) do |r|
+        r.rating = 1200
+        r.games_played = 0
+      end
+      r2 = EloRating.find_or_create_by!(user: @user2, game_system: @system) do |r|
+        r.rating = 1200
+        r.games_played = 0
+      end
+
+      @updater.update_for_event(event)
+
+      r1.reload
+      r2.reload
+      assert_equal 1200, r1.rating
+      assert_equal 1200, r2.rating
+      assert_equal 0, EloChange.where(game_event: event).count
+      assert event.reload.elo_applied
+    end
   end
 end

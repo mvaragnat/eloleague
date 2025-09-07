@@ -1,11 +1,3 @@
-## 2025-09-02
-
-- 2025-09-04: Refactor New Game and Tournament Match forms to share participation fields partial; ensure New Game supports two-player entry and submission; add system test for dashboard game creation.
-
-- Feature — Tournament admin can toggle participant status (pending/checked-in) directly from the Participants tab, regardless of participant requirements (faction or army list). Tab state is now persisted in the URL via `?tab=` and preserved on redirects/updates, so you return to the same tab after actions. Localized labels added.
-- Feature — Open tournaments: when organizer clicks "Add game", they can now select Player A and Player B from participants. If the organizer is also registered, they are preselected as Player A by default (can be removed). Form uses Stimulus to select two players, validates factions and scores for both, and populates factions dynamically.
-
-- Feature — Admin tab now includes a Description editor available to the organizer for all tournament formats. Updates auto-save on blur via Stimulus and reflect immediately in the Overview tab. Localized in EN/FR.
 
 ## 2025-09-05
 - Admin dashboard with Avo
@@ -14,6 +6,17 @@
   - Avo configured to use `current_admin`, with sign-out pointing to `destroy_admin_session_path`
   - Created resources for Game, Tournament, and Elo models; added corresponding Avo controllers
   - Added integration test ensuring `/avo` is protected and accessible after admin login
+
+Feature — Non-competitive tournaments. Organizer can toggle a tournament as non-competitive (default off). When enabled, tournament games do not affect ELO. Flag propagates to `Tournament::Match` and created `Game::Event` records. Added scopes and UI toggle (new and admin), and overview display. Localized EN/FR. Tests included.
+
+## 2025-09-02
+
+- 2025-09-04: Refactor New Game and Tournament Match forms to share participation fields partial; ensure New Game supports two-player entry and submission; add system test for dashboard game creation.
+
+- Feature — Tournament admin can toggle participant status (pending/checked-in) directly from the Participants tab, regardless of participant requirements (faction or army list). Tab state is now persisted in the URL via `?tab=` and preserved on redirects/updates, so you return to the same tab after actions. Localized labels added.
+- Feature — Open tournaments: when organizer clicks "Add game", they can now select Player A and Player B from participants. If the organizer is also registered, they are preselected as Player A by default (can be removed). Form uses Stimulus to select two players, validates factions and scores for both, and populates factions dynamically.
+
+- Feature — Admin tab now includes a Description editor available to the organizer for all tournament formats. Updates auto-save on blur via Stimulus and reflect immediately in the Overview tab. Localized in EN/FR.
 
 ## 2025-08-31
 

@@ -55,5 +55,21 @@
         <%= t("tournaments.show.strategies.explanations.tiebreak.#{@tournament.tiebreak2_key}", default: t('tournaments.show.strategies.explanations.tiebreak.default')) %>
       </div>
     </div>
+
+    <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+      <div><%= t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %></div>
+      <div>
+        <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+          <input type="checkbox"
+                 data-action="change->strategy#changed"
+                 data-field="non_competitive"
+                 <%= 'checked' if @tournament.non_competitive %> />
+          <span><%= @tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
+        </label>
+      </div>
+      <div class="card-date">
+        <%= t('tournaments.show.strategies.explanations.tiebreak.default') %>
+      </div>
+    </div>
   </div>
 </div> 

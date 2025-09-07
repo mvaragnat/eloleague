@@ -79,6 +79,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Admin actions for the tournament creator: lock registration, generate pairings, close round, finalize
 - Tournament games integrate with Elo the same way as casual games
 
+#### Competitive vs Non-competitive Tournaments
+- Organizers can mark a tournament as non-competitive. Default is competitive.
+- When non-competitive, reported tournament games do not affect ELO.
+- The non-competitive flag is copied down to all `Tournament::Match` records and created `Game::Event` records.
+- Scopes exist to filter competitive vs non-competitive on tournaments, matches, and events.
+
 #### Admin Check-in Toggle & Tab Persistence
 - The organizer can toggle any participant status between `pending` and `checked_in` from the `Participants` tab, bypassing participant requirements (faction selection or army list submission). This is intended for day-of check-in adjustments.
 - The tournaments page persists the selected tab in the URL using the `tab` query parameter and keeps the same tab active after updates and redirects.

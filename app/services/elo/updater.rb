@@ -11,6 +11,12 @@ module Elo
     def update_for_event(event)
       return if event.elo_applied
 
+      # Skip Elo updates for non-competitive events, but mark as applied to avoid reprocessing
+      if event.respond_to?(:non_competitive) && event.non_competitive
+        event.update!(elo_applied: true)
+        return
+      end
+
       ActiveRecord::Base.transaction { process_event(event) }
     end
 
