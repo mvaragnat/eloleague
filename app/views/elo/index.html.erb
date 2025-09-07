@@ -58,6 +58,9 @@
           <div class="card-row">
             <div class="player">
               <%= a&.user&.username %>
+              <% if a&.faction %>
+                <div class="card-date"><%= a.faction.localized_name %></div>
+              <% end %>
               <% if a %>
                 <% ch = @elo_changes_map[[event.id, a.user_id]] %>
                 <% if ch %>
@@ -68,6 +71,9 @@
             <div class="score"><%= [a&.score, b&.score].compact.join(' - ') %></div>
             <div class="player" style="text-align: right;">
               <%= b&.user&.username %>
+              <% if b&.faction %>
+                <div class="card-date"><%= b.faction.localized_name %></div>
+              <% end %>
               <% if b %>
                 <% ch = @elo_changes_map[[event.id, b.user_id]] %>
                 <% if ch %>
