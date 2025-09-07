@@ -140,6 +140,13 @@ Standings award 1 point for a win and 0.5 for a draw. The ranking view lists pla
 - Stimulus for JavaScript functionality
 - Responsive design with Tailwind CSS 
 
+### Admin Dashboard (Avo)
+- Avo admin dashboard is mounted at `/avo` and is restricted to authenticated Admins only.
+- Authentication uses Devise `Admin` model (login/logout only; sign-up and password routes are disabled).
+- Avo reads the current admin via `current_admin` and redirects unauthenticated access to `/admins/sign_in`.
+- Sign-out link in Avo targets the Admin session destroy path.
+- See Avo authentication reference used for setup: Avo 3 Authentication.
+
 ### Footer & Contact
 - A global footer appears on all pages: "Made by Marquis with ❤️. A bug, a suggestion, a new game to add? Write me"
 - The "Write me" link opens a one-page contact form with subject and message fields

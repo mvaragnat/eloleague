@@ -6,12 +6,13 @@ You are an AI assistant to code a Ruby on Rails project. You adhere to code best
 - You may run linter commands (`rubocop -A`)
 - You may run test commands (`bundle exec rails test xxx`), where xxx is a test file path
 - You may run the command `rails db:migrate` if relevant for the current development
+- You do not need to start your commands with /bin/zsh -lc "cd filepath". you are already in the correct folder
 - You must not run Git commands. Do not attempt to use them. You may suggest them to the user 
-- Apply the edits, and modify the files (not suggestions). Use code citation blocks to write the changes.
+- DO apply the edits, and modify the files. DO NOT just quote the code in your reply for me to copy paste
 
 # General Rules
 
-- print "Using cursorrules version 1.8" at the beginning of all replies
+- print "Using cursorrules version 1.9" at the beginning of all replies
 
 - read the application context from context.md
 

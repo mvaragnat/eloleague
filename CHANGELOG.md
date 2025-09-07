@@ -1,3 +1,14 @@
+
+## 2025-09-05
+- Admin dashboard with Avo
+  - Added Devise-backed `Admin` model (login/logout only; no registrations or password flows)
+  - `/avo` restricted to authenticated admins via `authenticate :admin` in routes
+  - Avo configured to use `current_admin`, with sign-out pointing to `destroy_admin_session_path`
+  - Created resources for Game, Tournament, and Elo models; added corresponding Avo controllers
+  - Added integration test ensuring `/avo` is protected and accessible after admin login
+
+Feature — Non-competitive tournaments. Organizer can toggle a tournament as non-competitive (default off). When enabled, tournament games do not affect ELO. Flag propagates to `Tournament::Match` and created `Game::Event` records. Added scopes and UI toggle (new and admin), and overview display. Localized EN/FR. Tests included.
+
 ## 2025-09-02
 
 - 2025-09-04: Refactor New Game and Tournament Match forms to share participation fields partial; ensure New Game supports two-player entry and submission; add system test for dashboard game creation.
@@ -6,8 +17,6 @@
 - Feature — Open tournaments: when organizer clicks "Add game", they can now select Player A and Player B from participants. If the organizer is also registered, they are preselected as Player A by default (can be removed). Form uses Stimulus to select two players, validates factions and scores for both, and populates factions dynamically.
 
 - Feature — Admin tab now includes a Description editor available to the organizer for all tournament formats. Updates auto-save on blur via Stimulus and reflect immediately in the Overview tab. Localized in EN/FR.
-
-- 2025-09-05: Feature — Non-competitive tournaments. Organizer can toggle a tournament as non-competitive (default off). When enabled, tournament games do not affect ELO. Flag propagates to `Tournament::Match` and created `Game::Event` records. Added scopes and UI toggle (new and admin), and overview display. Localized EN/FR. Tests included.
 
 ## 2025-08-31
 
