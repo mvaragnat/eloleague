@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # Restrict Avo to authenticated admins only
+  authenticate :admin do
+    mount_avo
+  end
   scope '(:locale)', locale: /en|fr/ do
     devise_for :users, controllers: { sessions: 'users/sessions' }
+    devise_for :admins, skip: %i[registrations passwords], controllers: { sessions: 'devise/sessions' }
     root to: 'pages#home'
 
     # Devise handles sessions/registrations/passwords
