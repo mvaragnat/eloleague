@@ -30,4 +30,13 @@ class GameEventComponentTest < ViewComponent::TestCase
     assert_text @other_user.username
     assert_text opponent_participation.score.to_s
   end
+
+  test 'renders both players factions' do
+    render_inline(@component)
+    my_participation = @game.game_participations.find_by(user: @user)
+    opponent_participation = @game.game_participations.find_by(user: @other_user)
+
+    assert_text my_participation.faction.localized_name
+    assert_text opponent_participation.faction.localized_name
+  end
 end

@@ -61,6 +61,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Display game history with participants and results
 - Use ViewComponent for modular game display
 - Exactly two players are required for each game. The form provides two independent player selectors; front-end prevents submission unless both players, scores, and factions are provided; back-end enforces the same validations.
+- Game cards on the Dashboard and Elo pages display each player's faction (localized) beneath their username.
 
 ### Factions System
 - Each game system can define multiple factions (e.g., White/Black for Chess, different armies for war games)
@@ -106,12 +107,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 #### Elimination Bracket
 - On lock, elimination tournaments generate a full bracket tree using `Tournament::BracketBuilder` (Elo-based seeding, power-of-two sizing, byes to top seeds).
 - Tree is modeled via `Tournament::Match` with `parent_match_id` and `child_slot`.
-- Bracket UI renders from the tree; "Open" link appears only when both players are assigned and the viewer is a participant or the organizer.
+- Bracket UI renders from the tree; "Open" link appears only when both players are assigned and the user is eligible.
 
 #### Swiss/Open Tournaments
-Swiss/Open tournaments run in rounds. Closing a round validates all results and generates the next-round pairings from checked-in players (or all registrants if none are checked in). Pairings group players by current points and draw opponents within each group while avoiding repeats when possible. If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
+- Swiss/Open tournaments run in rounds. Closing a round validates all results and generates the next-round pairings from checked-in players (or all registrants if none are checked in). Pairings group players by current points and draw opponents within each group while avoiding repeats when possible. If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
 
-Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by points with tie-breakers applied. Tournament pages display primary scores prominently; secondary scores are shown compactly where appropriate (e.g., match detail and open format modal).
+- Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by points with tie-breakers applied. Tournament pages display primary scores prominently; secondary scores are shown compactly where appropriate (e.g., match detail and open format modal).
 
 #### Open match reporting
 - In Open format, the organizer (or any registered participant when allowed) can add games from the Matches panel. The modal now lets you select Player A and Player B from registered participants.

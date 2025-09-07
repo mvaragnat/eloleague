@@ -17,6 +17,9 @@ end %>
     <div class="card-row">
       <div class="player">
         <%= @current_user.username %>
+        <% if my&.faction %>
+          <div class="card-date"><%= my.faction.localized_name %></div>
+        <% end %>
         <% if my_change %>
           <div class="card-date">(<%= my_change.rating_before %> → <%= my_change.rating_after %>)</div>
         <% end %>
@@ -31,6 +34,9 @@ end %>
       </div>
       <div class="player" style="text-align: right;">
         <%= opp&.user&.username %>
+        <% if opp&.faction %>
+          <div class="card-date"><%= opp.faction.localized_name %></div>
+        <% end %>
         <% if opp_change %>
           <div class="card-date">(<%= opp_change.rating_before %> → <%= opp_change.rating_after %>)</div>
         <% end %>

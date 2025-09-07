@@ -1,3 +1,7 @@
+## 2025-09-07
+
+- Feature — Game cards on Dashboard and Elo pages now display each player's faction (localized). This provides more context alongside usernames, scores, and ELO changes.
+
 ## 2025-09-02
 
 - 2025-09-04: Refactor New Game and Tournament Match forms to share participation fields partial; ensure New Game supports two-player entry and submission; add system test for dashboard game creation.
@@ -5,7 +9,7 @@
 - Feature — Tournament admin can toggle participant status (pending/checked-in) directly from the Participants tab, regardless of participant requirements (faction or army list). Tab state is now persisted in the URL via `?tab=` and preserved on redirects/updates, so you return to the same tab after actions. Localized labels added.
 - Feature — Open tournaments: when organizer clicks "Add game", they can now select Player A and Player B from participants. If the organizer is also registered, they are preselected as Player A by default (can be removed). Form uses Stimulus to select two players, validates factions and scores for both, and populates factions dynamically.
 
-- Feature — Admin tab now includes a Description editor available to the organizer for all tournament formats. Updates auto-save on blur via Stimulus and reflect immediately in the Overview tab. Localized in EN/FR.
+- Feature — Admin tab now includes a Description editor available to the organizer for all tournament formats. Updates auto-save on blur via Stimulus and reflect immediately in the Overview tab. Localized EN/FR.
 
 - 2025-09-05: Feature — Non-competitive tournaments. Organizer can toggle a tournament as non-competitive (default off). When enabled, tournament games do not affect ELO. Flag propagates to `Tournament::Match` and created `Game::Event` records. Added scopes and UI toggle (new and admin), and overview display. Localized EN/FR. Tests included.
 
@@ -24,7 +28,6 @@
 - Add footer rendered on all pages with localized copy and link to a contact page
 - Display current user's email next to the logout link in the top navigation
 - Implement contact form (subject + message) sending an email via Gmail SMTP (ENV: `GMAIL_USERNAME`, `GMAIL_PASSWORD`, `CONTACT_TO_EMAIL`)
-- Localized contact UI in EN/FR, added basic validations
 
 # Changelog
 
@@ -62,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2025-08-13]
 - Swiss: Fix pairing to fill the top spot first when score groups are odd, preventing 2 vs 0 pairings when a 2 vs 1 and 1 vs 0 are possible.
 - Swiss: Implement deterministic bye assignment for odd participant counts (random among lowest points, avoid repeating same player), recorded as a free win and shown in UI.
-- Add tests covering the top-spot fill logic and bye behavior.
+- Tests for bracket builder with 5, 16, and 33 participants (match counts, byes, highest-Elo bye).
 
 ## [2025-08-10]
 
