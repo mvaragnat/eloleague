@@ -11,11 +11,13 @@ namespace :temp do
     tournament = Tournament::Tournament.find(15)
 
     User.limit(10).each do |user|
-      Tournament::Registration.create!(
-        tournament: tournament,
-        user: user,
-        status: 'pending'
-      ) unless tournament.registrations.where(user: user).exists?
+      unless tournament.registrations.exists?(user: user)
+        Tournament::Registration.create!(
+          tournament: tournament,
+          user: user,
+          status: 'pending'
+        )
+      end
 
       puts "Registered #{user.username} to tournament #{tournament.name}"
     end
