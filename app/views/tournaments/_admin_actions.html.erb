@@ -1,28 +1,30 @@
 <section>
-  <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
-    <%= t('tournaments.show.admin.actions', default: 'Actions') %>
-  </h3>
-  <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-    <% if tournament.registrations_open? %>
-      <span class="card-date" style="font-style:normal;"><%= t('tournaments.show.lock_warning') %></span>
-      <%= button_to t('tournaments.show.lock_registration'), lock_registration_tournament_path(tournament), method: :post, class: 'btn' %>
-    <% end %>
-
-    <% if tournament.running? %>
-      <%# Only show next-round button section where relevant; only swiss admin need this %>
-      <% if tournament.swiss? %>
-        <% if can_move_to_next_round %>
-          <%= button_to t('tournaments.show.move_to_next_round', default: 'Move to next round'), next_round_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
-        <% else %>
-          <button class="btn" disabled title="<%= move_block_reason %>"><%= t('tournaments.show.move_to_next_round', default: 'Move to next round') %></button>
-          <% if move_block_reason %>
-            <span class="card-date" style="font-style:normal;"><%= move_block_reason %></span>
-          <% end %>
-        <% end %>
+  <div class="card" style="margin-bottom:0.5rem;">
+    <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
+      <%= t('tournaments.show.admin.actions', default: 'Actions') %>
+    </h3>
+    <div class="card-body" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+      <% if tournament.registrations_open? %>
+        <span class="card-date" style="font-style:normal;"><%= t('tournaments.show.lock_warning') %></span>
+        <%= button_to t('tournaments.show.lock_registration'), lock_registration_tournament_path(tournament), method: :post, class: 'btn' %>
       <% end %>
 
-      <%= button_to t('tournaments.show.finalize'), finalize_tournament_path(tournament), method: :post, class: 'btn' %>
-    <% end %>
+      <% if tournament.running? %>
+        <%# Only show next-round button section where relevant; only swiss admin need this %>
+        <% if tournament.swiss? %>
+          <% if can_move_to_next_round %>
+            <%= button_to t('tournaments.show.move_to_next_round', default: 'Move to next round'), next_round_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
+          <% else %>
+            <button class="btn" disabled title="<%= move_block_reason %>"><%= t('tournaments.show.move_to_next_round', default: 'Move to next round') %></button>
+            <% if move_block_reason %>
+              <span class="card-date" style="font-style:normal;"><%= move_block_reason %></span>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <%= button_to t('tournaments.show.finalize'), finalize_tournament_path(tournament), method: :post, class: 'btn' %>
+      <% end %>
+    </div>
   </div>
 
 
@@ -71,65 +73,65 @@
                    style="width:100%;" />
           </div>
         </div>
+        
+        <div
+          data-controller="strategy"
+          data-strategy-update-url-value="<%= tournament_path(@tournament, tab: (@tournament.elimination? ? 3 : 4), locale: I18n.locale) %>"
+          data-strategy-saved-text-value="<%= t('tournaments.show.strategies.saved', default: 'Settings saved') %>"
+        >
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.require_army_list_for_check_in', default: 'Require army list at check-in') %></div>
+            <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+              <input type="checkbox"
+                     data-action="change->strategy#changed"
+                     data-field="require_army_list_for_check_in"
+                     <%= 'checked' if @tournament.require_army_list_for_check_in %> />
+              <span><%= @tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
+            </label>
+          </div>
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %></div>
+            <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+              <input type="checkbox"
+                     data-action="change->strategy#changed"
+                     data-field="non_competitive"
+                     <%= 'checked' if @tournament.non_competitive %> />
+              <span><%= @tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
+            </label>
+          </div>
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.online', default: 'Online tournament') %></div>
+            <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+              <input type="checkbox"
+                     data-action="change->strategy#changed"
+                     data-field="online"
+                     <%= 'checked' if @tournament.online %> />
+              <span><%= @tournament.online ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
+            </label>
+          </div>
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center; <%= @tournament.online ? 'display:none;' : '' %>">
+            <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.location', default: 'Location') %></div>
+            <input type="text"
+                   value="<%= @tournament.location %>"
+                   data-action="blur->strategy#changed"
+                   data-field="location"
+                   placeholder="<%= t('tournaments.new.location_placeholder', default: 'Enter address') %>"
+                   style="width:100%;" />
+          </div>
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.max_players', default: 'Max players') %></div>
+            <input type="number"
+                   value="<%= @tournament.max_players %>"
+                   min="1"
+                   data-action="blur->strategy#changed"
+                   data-field="max_players"
+                   placeholder="<%= t('tournaments.new.max_players_placeholder', default: 'No limit') %>"
+                   style="width:100%; max-width: 220px;" />
+          </div>
+        </div>
       </div>
     </div>
-    <div class="card-body" style="display:grid; gap:0.5rem;">
-    <div
-      data-controller="strategy"
-      data-strategy-update-url-value="<%= tournament_path(@tournament, tab: (@tournament.elimination? ? 2 : 3), locale: I18n.locale) %>"
-      data-strategy-saved-text-value="<%= t('tournaments.show.strategies.saved', default: 'Settings saved') %>"
-    >
-      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
-        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.require_army_list_for_check_in', default: 'Require army list at check-in') %></div>
-        <label style="display:inline-flex; align-items:center; gap:0.5rem;">
-          <input type="checkbox"
-                 data-action="change->strategy#changed"
-                 data-field="require_army_list_for_check_in"
-                 <%= 'checked' if @tournament.require_army_list_for_check_in %> />
-          <span><%= @tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
-        </label>
-      </div>
-      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
-        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %></div>
-        <label style="display:inline-flex; align-items:center; gap:0.5rem;">
-          <input type="checkbox"
-                 data-action="change->strategy#changed"
-                 data-field="non_competitive"
-                 <%= 'checked' if @tournament.non_competitive %> />
-          <span><%= @tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
-        </label>
-      </div>
-      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
-        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.online', default: 'Online tournament') %></div>
-        <label style="display:inline-flex; align-items:center; gap:0.5rem;">
-          <input type="checkbox"
-                 data-action="change->strategy#changed"
-                 data-field="online"
-                 <%= 'checked' if @tournament.online %> />
-          <span><%= @tournament.online ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
-        </label>
-      </div>
-      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center; <%= @tournament.online ? 'display:none;' : '' %>">
-        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.location', default: 'Location') %></div>
-        <input type="text"
-               value="<%= @tournament.location %>"
-               data-action="blur->strategy#changed"
-               data-field="location"
-               placeholder="<%= t('tournaments.new.location_placeholder', default: 'Enter address') %>"
-               style="width:100%;" />
-      </div>
-      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
-        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.max_players', default: 'Max players') %></div>
-        <input type="number"
-               value="<%= @tournament.max_players %>"
-               min="1"
-               data-action="blur->strategy#changed"
-               data-field="max_players"
-               placeholder="<%= t('tournaments.new.max_players_placeholder', default: 'No limit') %>"
-               style="width:100%; max-width: 220px;" />
-      </div>
-    </div>
-  </div>
+    
 </section>
 
 

@@ -1,3 +1,10 @@
+## 2025-09-10
+
+- Admin tab layout refined on tournament page:
+  - Grouped action buttons into an "Actions" card.
+  - Moved settings (Require army list at check-in, Non-competitive, Online tournament, Location, Max players) into the "Settings" card.
+  - Removed duplicate "Non-competitive (no Elo impact)" toggle from strategy settings.
+
 ## 2025-09-09
 - Tournaments: add optional `location` with Google Maps embed on Overview; add `online` toggle to hide location fields; add optional `max_players` with registration cap and UI messaging. Editable from Admin tab and creation form. Tests and i18n updated.
 ## 2025-09-07
