@@ -228,7 +228,8 @@ fr:
     my_current_rankings: "Mes classements ELO actuels"
     standings: "Classement"
     player: "Joueur"
-    rating: "Cote"
+    rating: "Classement"
+    count: "Nombre de parties"
     select_system: "Sélectionner un système"
   time:
     formats:

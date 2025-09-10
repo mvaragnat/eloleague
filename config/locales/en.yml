@@ -260,6 +260,7 @@ en:
     standings: "Standings"
     player: "Player"
     rating: "Rating"
+    count: "Games count"
     select_system: "Select a system"
   time:
     formats:
