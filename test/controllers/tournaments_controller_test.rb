@@ -282,6 +282,30 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/\b#{Regexp.escape(I18n.t('tournaments.show.register'))}\b/, @response.body)
   end
 
+  test 'registration blocked when max_players reached' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Capped', description: 'X', game_system_id: game_systems(:chess).id,
+        format: 'open', max_players: 1
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    # First user registers OK
+    post register_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 2)
+
+    # Second user cannot register
+    sign_out @user
+    sign_in users(:player_two)
+    post register_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+
+    get tournament_path(t, locale: I18n.locale)
+    assert_includes @response.body, I18n.t('tournaments.full', default: 'Tournament is full')
+  end
+
   test 'next_round generates pairings and blocks when pending matches exist' do
     # Sign in and create a swiss tournament
     sign_in @user

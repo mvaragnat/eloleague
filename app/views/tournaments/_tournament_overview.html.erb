@@ -1,8 +1,11 @@
-<div class="card">
+<div class="card" style="margin-bottom:0.5rem;">
+  <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
+    <%= t('tournaments.show.info', default: 'Info') %>
+  </h3>
   <div class="card-body" style="display:grid; gap:0.75rem;">
     <div>
       <div style="font-weight:600;">
-        Jeu : <%= @tournament.game_system.localized_name %></span>
+        <%= t('tournaments.new.game_system', default: 'Game system') %> : <%= @tournament.game_system.localized_name %></span>
       </div>
     </div>
 
@@ -19,13 +22,41 @@
       </div>
     <% end %>
 
-
     <div>
       <div style="font-weight:600;">
-        Format : <%= @tournament.format %></span>
+        <%= t('tournaments.new.format', default: 'Format') %> : <%= @tournament.format %></span>
       </div>
     </div>
 
+    <% if tournament.online %>
+      <div>
+        <div class="card-date" style="font-style:normal; font-weight:600;">
+          <%= t('tournaments.show.online_label', default: 'Online tournament') %>
+        </div>
+      </div>
+    <% elsif tournament.location.present? %>
+      <div>
+        <div class="card-date" style="font-style:normal; font-weight:600;"><%= t('tournaments.new.location', default: 'Location') %></div>
+        <div><%= tournament.location %></div>
+      </div>
+      <div>
+        <iframe
+          title="map"
+          style="border:0; width:100%; height:200px; border-radius:0.5rem;"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          src="https://www.google.com/maps?q=<%= ERB::Util.url_encode(tournament.location) %>&output=embed">
+        </iframe>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card">
+  <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
+    <%= t('tournaments.show.settings', default: 'Settings') %>
+  </h3>
+  <div class="card-body" style="display:grid; gap:0.75rem;">
     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:0.5rem;">
       <div class="card-date" style="font-style:normal;">
         <strong><%= t('tournaments.new.starts_at') %>:</strong>
@@ -37,28 +68,31 @@
       </div>
     </div>
 
-    <div>
-      <div class="card-date" style="font-style:normal; font-weight:600;"><%= t('tournaments.show.settings', default: 'Settings') %></div>
-      <div style="display:flex; flex-direction:column; gap:0.25rem;">
-        <div class="card-date" style="font-style:normal;">
-          <strong><%= t('tournaments.show.strategies.tiebreak1', default: 'Tie-break #1') %>:</strong>
-          <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: @tiebreak1_label) %>
-        </div>
-        <div class="card-date" style="font-style:normal;">
-          <strong><%= t('tournaments.show.strategies.tiebreak2', default: 'Tie-break #2') %>:</strong>
-          <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: @tiebreak2_label) %>
-        </div>
-        <div class="card-date" style="font-style:normal;">
-          <strong><%= t('tournaments.new.require_army_list_for_check_in') %>:</strong>
-          <%= tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %>
-        </div>
-        <% if tournament.non_competitive %>
-          <div class="card-date" style="font-style:normal;">
-            <strong><%= t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %>:</strong>
-            <%= tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %>
-          </div>
-        <% end %>
+    <div style="display:flex; flex-direction:column; gap:0.25rem;">
+      <div class="card-date" style="font-style:normal;">
+        <strong><%= t('tournaments.show.strategies.tiebreak1', default: 'Tie-break #1') %>:</strong>
+        <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: @tiebreak1_label) %>
       </div>
+      <div class="card-date" style="font-style:normal;">
+        <strong><%= t('tournaments.show.strategies.tiebreak2', default: 'Tie-break #2') %>:</strong>
+        <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: @tiebreak2_label) %>
+      </div>
+      <div class="card-date" style="font-style:normal;">
+        <strong><%= t('tournaments.new.require_army_list_for_check_in') %>:</strong>
+        <%= tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %>
+      </div>
+      <% if tournament.non_competitive %>
+        <div class="card-date" style="font-style:normal;">
+          <strong><%= t('tournaments.new.non_competitive', default: 'Non-competitive (no Elo impact)') %>:</strong>
+          <%= tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %>
+        </div>
+      <% end %>
+      <% if tournament.max_players.present? %>
+        <div class="card-date" style="font-style:normal;">
+          <strong><%= t('tournaments.new.max_players', default: 'Max players') %>:</strong>
+          <%= tournament.max_players %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

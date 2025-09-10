@@ -19,6 +19,9 @@ module Avo
         field :ends_at, as: :date_time
         field :state, as: :text
         field :require_army_list_for_check_in, as: :boolean
+        field :online, as: :boolean
+        field :location, as: :text
+        field :max_players, as: :number
         field :pairing_strategy_key, as: :text
         field :tiebreak1_strategy_key, as: :text
         field :tiebreak2_strategy_key, as: :text

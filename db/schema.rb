@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_05_071500) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_09_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -173,10 +173,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_05_071500) do
     t.string "tiebreak2_strategy_key", default: "none", null: false
     t.boolean "require_army_list_for_check_in", default: false, null: false
     t.boolean "non_competitive", default: false, null: false
+    t.string "location"
+    t.boolean "online", default: false, null: false
+    t.integer "max_players"
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"
     t.index ["non_competitive"], name: "index_tournaments_on_non_competitive"
+    t.index ["online"], name: "index_tournaments_on_online"
     t.index ["slug"], name: "index_tournaments_on_slug", unique: true
   end
 

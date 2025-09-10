@@ -29,6 +29,7 @@ module Tournament
     validates :name, presence: true
     validates :format, presence: true
     validates :rounds_count, numericality: { greater_than: 0 }, allow_nil: true
+    validates :max_players, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
 
     validate :strategy_keys_are_known
 
@@ -37,6 +38,12 @@ module Tournament
 
     def registrations_open?
       state.in?(%w[draft registration])
+    end
+
+    def registration_full?
+      return false if max_players.blank?
+
+      registrations.count >= max_players
     end
 
     def state_label

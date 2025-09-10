@@ -11,12 +11,16 @@
     <% end %>
     <%= button_to t('tournaments.show.unregister'), unregister_tournament_path(tournament), method: :delete, class: 'btn' %>
   <% elsif tournament.registrations_open? %>
+    <% if tournament.registration_full? %>
+      <p class="card-date" style="color:#b45309;"><%= t('tournaments.full', default: 'Tournament is full') %></p>
+    <% else %>
     <% if authenticated? %>
       <%= button_to t('tournaments.show.register'), register_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
     <% else %>
       <p class="card-date">
         <%= t('tournaments.show.sign_in_to_register_html', default: 'Please <a href="%{url}">sign in</a> to register.', url: new_user_session_path(locale: I18n.locale)) %>
       </p>
+    <% end %>
     <% end %>
   <% end %>
 </div>

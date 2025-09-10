@@ -1,3 +1,13 @@
+## 2025-09-10
+
+- Admin tab layout refined on tournament page:
+  - Grouped action buttons into an "Actions" card.
+  - Moved settings (Require army list at check-in, Non-competitive, Online tournament, Location, Max players) into the "Settings" card.
+  - Removed duplicate "Non-competitive (no Elo impact)" toggle from strategy settings.
+  - Overview tab now mirrors Admin: split into "Info" (status, description, format, localization) and "Settings" (dates, tie-breaks, army list requirement, non-competitive, max players).
+
+## 2025-09-09
+- Tournaments: add optional `location` with Google Maps embed on Overview; add `online` toggle to hide location fields; add optional `max_players` with registration cap and UI messaging. Editable from Admin tab and creation form. Tests and i18n updated.
 ## 2025-09-07
 
 - Feature — Game cards on Dashboard and Elo pages now display each player's faction (localized). This provides more context alongside usernames, scores, and ELO changes.
