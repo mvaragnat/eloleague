@@ -24,7 +24,7 @@
 
     <div>
       <div style="font-weight:600;">
-        <%= t('tournaments.new.format', default: 'Format') %> : <%= @tournament.format %></span>
+        <%= t('tournaments.new.format', default: 'Format') %> : <%= t("tournaments.formats.#{@tournament.format}", default: @tournament.format.to_s.humanize) %></span>
       </div>
     </div>
 

@@ -203,8 +203,6 @@ fr:
       settings: "Paramètres"
       online_label: "Tournoi en ligne"
     full: "Le tournoi est complet"
-    show:
-      online_label: "Tournoi en ligne"
     state:
       draft: "Brouillon"
       registration: "Inscriptions"
@@ -234,5 +232,5 @@ fr:
     select_system: "Sélectionner un système"
   time:
     formats:
-      long: "%Y-%m-%d %H:%M:%S"
+      long: "Le %d/%m/%Y à %Hh%M"
       card: "%d/%m/%Y"

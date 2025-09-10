@@ -263,5 +263,5 @@ en:
     select_system: "Select a system"
   time:
     formats:
-      long: "%Y-%m-%d %H:%M:%S"
+      long: "%d/%m/%Y at %H:%M"
       card: "%d/%m/%Y"
