@@ -1,6 +1,6 @@
 <div class="tournament-container">
   <h1><%= @tournament.name %></h1>
-  <p class="card-date"><%= @tournament.game_system.localized_name %> · <%= @tournament.format %> · <strong><%= @tournament.state_label %></strong></p>
+  <p class="card-date"><%= @tournament.game_system.localized_name %> · <%= t("tournaments.formats.#{@tournament.format}", default: @tournament.format.to_s.humanize) %> · <strong><%= @tournament.state_label %></strong></p>
   <p class="card-date"><%= t('tournaments.show.organizer', default: 'Organizer') %>: <%= @tournament.creator.username %></p>
 
   <%= render 'registration_actions', tournament: @tournament, is_registered: @is_registered, my_registration: @my_registration %>
