@@ -203,6 +203,8 @@ fr:
       settings: "Paramètres"
       online_label: "Tournoi en ligne"
     full: "Le tournoi est complet"
+    show:
+      online_label: "Tournoi en ligne"
     state:
       draft: "Brouillon"
       registration: "Inscriptions"
