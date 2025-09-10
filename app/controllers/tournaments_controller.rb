@@ -76,6 +76,13 @@ class TournamentsController < ApplicationController
       )
     end
 
+    if @tournament.registration_full?
+      return redirect_back(
+        fallback_location: tournament_path(@tournament),
+        alert: t('tournaments.full', default: 'Tournament is full')
+      )
+    end
+
     @tournament.registrations.find_or_create_by!(user: Current.user)
     # Participants tab index shifts by +1 due to new Overview tab
     redirect_to tournament_path(@tournament, tab: 2),
@@ -246,7 +253,8 @@ class TournamentsController < ApplicationController
     params.require(:tournament).permit(:name, :description, :game_system_id, :format, :rounds_count, :starts_at,
                                        :ends_at,
                                        :pairing_strategy_key, :tiebreak1_strategy_key, :tiebreak2_strategy_key,
-                                       :require_army_list_for_check_in, :non_competitive)
+                                       :require_army_list_for_check_in, :non_competitive,
+                                       :location, :online, :max_players)
   end
 
   def can_register?

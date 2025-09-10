@@ -1,3 +1,5 @@
+## 2025-09-09
+- Tournaments: add optional `location` with Google Maps embed on Overview; add `online` toggle to hide location fields; add optional `max_players` with registration cap and UI messaging. Editable from Admin tab and creation form. Tests and i18n updated.
 ## 2025-09-07
 
 - Feature — Game cards on Dashboard and Elo pages now display each player's faction (localized). This provides more context alongside usernames, scores, and ELO changes.

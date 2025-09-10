@@ -103,6 +103,12 @@ fr:
       create: "Créer un nouveau tournoi"
       title: "Nouveau tournoi"
       name: "Nom"
+      location: "Lieu"
+      location_placeholder: "Saisir une adresse"
+      online: "Tournoi en ligne"
+      online_hint: "Si coché, pas de lieu physique"
+      max_players: "Nombre max de joueurs"
+      max_players_placeholder: "Sans limite"
       description: "Description"
       game_system: "Système de jeu"
       format: "Format"
@@ -195,6 +201,10 @@ fr:
         toggle_status_to_pending: "Marquer en attente"
       type: "Tournoi"
       settings: "Paramètres"
+      online_label: "Tournoi en ligne"
+    full: "Le tournoi est complet"
+    show:
+      online_label: "Tournoi en ligne"
     state:
       draft: "Brouillon"
       registration: "Inscriptions"

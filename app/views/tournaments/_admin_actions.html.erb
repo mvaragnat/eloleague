@@ -57,6 +57,20 @@
                     data-field="description"
                     style="width:100%;"><%= @tournament.description %></textarea>
         </div>
+        <div data-controller="strategy"
+             data-strategy-update-url-value="<%= tournament_path(@tournament, tab: (@tournament.elimination? ? 3 : 4), locale: I18n.locale) %>"
+             data-strategy-saved-text-value="<%= t('tournaments.show.strategies.saved', default: 'Settings saved') %>">
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="card-date" style="font-style:normal;">
+              <%= t('tournaments.new.name') %>
+            </div>
+            <input type="text"
+                   value="<%= @tournament.name %>"
+                   data-action="blur->strategy#changed"
+                   data-field="name"
+                   style="width:100%;" />
+          </div>
+        </div>
       </div>
     </div>
     <div class="card-body" style="display:grid; gap:0.5rem;">
@@ -84,6 +98,35 @@
                  <%= 'checked' if @tournament.non_competitive %> />
           <span><%= @tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
         </label>
+      </div>
+      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.online', default: 'Online tournament') %></div>
+        <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+          <input type="checkbox"
+                 data-action="change->strategy#changed"
+                 data-field="online"
+                 <%= 'checked' if @tournament.online %> />
+          <span><%= @tournament.online ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
+        </label>
+      </div>
+      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center; <%= @tournament.online ? 'display:none;' : '' %>">
+        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.location', default: 'Location') %></div>
+        <input type="text"
+               value="<%= @tournament.location %>"
+               data-action="blur->strategy#changed"
+               data-field="location"
+               placeholder="<%= t('tournaments.new.location_placeholder', default: 'Enter address') %>"
+               style="width:100%;" />
+      </div>
+      <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+        <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.max_players', default: 'Max players') %></div>
+        <input type="number"
+               value="<%= @tournament.max_players %>"
+               min="1"
+               data-action="blur->strategy#changed"
+               data-field="max_players"
+               placeholder="<%= t('tournaments.new.max_players_placeholder', default: 'No limit') %>"
+               style="width:100%; max-width: 220px;" />
       </div>
     </div>
   </div>

@@ -9,6 +9,19 @@
           <%= f.text_field :name, required: true %>
         </div>
         <div>
+          <label class="card-date" style="font-style:normal; font-weight:600;">
+            <%= t('tournaments.new.online', default: 'Online tournament') %>
+          </label>
+          <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+            <%= f.check_box :online, data: { action: 'change->tournament-form#toggleOnline' } %>
+            <span><%= t('tournaments.new.online_hint', default: 'If checked, no physical location') %></span>
+          </label>
+        </div>
+        <div data-tournament-form-target="locationBlock">
+          <%= f.label :location, t('tournaments.new.location', default: 'Location') %>
+          <%= f.text_field :location, placeholder: t('tournaments.new.location_placeholder', default: 'Enter address'), data: { controller: 'place-autocomplete' } %>
+        </div>
+        <div>
           <%= f.label :description, t('tournaments.new.description') %>
           <%= f.text_area :description, rows: 3 %>
         </div>
@@ -23,6 +36,10 @@
         <div data-tournament-form-target="rounds" style="display:none;">
           <%= f.label :rounds_count, t('tournaments.new.rounds_count') %>
           <%= f.number_field :rounds_count, min: 1 %>
+        </div>
+        <div>
+          <%= f.label :max_players, t('tournaments.new.max_players', default: 'Max players') %>
+          <%= f.number_field :max_players, min: 1, placeholder: t('tournaments.new.max_players_placeholder', default: 'No limit') %>
         </div>
         <div>
           <%= f.label :starts_at, t('tournaments.new.starts_at') %>
