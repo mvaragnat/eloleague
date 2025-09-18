@@ -168,7 +168,8 @@ module ApplicationHelper
       b_style = pb&.score.to_i > pa&.score.to_i ? 'font-weight:700; fill:#16a34a;' : ''
       score_text = "#{pa&.score} - #{pb&.score}"
       # For open format listing, we may show secondary below or omit to reduce clutter. Keep compact here.
-      link = nil
+      both_present = match.a_user_id.present? && match.b_user_id.present?
+      link = admin && both_present ? tournament_tournament_match_path(tournament, match) : nil
     else
       a_style = ''
       b_style = ''

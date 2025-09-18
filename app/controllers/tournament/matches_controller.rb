@@ -116,7 +116,14 @@ module Tournament
                                           faction: b_reg&.faction)
         end
 
-        if event.save
+        # Persist participants explicitly to avoid relying on autosave
+        if ActiveRecord::Base.transaction do
+             # Save parts if they exist; if they were rebuilt, saving event will persist them
+             a_part&.save!
+             b_part&.save!
+             event.save!
+             true
+           end
           @match.non_competitive = @tournament.non_competitive
           @match.result = deduce_result(a_score.to_i, b_score.to_i)
           @match.save!

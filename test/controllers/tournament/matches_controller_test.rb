@@ -274,7 +274,9 @@ module Tournament
       event.game_participations.build(user: parent.a_user, score: 2,
                                       faction: t.registrations.find_by(user: parent.a_user)&.faction)
       # Parent might not have b_user yet; use a second participant or mirror if nil
-      opp = parent.b_user || [@p2, @p3, t.creator, leaf.b_user, leaf.a_user].compact.uniq.find { |u| u != parent.a_user }
+      opp = parent.b_user || [@p2, @p3, t.creator, leaf.b_user, leaf.a_user].compact.uniq.find do |u|
+        u != parent.a_user
+      end
       event.game_participations.build(user: opp, score: 0,
                                       faction: t.registrations.find_by(user: opp)&.faction)
       assert event.save!, event.errors.full_messages.to_sentence
