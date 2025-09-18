@@ -33,6 +33,7 @@ fr:
       fr: "Français"
     shared:
       cancel: "Annuler"
+      save: "Enregistrer"
   yes: "Oui"
   no: "Non"
   footer:
@@ -212,6 +213,7 @@ fr:
     not_allowed_state: "Action non autorisée dans l'état actuel"
     draw_not_allowed: "Match nul interdit en élimination"
     cannot_advance_pending: "Tous les matchs doivent être terminés pour passer à la ronde suivante"
+    match_updated: "Match mis à jour"
     faction_required_hint: "Veuillez sélectionner votre faction dans l'onglet Participants avant le check-in."
     faction_required_to_check_in: "Veuillez sélectionner votre faction avant l'enregistrement"
     army_list_required_hint: "La liste d'armée est requise pour le check-in"

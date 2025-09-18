@@ -28,6 +28,34 @@
           </div>
           <div class="player" style="text-align:right; <%= b.score > a.score ? 'color: var(--green-500); font-weight:700;' : '' %>"><%= @match.b_user.username %></div>
         </div>
+        <% if Current.user && @tournament.creator_id == Current.user.id %>
+          <div style="margin-top:1rem; border-top:1px solid var(--gray-200); padding-top:1rem;">
+            <%= form_with model: @match, url: tournament_tournament_match_path(@tournament, @match), method: :patch do |f| %>
+              <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0.75rem; align-items:center;">
+                <div>
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.a_user.username %></label>
+                  <%= number_field_tag 'tournament_match[a_score]', a.score, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
+                  <div style="margin-top:0.25rem;">
+                    <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
+                    <%= number_field_tag 'tournament_match[a_secondary_score]', a.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                  </div>
+                </div>
+                <div style="text-align:center; font-weight:700; font-size:1.25rem;">vs</div>
+                <div>
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.b_user.username %></label>
+                  <%= number_field_tag 'tournament_match[b_score]', b.score, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
+                  <div style="margin-top:0.25rem;">
+                    <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
+                    <%= number_field_tag 'tournament_match[b_secondary_score]', b.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:0.75rem;">
+                <%= f.submit t('layouts.shared.save', default: 'Save'), class: 'btn btn-primary' %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
       <% else %>
         <%= form_with model: @match, url: tournament_tournament_match_path(@tournament, @match), method: :patch do |f| %>
           <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0.75rem; align-items:center;">

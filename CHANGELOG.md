@@ -1,3 +1,10 @@
+## 2025-09-18
+
+- Tournament: organizers can edit reported matches
+  - Editing updates the existing Game::Event (no new Elo application)
+  - Swiss: existing generated next-round pairings remain unchanged
+  - Elimination: parent assignment updates only if the next match has not been played
+
 ## 2025-09-10
 
 - Admin tab layout refined on tournament page:

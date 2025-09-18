@@ -96,33 +96,68 @@ module Tournament
         return render :show, status: :unprocessable_content
       end
 
-      event = Game::Event.new(
-        game_system: @tournament.game_system,
-        played_at: Time.current,
-        tournament: @tournament,
-        non_competitive: @tournament.non_competitive
-      )
-      a_reg = @tournament.registrations.find_by(user: @match.a_user)
-      b_reg = @tournament.registrations.find_by(user: @match.b_user)
-      event.game_participations.build(user: @match.a_user, score: a_score, secondary_score: a_secondary,
-                                      faction: a_reg&.faction)
-      event.game_participations.build(user: @match.b_user, score: b_score, secondary_score: b_secondary,
-                                      faction: b_reg&.faction)
+      if @match.game_event.present?
+        # Edit existing event (do not create a new one) so Elo is unaffected
+        event = @match.game_event
+        a_part = event.game_participations.find_by(user: @match.a_user)
+        b_part = event.game_participations.find_by(user: @match.b_user)
 
-      if event.save
-        @match.game_event = event
-        @match.non_competitive = @tournament.non_competitive
-        @match.result = deduce_result(a_score.to_i, b_score.to_i)
-        @match.save!
+        # Fallback in case of historical inconsistencies
+        if a_part && b_part
+          a_part.assign_attributes(score: a_score, secondary_score: a_secondary)
+          b_part.assign_attributes(score: b_score, secondary_score: b_secondary)
+        else
+          event.game_participations.destroy_all
+          a_reg = @tournament.registrations.find_by(user: @match.a_user)
+          b_reg = @tournament.registrations.find_by(user: @match.b_user)
+          event.game_participations.build(user: @match.a_user, score: a_score, secondary_score: a_secondary,
+                                          faction: a_reg&.faction)
+          event.game_participations.build(user: @match.b_user, score: b_score, secondary_score: b_secondary,
+                                          faction: b_reg&.faction)
+        end
 
-        propagate_winner_to_parent!(@match)
+        if event.save
+          @match.non_competitive = @tournament.non_competitive
+          @match.result = deduce_result(a_score.to_i, b_score.to_i)
+          @match.save!
 
-        # After reporting, redirect to Rounds/Matches tab (index 1 due to Overview at 0)
-        redirect_to tournament_path(@tournament, tab: 1),
-                    notice: t('tournaments.match_updated', default: 'Match updated')
+          propagate_winner_to_parent!(@match)
+
+          redirect_to tournament_path(@tournament, tab: 1),
+                      notice: t('tournaments.match_updated', default: 'Match updated')
+        else
+          flash.now[:alert] = event.errors.full_messages.to_sentence
+          render :show, status: :unprocessable_content
+        end
       else
-        flash.now[:alert] = event.errors.full_messages.to_sentence
-        render :show, status: :unprocessable_content
+        event = Game::Event.new(
+          game_system: @tournament.game_system,
+          played_at: Time.current,
+          tournament: @tournament,
+          non_competitive: @tournament.non_competitive
+        )
+        a_reg = @tournament.registrations.find_by(user: @match.a_user)
+        b_reg = @tournament.registrations.find_by(user: @match.b_user)
+        event.game_participations.build(user: @match.a_user, score: a_score, secondary_score: a_secondary,
+                                        faction: a_reg&.faction)
+        event.game_participations.build(user: @match.b_user, score: b_score, secondary_score: b_secondary,
+                                        faction: b_reg&.faction)
+
+        if event.save
+          @match.game_event = event
+          @match.non_competitive = @tournament.non_competitive
+          @match.result = deduce_result(a_score.to_i, b_score.to_i)
+          @match.save!
+
+          propagate_winner_to_parent!(@match)
+
+          # After reporting, redirect to Rounds/Matches tab (index 1 due to Overview at 0)
+          redirect_to tournament_path(@tournament, tab: 1),
+                      notice: t('tournaments.match_updated', default: 'Match updated')
+        else
+          flash.now[:alert] = event.errors.full_messages.to_sentence
+          render :show, status: :unprocessable_content
+        end
       end
     end
 
@@ -148,7 +183,13 @@ module Tournament
       parent = match.parent_match
       return unless parent
 
-      winner_user = match.result == 'a_win' ? match.a_user : match.b_user
+      # Do not change bracket if the next match has already been played
+      return if parent.game_event.present? || parent.result != 'pending'
+
+      winner_user = case match.result
+                    when 'a_win' then match.a_user
+                    when 'b_win' then match.b_user
+                    end
       return unless winner_user
 
       if match.child_slot == 'a'
