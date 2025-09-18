@@ -116,6 +116,13 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 - Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by points with tie-breakers applied. Tournament pages display primary scores prominently; secondary scores are shown compactly where appropriate (e.g., match detail and open format modal).
 
+#### Pairing swap (Swiss & Elimination)
+- The tournament organizer can adjust pairings for unplayed matches directly from the match page.
+- For Swiss, eligible swap targets are players from other unreported matches within the same round.
+- For Elimination, eligible swap targets are players from other unreported matches at the same depth level in the bracket (i.e., same round of the tree).
+- Swapping is symmetric: selecting a player in the dropdown performs a swap between the two affected matches.
+- Security/validation: only the organizer can swap; only pending matches are eligible; swaps are constrained to the same round/depth.
+
 #### Open match reporting
 - In Open format, the organizer (or any registered participant when allowed) can add games from the Matches panel. The modal now lets you select Player A and Player B from registered participants.
 - If the organizer is also a registered participant, they are preselected as Player A by default but can be removed to enter a different pairing.
