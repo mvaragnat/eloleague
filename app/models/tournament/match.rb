@@ -30,5 +30,29 @@ module Tournament
     def copy_non_competitive_from_tournament
       self.non_competitive = tournament&.non_competitive || false
     end
+
+    public
+
+    # Update the parent match's participant based on this match's result.
+    # No-op if the parent already has a played/recorded result.
+    def propagate_winner_to_parent!
+      parent = parent_match
+      return unless parent
+
+      # Do not change bracket if the next match has already been played
+      return if parent.game_event.present? || parent.result != 'pending'
+
+      winner_user = case result
+                    when 'a_win' then a_user
+                    when 'b_win' then b_user
+                    end
+      return unless winner_user
+
+      if child_slot == 'a'
+        parent.update!(a_user_id: winner_user.id)
+      elsif child_slot == 'b'
+        parent.update!(b_user_id: winner_user.id)
+      end
+    end
   end
 end
