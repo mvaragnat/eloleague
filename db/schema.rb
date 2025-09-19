@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_09_120000) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_18_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -176,6 +176,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_120000) do
     t.string "location"
     t.boolean "online", default: false, null: false
     t.integer "max_players"
+    t.string "primary_strategy_key", default: "points", null: false
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"

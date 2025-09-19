@@ -896,4 +896,45 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     # But not twice (first user still has no list)
     assert_operator body.scan(I18n.t('tournaments.show.view_army_list', default: 'Army list')).size, :<, 2
   end
+
+  test 'ranking can use score_sum as primary' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Primary Score Sum', description: 'S', game_system_id: game_systems(:chess).id, format: 'swiss' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    # Set primary to score_sum
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { primary_strategy_key: 'score_sum' } }
+
+    # Register two users and check in
+    [users(:player_one), users(:player_two)].each do |u|
+      sign_out @user
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+      f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: "F-#{u.username}")
+      t.registrations.find_by(user: u).update!(faction: f)
+      post check_in_tournament_path(t, locale: I18n.locale)
+    end
+
+    # Start first round and play draw with different scores
+    sign_out @user
+    sign_in @user
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+    post next_round_tournament_path(t, locale: I18n.locale)
+
+    match = t.rounds.last.matches.first
+
+    sign_out @user
+    sign_in match.a_user
+    patch tournament_tournament_match_path(t, match, locale: I18n.locale),
+          params: { tournament_match: { a_score: 10, b_score: 8, result: 'draw' } }
+
+    # Ranking should use score_sum as primary, so player A first
+    get tournament_path(t, locale: I18n.locale, tab: 2)
+    assert_response :success
+    body = @response.body
+    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split('<tr>')[1]
+    assert_includes first_row, match.a_user.username
+  end
 end

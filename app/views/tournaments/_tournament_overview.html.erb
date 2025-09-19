@@ -70,6 +70,10 @@
 
     <div style="display:flex; flex-direction:column; gap:0.25rem;">
       <div class="card-date" style="font-style:normal;">
+        <strong><%= t('tournaments.show.strategies.primary', default: 'Primary') %>:</strong>
+        <%= t("tournaments.show.strategies.names.primary.#{tournament.primary_key}", default: @primary_label || 'Points') %>
+      </div>
+      <div class="card-date" style="font-style:normal;">
         <strong><%= t('tournaments.show.strategies.tiebreak1', default: 'Tie-break #1') %>:</strong>
         <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: @tiebreak1_label) %>
       </div>

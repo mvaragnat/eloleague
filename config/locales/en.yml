@@ -190,13 +190,19 @@ en:
         points: "Points"
         score: "Score"
       strategies:
-        explanation: "Ranking uses Points, then Tie-break #1, then Tie-break #2. Pairings avoid repeat matches when possible."
+        primary: "Primary"
+        explanation: "Ranking uses the following criteria:"
         pairing_strategy: "Pairing strategy"
         tiebreak1: "Tie-break #1"
         tiebreak2: "Tie-break #2"
         names:
           pairing:
             by_points_random_within_group: "By Points (random within ties)"
+          primary:
+            points: "Points"
+            score_sum: "Score sum"
+            secondary_score_sum: "Secondary score sum"
+            sos: "Strength of Schedule"
           tiebreak:
             none: "None"
             score_sum: "Score sum"
@@ -207,6 +213,12 @@ en:
           pairing:
             by_points_random_within_group: "Pairs by points; random within ties; avoids repeats when possible."
             default: "Pairs by current points; shuffles within tied groups; avoids repeats when possible."
+          primary:
+            points: "Win/Lose points (1 win, 0.5 draw, 0 loss)."
+            score_sum: "Higher total score across reported games ranks first."
+            secondary_score_sum: "Higher total secondary score across reported games ranks first."
+            sos: "Higher sum of your opponents' final tournament points ranks first."
+            default: "Main ranking criterion."
           tiebreak:
             none: "No tie-break applied."
             score_sum: "Higher total score across reported games ranks higher when points are equal."

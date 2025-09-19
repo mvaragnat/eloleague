@@ -62,13 +62,19 @@ module Tournament
       tiebreak2_strategy_key.presence || ::Tournament::StrategyRegistry.default_tiebreak2_key
     end
 
+    def primary_key
+      primary_strategy_key.presence || ::Tournament::StrategyRegistry.default_primary_key
+    end
+
     private
 
     def strategy_keys_are_known
       pairings = ::Tournament::StrategyRegistry.pairing_strategies
       tbs = ::Tournament::StrategyRegistry.tiebreak_strategies
+      primaries = ::Tournament::StrategyRegistry.primary_strategies
 
       errors.add(:pairing_strategy_key, 'is not a recognized pairing strategy') unless pairing_key.in?(pairings.keys)
+      errors.add(:primary_strategy_key, 'is not a recognized primary strategy') unless primary_key.in?(primaries.keys)
       errors.add(:tiebreak1_strategy_key, 'is not a recognized tie-break strategy') unless tiebreak1_key.in?(tbs.keys)
       return if tiebreak2_key.in?(tbs.keys)
 

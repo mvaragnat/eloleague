@@ -126,6 +126,13 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Secondary score sum: sums secondary scores across reported games.
   - Strength of Schedule (SoS): sums the final tournament points of your opponents across all your matches. Higher is better.
 
+- Primary ranking strategy for standings is customizable (default: Points). Supported options mirror tie-breakers:
+  - Points: win=1, draw=0.5, loss=0
+  - Score sum
+  - Secondary score sum
+  - Strength of Schedule (SoS)
+  The Admin tab includes a dropdown for Primary with localized explanations; Overview and Ranking reflect the selected strategy.
+
 ### Homepage
 - Hero section with background image (`public/ork-wallpaper.jpg`), localized subtitle, and buttons to browse tournaments and see ELO rankings.
 

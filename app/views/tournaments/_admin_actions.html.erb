@@ -39,7 +39,7 @@
       <%# For Swiss/Open, keep strategies partial under admin; for elimination, we skip it per request %>
       <% unless tournament.elimination? %>
         <div style="width:100%;">
-          <p class="card-date" style="font-style:normal;"><%= t('tournaments.show.strategies.explanation', default: 'Ranking uses Points, then Tie-break #1, then Tie-break #2. Pairings avoid repeat matches when possible.') %></p>
+          <p class="card-date" style="font-style:normal;"><%= t('tournaments.show.strategies.explanation') %></p>
           <%= render 'strategy_settings', show_pairing: !tournament.open? %>
         </div>
       <% end %>
