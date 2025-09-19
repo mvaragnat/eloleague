@@ -290,4 +290,144 @@ module Tournament
                    'Parent should stay unchanged when already played'
     end
   end
+
+  # Additional tests for pairing reassign feature
+  class TournamentMatchesReassignTest < ActionDispatch::IntegrationTest
+    setup do
+      @system = game_systems(:chess)
+      @creator = users(:player_one)
+      @p2 = users(:player_two)
+      @p3 = User.create!(username: 'third', email: 'third@example.com', password: 'password')
+      @p4 = User.create!(username: 'fourth', email: 'fourth@example.com', password: 'password')
+
+      EloRating.find_or_create_by!(user: @creator, game_system: @system) do |r|
+        r.rating = 1600
+        r.games_played = 0
+      end
+      EloRating.find_or_create_by!(user: @p2, game_system: @system) do |r|
+        r.rating = 1500
+        r.games_played = 0
+      end
+      EloRating.find_or_create_by!(user: @p3, game_system: @system) do |r|
+        r.rating = 1400
+        r.games_played = 0
+      end
+      EloRating.find_or_create_by!(user: @p4, game_system: @system) do |r|
+        r.rating = 1300
+        r.games_played = 0
+      end
+    end
+
+    test 'organizer can swap players between pending matches in swiss' do
+      sign_in @creator
+      post tournaments_path(locale: I18n.locale), params: {
+        tournament: { name: 'Swiss', description: 'S', game_system_id: @system.id, format: 'swiss' }
+      }
+      t = ::Tournament::Tournament.order(:created_at).last
+
+      # Register + check-in creator
+      post register_tournament_path(t, locale: I18n.locale)
+      f1 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F1')
+      t.registrations.find_by(user: @creator)&.update!(faction: f1)
+      post check_in_tournament_path(t, locale: I18n.locale)
+
+      # p2
+      sign_out @creator
+      sign_in @p2
+      post register_tournament_path(t, locale: I18n.locale)
+      f2 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F2')
+      t.registrations.find_by(user: @p2)&.update!(faction: f2)
+      post check_in_tournament_path(t, locale: I18n.locale)
+
+      # p3
+      sign_out @p2
+      sign_in @p3
+      post register_tournament_path(t, locale: I18n.locale)
+      f3 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F3')
+      t.registrations.find_by(user: @p3)&.update!(faction: f3)
+      post check_in_tournament_path(t, locale: I18n.locale)
+
+      # p4
+      sign_out @p3
+      sign_in @p4
+      post register_tournament_path(t, locale: I18n.locale)
+      f4 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F4')
+      t.registrations.find_by(user: @p4)&.update!(faction: f4)
+      post check_in_tournament_path(t, locale: I18n.locale)
+
+      sign_out @p4
+      sign_in @creator
+
+      post lock_registration_tournament_path(t, locale: I18n.locale)
+      post next_round_tournament_path(t, locale: I18n.locale)
+
+      r1 = t.rounds.order(:number).last
+      m1, m2 = r1.matches.to_a
+      assert_equal 'pending', m1.result
+      assert_equal 'pending', m2.result
+
+      original_m1_a = m1.a_user
+      swap_user = m2.a_user
+      patch reassign_tournament_tournament_match_path(t, m1, locale: I18n.locale),
+            params: { slot: 'a', user_id: swap_user.id }
+      assert_redirected_to tournament_tournament_match_path(t, m1, locale: I18n.locale)
+      m1.reload
+      m2.reload
+      assert_equal swap_user.id, m1.a_user_id
+      assert_includes [m2.a_user_id, m2.b_user_id], original_m1_a.id
+    end
+
+    test 'organizer can swap players at same elimination depth level' do
+      sign_in @creator
+      post tournaments_path(locale: I18n.locale), params: {
+        tournament: { name: 'KO', description: 'Tree', game_system_id: @system.id, format: 'elimination' }
+      }
+      t = ::Tournament::Tournament.order(:created_at).last
+
+      # creator
+      post register_tournament_path(t, locale: I18n.locale)
+      f1 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F1')
+      t.registrations.find_by(user: @creator)&.update!(faction: f1)
+      post check_in_tournament_path(t, locale: I18n.locale)
+
+      # p2
+      sign_out @creator
+      sign_in @p2
+      post register_tournament_path(t, locale: I18n.locale)
+      f2 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F2')
+      t.registrations.find_by(user: @p2)&.update!(faction: f2)
+      post check_in_tournament_path(t, locale: I18n.locale)
+
+      # p3
+      sign_out @p2
+      sign_in @p3
+      post register_tournament_path(t, locale: I18n.locale)
+      f3 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F3')
+      t.registrations.find_by(user: @p3)&.update!(faction: f3)
+      post check_in_tournament_path(t, locale: I18n.locale)
+
+      # p4
+      sign_out @p3
+      sign_in @p4
+      post register_tournament_path(t, locale: I18n.locale)
+      f4 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F4')
+      t.registrations.find_by(user: @p4)&.update!(faction: f4)
+      post check_in_tournament_path(t, locale: I18n.locale)
+
+      sign_out @p4
+      sign_in @creator
+
+      post lock_registration_tournament_path(t, locale: I18n.locale)
+      leaves = t.matches.select { |m| m.child_matches.empty? && m.a_user_id.present? && m.b_user_id.present? }
+      m1, m2 = leaves.first(2)
+
+      swap_user = m2.a_user
+      patch reassign_tournament_tournament_match_path(t, m1, locale: I18n.locale),
+            params: { slot: 'b', user_id: swap_user.id }
+      assert_redirected_to tournament_tournament_match_path(t, m1, locale: I18n.locale)
+      m1.reload
+      m2.reload
+      assert_equal swap_user.id, m1.b_user_id
+    end
+  end
 end

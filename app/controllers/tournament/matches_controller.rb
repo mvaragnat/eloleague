@@ -4,14 +4,17 @@ module Tournament
   class MatchesController < ApplicationController
     before_action :authenticate_user!
     before_action :set_tournament
-    before_action :set_match, only: %i[show update]
+    before_action :set_match, only: %i[show update reassign]
     before_action :authorize_update!, only: %i[update]
+    before_action :authorize_admin!, only: %i[reassign]
 
     def index
       @matches = @tournament.matches.order(created_at: :desc)
     end
 
-    def show; end
+    def show
+      @eligible_users = ::Tournament::SwapPairing.eligible_users_for(@tournament, @match)
+    end
 
     def new
       unless can_add_match?
@@ -104,6 +107,19 @@ module Tournament
       finalize_match_update(a_score, b_score, event)
     end
 
+    def reassign
+      result = ::Tournament::SwapPairing.new(@tournament, @match, params[:slot], params[:user_id]).call
+      unless result.ok
+        return redirect_back(
+          fallback_location: tournament_tournament_match_path(@tournament, @match),
+          alert: t('tournaments.invalid_swap_target', default: 'Cannot swap with selected player')
+        )
+      end
+
+      redirect_to tournament_tournament_match_path(@tournament, @match),
+                  notice: t('tournaments.pairing_reassigned', default: 'Pairing updated')
+    end
+
     private
 
     # Devise provides authentication; Current.user is set at ApplicationController
@@ -114,6 +130,13 @@ module Tournament
 
     def set_match
       @match = @tournament.matches.find(params[:id])
+    end
+
+    def authorize_admin!
+      return if Current.user && @tournament.creator_id == Current.user.id
+
+      redirect_to tournament_tournament_match_path(@tournament, @match),
+                  alert: t('tournaments.unauthorized', default: 'Not authorized')
     end
 
     def deduce_result(a_score, b_score)

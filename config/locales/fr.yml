@@ -186,6 +186,12 @@ fr:
             sos: "Somme des points finaux de vos adversaires sur l'ensemble du tournoi."
             default: "Règle de départage appliquée en cas d'égalité de points."
         saved: "Paramètres enregistrés"
+      pairing:
+        switch: "Échanger"
+        player_a: "Joueur A"
+        player_b: "Joueur B"
+      pairing_reassigned: "Appariement mis à jour"
+      invalid_swap_target: "Impossible d'échanger avec ce joueur"
       admin:
         actions: "Actions"
         strategies: "Stratégies"
@@ -230,7 +236,8 @@ fr:
     my_current_rankings: "Mes classements ELO actuels"
     standings: "Classement"
     player: "Joueur"
-    rating: "Cote"
+    rating: "Classement"
+    count: "Nombre de parties"
     select_system: "Sélectionner un système"
   time:
     formats:
