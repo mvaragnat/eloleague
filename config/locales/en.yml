@@ -215,6 +215,12 @@ en:
             sos: "Sum of your opponents' final tournament points across all your matches."
             default: "Tie-break rule applied when points are equal."
         saved: "Settings saved"
+      pairing:
+        switch: "Switch"
+        player_a: "Player A"
+        player_b: "Player B"
+      pairing_reassigned: "Pairing updated"
+      invalid_swap_target: "Cannot swap with selected player"
       admin:
         actions: "Actions"
         strategies: "Strategies"
@@ -262,6 +268,7 @@ en:
     standings: "Standings"
     player: "Player"
     rating: "Rating"
+    count: "Games count"
     select_system: "Select a system"
   time:
     formats:
