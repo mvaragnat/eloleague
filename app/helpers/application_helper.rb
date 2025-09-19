@@ -221,6 +221,15 @@ module ApplicationHelper
     safe_join(parts)
   end
 
+  # Controller-generated list item wrapper for small match boxes
+  def svg_match_list_item(tournament, match)
+    content_tag(:li, style: 'margin:0; display:flex; justify-content:center;') do
+      content_tag(:svg, width: 240, height: 88) do
+        small_match_box(tournament, match, 0, 0, width: 240, show_seeds: false)
+      end
+    end
+  end
+
   private
 
   def round_label_for_column(index, total)

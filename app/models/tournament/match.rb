@@ -25,6 +25,12 @@ module Tournament
 
     before_validation :copy_non_competitive_from_tournament, on: :create
 
+    def self.deduce_result(a_score, b_score)
+      return 'draw' if a_score == b_score
+
+      a_score > b_score ? 'a_win' : 'b_win'
+    end
+
     private
 
     def copy_non_competitive_from_tournament

@@ -58,14 +58,17 @@ module Tournament
           b_user_id: game.game_participations.second.user_id,
           game_event: game,
           non_competitive: @tournament.non_competitive,
-          result: deduce_result(game.game_participations.first.score.to_i, game.game_participations.second.score.to_i)
+          result: ::Tournament::Match.deduce_result(
+            game.game_participations.first.score.to_i,
+            game.game_participations.second.score.to_i
+          )
         )
 
         respond_to do |format|
           format.turbo_stream do
             render turbo_stream: [
               turbo_stream.remove('no-matches-message'),
-              turbo_stream.prepend('matches-list', svg_match_list_item(match)),
+              turbo_stream.prepend('matches-list', view_context.svg_match_list_item(@tournament, match)),
               turbo_stream.replace('modal', '')
             ]
           end
@@ -84,27 +87,40 @@ module Tournament
     end
 
     def update
-      a_score, b_score, a_secondary, b_secondary = fetch_scores
+      a_score = params.dig(:tournament_match, :a_score)
+      b_score = params.dig(:tournament_match, :b_score)
+      a_secondary = params.dig(:tournament_match, :a_secondary_score)
+      b_secondary = params.dig(:tournament_match, :b_secondary_score)
 
-      unless scores_present?(a_score, b_score)
-        flash.now[:alert] = t('tournaments.score_required', default: 'Both scores are required')
+      result = ::Tournament::ReportMatch
+               .new(
+                 tournament: @tournament,
+                 match: @match,
+                 scores: {
+                   a_score: a_score,
+                   b_score: b_score,
+                   a_secondary_score: a_secondary,
+                   b_secondary_score: b_secondary
+                 }
+               ).call
+
+      unless result.ok
+        message = case result.error
+                  when :scores_missing
+                    t('tournaments.score_required', default: 'Both scores are required')
+                  when :draw_not_allowed
+                    t('tournaments.draw_not_allowed', default: 'Draw is not allowed in elimination')
+                  else
+                    # Keep this short to avoid long safe navigation chains
+                    errs = result.event&.errors
+                    errs&.full_messages&.to_sentence
+                  end
+        flash.now[:alert] = message
         return render :show, status: :unprocessable_content
       end
 
-      if elimination_draw?(a_score, b_score)
-        flash.now[:alert] = t('tournaments.draw_not_allowed', default: 'Draw is not allowed in elimination')
-        return render :show, status: :unprocessable_content
-      end
-
-      success, event = if @match.game_event.present?
-                         update_existing_event(@match.game_event, a_score, b_score, a_secondary, b_secondary)
-                       else
-                         build_new_event(a_score, b_score, a_secondary, b_secondary)
-                       end
-
-      return handle_event_failure(event) unless success
-
-      finalize_match_update(a_score, b_score, event)
+      redirect_to tournament_path(@tournament, tab: 1),
+                  notice: t('tournaments.match_updated', default: 'Match updated')
     end
 
     def reassign
@@ -139,98 +155,6 @@ module Tournament
                   alert: t('tournaments.unauthorized', default: 'Not authorized')
     end
 
-    def deduce_result(a_score, b_score)
-      return 'draw' if a_score == b_score
-
-      a_score > b_score ? 'a_win' : 'b_win'
-    end
-
-    def fetch_scores
-      a_score = params.dig(:tournament_match, :a_score)
-      b_score = params.dig(:tournament_match, :b_score)
-      a_secondary = params.dig(:tournament_match, :a_secondary_score)
-      b_secondary = params.dig(:tournament_match, :b_secondary_score)
-      [a_score, b_score, a_secondary, b_secondary]
-    end
-
-    def scores_present?(a_score, b_score)
-      a_score.present? && b_score.present?
-    end
-
-    def elimination_draw?(a_score, b_score)
-      @tournament.elimination? && a_score.to_i == b_score.to_i
-    end
-
-    def update_existing_event(event, a_score, b_score, a_secondary, b_secondary)
-      a_part = event.game_participations.find_by(user: @match.a_user)
-      b_part = event.game_participations.find_by(user: @match.b_user)
-
-      if a_part && b_part
-        a_part.assign_attributes(score: a_score, secondary_score: a_secondary)
-        b_part.assign_attributes(score: b_score, secondary_score: b_secondary)
-      else
-        rebuild_participations(event, a_score, b_score, a_secondary, b_secondary)
-        # Re-lookup parts in case they are needed below (kept symmetrical with the logic above)
-        a_part = event.game_participations.find { |p| p.user_id == @match.a_user_id }
-        b_part = event.game_participations.find { |p| p.user_id == @match.b_user_id }
-      end
-
-      success = persist_event_and_parts?(event, a_part, b_part)
-      [success, event]
-    end
-
-    def build_new_event(a_score, b_score, a_secondary, b_secondary)
-      event = Game::Event.new(
-        game_system: @tournament.game_system,
-        played_at: Time.current,
-        tournament: @tournament,
-        non_competitive: @tournament.non_competitive
-      )
-
-      add_participations(event, a_score, b_score, a_secondary, b_secondary)
-      [event.save, event]
-    end
-
-    def rebuild_participations(event, a_score, b_score, a_secondary, b_secondary)
-      event.game_participations.destroy_all
-      add_participations(event, a_score, b_score, a_secondary, b_secondary)
-    end
-
-    def add_participations(event, a_score, b_score, a_secondary, b_secondary)
-      a_reg = @tournament.registrations.find_by(user: @match.a_user)
-      b_reg = @tournament.registrations.find_by(user: @match.b_user)
-      event.game_participations.build(user: @match.a_user, score: a_score, secondary_score: a_secondary,
-                                      faction: a_reg&.faction)
-      event.game_participations.build(user: @match.b_user, score: b_score, secondary_score: b_secondary,
-                                      faction: b_reg&.faction)
-    end
-
-    def persist_event_and_parts?(event, a_part, b_part)
-      ActiveRecord::Base.transaction do
-        a_part&.save!
-        b_part&.save!
-        event.save!
-        true
-      end
-    rescue ActiveRecord::ActiveRecordError
-      false
-    end
-
-    def handle_event_failure(event)
-      flash.now[:alert] = event.errors.full_messages.to_sentence
-      render :show, status: :unprocessable_content
-    end
-
-    def finalize_match_update(a_score, b_score, event)
-      @match.game_event ||= event
-      @match.non_competitive = @tournament.non_competitive
-      @match.result = deduce_result(a_score.to_i, b_score.to_i)
-      @match.save!
-      @match.propagate_winner_to_parent!
-      redirect_to tournament_path(@tournament, tab: 1),
-                  notice: t('tournaments.match_updated', default: 'Match updated')
-    end
-
     # Parent propagation moved to Tournament::Match
 
     def authorize_update!
@@ -258,13 +182,7 @@ module Tournament
       (@tournament.creator_id == Current.user.id) || participant_ids.include?(Current.user.id)
     end
 
-    def svg_match_list_item(match)
-      view_context.content_tag(:li, style: 'margin:0; display:flex; justify-content:center;') do
-        view_context.content_tag(:svg, width: 240, height: 88) do
-          view_context.small_match_box(@tournament, match, 0, 0, width: 240, show_seeds: false)
-        end
-      end
-    end
+    # View helper moved to ApplicationHelper#svg_match_list_item
 
     # rubocop:disable Rails/StrongParametersExpect
     def game_params
