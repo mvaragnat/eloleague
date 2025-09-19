@@ -190,6 +190,9 @@ en:
         games_played: "Games Played"
         points: "Points"
         score: "Score"
+        score_sum: "Score sum"
+        secondary_score_sum: "Secondary score sum"
+        sos: "Strength of Schedule"
       strategies:
         primary: "Primary"
         explanation: "Ranking uses the following criteria:"

@@ -161,6 +161,9 @@ fr:
         games_played: "Matchs joués"
         points: "Points"
         score: "Score"
+        score_sum: "Somme des scores"
+        secondary_score_sum: "Somme des scores secondaires"
+        sos: "Force de l'opposition"
       strategies:
         primary: "Critère principal"
         explanation: "Le classement utilise les critères suivants :"

@@ -306,10 +306,16 @@ class TournamentsController < ApplicationController
     t2 = tiebreaks[tournament.tiebreak2_key] || tiebreaks[Tournament::StrategyRegistry.default_tiebreak2_key]
     p1 = primaries[tournament.primary_key] || primaries[Tournament::StrategyRegistry.default_primary_key]
 
+    # Helper lambdas for fixed displayed metrics
+    sos_lambda = tiebreaks['sos'].last
+
     rows = users.map do |u|
       {
         user: u,
         points: points[u.id],
+        score_sum: score_sum[u.id],
+        secondary_score_sum: secondary_score_sum[u.id],
+        sos: sos_lambda.call(u.id, agg),
         primary: p1.last.call(u.id, agg),
         tiebreak1: t1.last.call(u.id, agg),
         tiebreak2: t2.last.call(u.id, agg)

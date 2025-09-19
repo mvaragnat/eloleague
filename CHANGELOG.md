@@ -155,3 +155,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 2025-09-18
 - Add customizable primary ranking strategy for tournament standings (default: Points). Primary can use same strategies as tie-breakers (Points, Score sum, Secondary score sum, SoS). Updated admin settings UI, overview and ranking table, plus i18n (EN/FR). Added migration and tests.
+
+## 2025-09-19
+- Ranking tab now shows all relevant columns: Points, Score sum, Strength of Schedule (SoS), and Secondary score sum. Columns selected as primary or tie-break criteria are highlighted in pale yellow. Added EN/FR translations and tests.
