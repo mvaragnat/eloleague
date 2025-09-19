@@ -8,6 +8,7 @@ class EloController < ApplicationController
     @system = selected_system(@systems)
     @events = load_events(@system)
     @elo_changes_map = load_elo_changes(@events)
+
     @standings = compute_standings(@system)
   end
 

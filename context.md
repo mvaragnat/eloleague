@@ -65,6 +65,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Exactly two players are required for each game. The form provides two independent player selectors; front-end prevents submission unless both players, scores, and factions are provided; back-end enforces the same validations.
 - Game cards on the Dashboard and Elo pages display each player's faction (localized) beneath their username.
 
+### ELO Rankings Page
+- `/elo` lists player ELO standings per selected game system.
+- Standings are server-paginated (default 25 per page; configurable via `?per=`, max 100).
+- When a user is signed in and has a rating for the selected system, the default page is the one containing the user; their username is bolded in the table.
+- Pagination controls are localized (EN/FR) and preserve the selected game system.
+
 ### Factions System
 - Each game system can define multiple factions (e.g., White/Black for Chess, different armies for war games)
 - Every game participation must include a faction selection - games cannot be submitted without both players selecting their factions
