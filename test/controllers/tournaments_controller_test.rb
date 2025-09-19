@@ -900,7 +900,12 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
   test 'ranking can use score_sum as primary' do
     sign_in @user
     post tournaments_path(locale: I18n.locale), params: {
-      tournament: { name: 'Primary Score Sum', description: 'S', game_system_id: game_systems(:chess).id, format: 'swiss' }
+      tournament: {
+        name: 'Primary Score Sum',
+        description: 'S',
+        game_system_id: game_systems(:chess).id,
+        format: 'swiss'
+      }
     }
     t = Tournament::Tournament.order(:created_at).last
 
