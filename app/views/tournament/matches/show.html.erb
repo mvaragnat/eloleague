@@ -10,7 +10,41 @@
 
   <div class="card">
     <div class="card-header">
-      <h3><%= @match.a_user.username %> vs <%= @match.b_user.username %></h3>
+      <h3>
+        <% if @tournament.creator == Current.user && @match.game_event.blank? %>
+          <div style="display:grid; grid-template-columns: 1fr auto 1fr; gap:0.5rem; align-items:center;">
+            <div>
+              <div class="card-date" style="margin-bottom:0.25rem;"><%= t('tournaments.pairing.player_a', default: 'Player A') %></div>
+              <%= form_with url: reassign_tournament_tournament_match_path(@tournament, @match), method: :patch, local: true, style: 'display:flex; gap:0.5rem; align-items:center;' do %>
+                <%= hidden_field_tag :slot, 'a' %>
+                <select name="user_id" class="input" style="min-width:180px;">
+                  <option value=""><%= @match.a_user.username %></option>
+                  <% @eligible_users.each do |u| %>
+                    <option value="<%= u.id %>"><%= u.username %></option>
+                  <% end %>
+                </select>
+                <%= submit_tag t('tournaments.pairing.switch', default: 'Switch'), class: 'btn' %>
+              <% end %>
+            </div>
+            <div style="text-align:center; font-weight:700; font-size:1.25rem;">vs</div>
+            <div>
+              <div class="card-date" style="margin-bottom:0.25rem;"><%= t('tournaments.pairing.player_b', default: 'Player B') %></div>
+              <%= form_with url: reassign_tournament_tournament_match_path(@tournament, @match), method: :patch, local: true, style: 'display:flex; gap:0.5rem; align-items:center;' do %>
+                <%= hidden_field_tag :slot, 'b' %>
+                <select name="user_id" class="input" style="min-width:180px;">
+                  <option value=""><%= @match.b_user.username %></option>
+                  <% @eligible_users.each do |u| %>
+                    <option value="<%= u.id %>"><%= u.username %></option>
+                  <% end %>
+                </select>
+                <%= submit_tag t('tournaments.pairing.switch', default: 'Switch'), class: 'btn' %>
+              <% end %>
+            </div>
+          </div>
+        <% else %>
+          <%= @match.a_user.username %> vs <%= @match.b_user.username %>
+        <% end %>
+      </h3>
     </div>
     <div class="card-body">
       <% if @match.game_event.present? %>
@@ -28,6 +62,34 @@
           </div>
           <div class="player" style="text-align:right; <%= b.score > a.score ? 'color: var(--green-500); font-weight:700;' : '' %>"><%= @match.b_user.username %></div>
         </div>
+        <% if Current.user && @tournament.creator_id == Current.user.id %>
+          <div style="margin-top:1rem; border-top:1px solid var(--gray-200); padding-top:1rem;">
+            <%= form_with model: @match, url: tournament_tournament_match_path(@tournament, @match), method: :patch do |f| %>
+              <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0.75rem; align-items:center;">
+                <div>
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.a_user.username %></label>
+                  <%= number_field_tag 'tournament_match[a_score]', a.score, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
+                  <div style="margin-top:0.25rem;">
+                    <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
+                    <%= number_field_tag 'tournament_match[a_secondary_score]', a.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                  </div>
+                </div>
+                <div style="text-align:center; font-weight:700; font-size:1.25rem;">vs</div>
+                <div>
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.b_user.username %></label>
+                  <%= number_field_tag 'tournament_match[b_score]', b.score, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
+                  <div style="margin-top:0.25rem;">
+                    <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
+                    <%= number_field_tag 'tournament_match[b_secondary_score]', b.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:0.75rem;">
+                <%= f.submit t('layouts.shared.save', default: 'Save'), class: 'btn btn-primary' %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
       <% else %>
         <%= form_with model: @match, url: tournament_tournament_match_path(@tournament, @match), method: :patch do |f| %>
           <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0.75rem; align-items:center;">

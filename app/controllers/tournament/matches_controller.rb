@@ -4,14 +4,17 @@ module Tournament
   class MatchesController < ApplicationController
     before_action :authenticate_user!
     before_action :set_tournament
-    before_action :set_match, only: %i[show update]
+    before_action :set_match, only: %i[show update reassign]
     before_action :authorize_update!, only: %i[update]
+    before_action :authorize_admin!, only: %i[reassign]
 
     def index
       @matches = @tournament.matches.order(created_at: :desc)
     end
 
-    def show; end
+    def show
+      @eligible_users = ::Tournament::SwapPairing.eligible_users_for(@tournament, @match)
+    end
 
     def new
       unless can_add_match?
@@ -55,14 +58,17 @@ module Tournament
           b_user_id: game.game_participations.second.user_id,
           game_event: game,
           non_competitive: @tournament.non_competitive,
-          result: deduce_result(game.game_participations.first.score.to_i, game.game_participations.second.score.to_i)
+          result: ::Tournament::Match.deduce_result(
+            game.game_participations.first.score.to_i,
+            game.game_participations.second.score.to_i
+          )
         )
 
         respond_to do |format|
           format.turbo_stream do
             render turbo_stream: [
               turbo_stream.remove('no-matches-message'),
-              turbo_stream.prepend('matches-list', svg_match_list_item(match)),
+              turbo_stream.prepend('matches-list', view_context.svg_match_list_item(@tournament, match)),
               turbo_stream.replace('modal', '')
             ]
           end
@@ -86,44 +92,48 @@ module Tournament
       a_secondary = params.dig(:tournament_match, :a_secondary_score)
       b_secondary = params.dig(:tournament_match, :b_secondary_score)
 
-      unless a_score.present? && b_score.present?
-        flash.now[:alert] = t('tournaments.score_required', default: 'Both scores are required')
+      result = ::Tournament::ReportMatch
+               .new(
+                 tournament: @tournament,
+                 match: @match,
+                 scores: {
+                   a_score: a_score,
+                   b_score: b_score,
+                   a_secondary_score: a_secondary,
+                   b_secondary_score: b_secondary
+                 }
+               ).call
+
+      unless result.ok
+        message = case result.error
+                  when :scores_missing
+                    t('tournaments.score_required', default: 'Both scores are required')
+                  when :draw_not_allowed
+                    t('tournaments.draw_not_allowed', default: 'Draw is not allowed in elimination')
+                  else
+                    # Keep this short to avoid long safe navigation chains
+                    errs = result.event&.errors
+                    errs&.full_messages&.to_sentence
+                  end
+        flash.now[:alert] = message
         return render :show, status: :unprocessable_content
       end
 
-      if @tournament.elimination? && a_score.to_i == b_score.to_i
-        flash.now[:alert] = t('tournaments.draw_not_allowed', default: 'Draw is not allowed in elimination')
-        return render :show, status: :unprocessable_content
+      redirect_to tournament_path(@tournament, tab: 1),
+                  notice: t('tournaments.match_updated', default: 'Match updated')
+    end
+
+    def reassign
+      result = ::Tournament::SwapPairing.new(@tournament, @match, params[:slot], params[:user_id]).call
+      unless result.ok
+        return redirect_back(
+          fallback_location: tournament_tournament_match_path(@tournament, @match),
+          alert: t('tournaments.invalid_swap_target', default: 'Cannot swap with selected player')
+        )
       end
 
-      event = Game::Event.new(
-        game_system: @tournament.game_system,
-        played_at: Time.current,
-        tournament: @tournament,
-        non_competitive: @tournament.non_competitive
-      )
-      a_reg = @tournament.registrations.find_by(user: @match.a_user)
-      b_reg = @tournament.registrations.find_by(user: @match.b_user)
-      event.game_participations.build(user: @match.a_user, score: a_score, secondary_score: a_secondary,
-                                      faction: a_reg&.faction)
-      event.game_participations.build(user: @match.b_user, score: b_score, secondary_score: b_secondary,
-                                      faction: b_reg&.faction)
-
-      if event.save
-        @match.game_event = event
-        @match.non_competitive = @tournament.non_competitive
-        @match.result = deduce_result(a_score.to_i, b_score.to_i)
-        @match.save!
-
-        propagate_winner_to_parent!(@match)
-
-        # After reporting, redirect to Rounds/Matches tab (index 1 due to Overview at 0)
-        redirect_to tournament_path(@tournament, tab: 1),
-                    notice: t('tournaments.match_updated', default: 'Match updated')
-      else
-        flash.now[:alert] = event.errors.full_messages.to_sentence
-        render :show, status: :unprocessable_content
-      end
+      redirect_to tournament_tournament_match_path(@tournament, @match),
+                  notice: t('tournaments.pairing_reassigned', default: 'Pairing updated')
     end
 
     private
@@ -138,25 +148,14 @@ module Tournament
       @match = @tournament.matches.find(params[:id])
     end
 
-    def deduce_result(a_score, b_score)
-      return 'draw' if a_score == b_score
+    def authorize_admin!
+      return if Current.user && @tournament.creator_id == Current.user.id
 
-      a_score > b_score ? 'a_win' : 'b_win'
+      redirect_to tournament_tournament_match_path(@tournament, @match),
+                  alert: t('tournaments.unauthorized', default: 'Not authorized')
     end
 
-    def propagate_winner_to_parent!(match)
-      parent = match.parent_match
-      return unless parent
-
-      winner_user = match.result == 'a_win' ? match.a_user : match.b_user
-      return unless winner_user
-
-      if match.child_slot == 'a'
-        parent.update!(a_user_id: winner_user.id)
-      elsif match.child_slot == 'b'
-        parent.update!(b_user_id: winner_user.id)
-      end
-    end
+    # Parent propagation moved to Tournament::Match
 
     def authorize_update!
       # If already reported, only organizer/admin may change
@@ -183,13 +182,7 @@ module Tournament
       (@tournament.creator_id == Current.user.id) || participant_ids.include?(Current.user.id)
     end
 
-    def svg_match_list_item(match)
-      view_context.content_tag(:li, style: 'margin:0; display:flex; justify-content:center;') do
-        view_context.content_tag(:svg, width: 240, height: 88) do
-          view_context.small_match_box(@tournament, match, 0, 0, width: 240, show_seeds: false)
-        end
-      end
-    end
+    # View helper moved to ApplicationHelper#svg_match_list_item
 
     # rubocop:disable Rails/StrongParametersExpect
     def game_params

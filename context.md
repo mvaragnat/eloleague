@@ -111,10 +111,23 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Tree is modeled via `Tournament::Match` with `parent_match_id` and `child_slot`.
 - Bracket UI renders from the tree; "Open" link appears only when both players are assigned and the user is eligible.
 
+#### Post-report Match Edits
+- Organizers can edit a match after it has been reported.
+- Editing updates the existing `Game::Event` (scores/secondary scores) rather than creating a new event; Elo is therefore not re-applied (use the `elo:rebuild` task if ratings must be recomputed).
+- Swiss: if a subsequent round has already been generated, its pairings remain unchanged when editing a previous round.
+- Elimination: changing the winner updates the assigned player on the parent match only if that parent match has not been played yet; if the parent has already been reported/played, the bracket remains unchanged.
+
 #### Swiss/Open Tournaments
 - Swiss/Open tournaments run in rounds. Closing a round validates all results and generates the next-round pairings from checked-in players (or all registrants if none are checked in). Pairings group players by current points and draw opponents within each group while avoiding repeats when possible. If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
 
 - Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by points with tie-breakers applied. Tournament pages display primary scores prominently; secondary scores are shown compactly where appropriate (e.g., match detail and open format modal).
+
+#### Pairing swap (Swiss & Elimination)
+- The tournament organizer can adjust pairings for unplayed matches directly from the match page.
+- For Swiss, eligible swap targets are players from other unreported matches within the same round.
+- For Elimination, eligible swap targets are players from other unreported matches at the same depth level in the bracket (i.e., same round of the tree).
+- Swapping is symmetric: selecting a player in the dropdown performs a swap between the two affected matches.
+- Security/validation: only the organizer can swap; only pending matches are eligible; swaps are constrained to the same round/depth.
 
 #### Open match reporting
 - In Open format, the organizer (or any registered participant when allowed) can add games from the Matches panel. The modal now lets you select Player A and Player B from registered participants.
