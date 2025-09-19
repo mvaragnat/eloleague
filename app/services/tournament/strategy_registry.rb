@@ -26,6 +26,14 @@ module Tournament
       }
     end
 
+    # Primary strategies map for standings (first sorting criterion): key => [human_label, lambda]
+    # Reuses the same building blocks as tie-breakers with an added 'points' option.
+    def primary_strategies
+      tiebreak_strategies.merge(
+        'points' => ['Points', ->(uid, agg) { agg[:points_by_user_id][uid] || 0.0 }]
+      )
+    end
+
     def default_pairing_key
       'by_points_random_within_group'
     end
@@ -36,6 +44,10 @@ module Tournament
 
     def default_tiebreak2_key
       'none'
+    end
+
+    def default_primary_key
+      'points'
     end
   end
 end

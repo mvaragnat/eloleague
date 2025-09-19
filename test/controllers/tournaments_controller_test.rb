@@ -812,6 +812,70 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_includes first_row, b.username
   end
 
+  test 'ranking displays points, score sum, SoS, and secondary score sum columns' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Columns', description: 'S', game_system_id: game_systems(:chess).id, format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    # Register two players to ensure standings render
+    [users(:player_one), users(:player_two)].each do |u|
+      sign_out @user
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+    end
+
+    sign_out @user
+    sign_in @user
+    get tournament_path(t, locale: I18n.locale, tab: 2)
+    assert_response :success
+    body = @response.body
+
+    assert_includes body, I18n.t('tournaments.show.standings.points', default: 'Points')
+    assert_includes body, I18n.t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum')
+    assert_includes body, I18n.t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule')
+    assert_includes body,
+                    I18n.t('tournaments.show.strategies.names.primary.secondary_score_sum',
+                           default: 'Secondary score sum')
+  end
+
+  test 'ranking highlights selected primary and tie-break columns' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Highlight', description: 'S', game_system_id: game_systems(:chess).id, format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    # Select primary = score_sum, tiebreak1 = sos
+    patch tournament_path(t, locale: I18n.locale), params: {
+      tournament: { primary_strategy_key: 'score_sum', tiebreak1_strategy_key: 'sos' }
+    }
+
+    # Register players so standings render rows
+    [users(:player_one), users(:player_two)].each do |u|
+      sign_out @user
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+    end
+
+    sign_out @user
+    sign_in @user
+    get tournament_path(t, locale: I18n.locale, tab: 2)
+    assert_response :success
+    body = @response.body
+
+    highlight_style = 'background-color:#fff8c4;'
+
+    # Score sum header highlighted
+    score_sum_label = I18n.t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum')
+    assert_match(%r{<th[^>]*#{Regexp.escape(highlight_style)}[^>]*>\s*#{Regexp.escape(score_sum_label)}\s*</th>}, body)
+
+    # SoS header highlighted
+    sos_label = I18n.t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule')
+    assert_match(%r{<th[^>]*#{Regexp.escape(highlight_style)}[^>]*>\s*#{Regexp.escape(sos_label)}\s*</th>}, body)
+  end
+
   test 'organizer can update description in open tournament' do
     sign_in @user
     post tournaments_path(locale: I18n.locale), params: {
@@ -895,5 +959,51 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     # But not twice (first user still has no list)
     assert_operator body.scan(I18n.t('tournaments.show.view_army_list', default: 'Army list')).size, :<, 2
+  end
+
+  test 'ranking can use score_sum as primary' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Primary Score Sum',
+        description: 'S',
+        game_system_id: game_systems(:chess).id,
+        format: 'swiss'
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    # Set primary to score_sum
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { primary_strategy_key: 'score_sum' } }
+
+    # Register two users and check in
+    [users(:player_one), users(:player_two)].each do |u|
+      sign_out @user
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+      f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: "F-#{u.username}")
+      t.registrations.find_by(user: u).update!(faction: f)
+      post check_in_tournament_path(t, locale: I18n.locale)
+    end
+
+    # Start first round and play draw with different scores
+    sign_out @user
+    sign_in @user
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+    post next_round_tournament_path(t, locale: I18n.locale)
+
+    match = t.rounds.last.matches.first
+
+    sign_out @user
+    sign_in match.a_user
+    patch tournament_tournament_match_path(t, match, locale: I18n.locale),
+          params: { tournament_match: { a_score: 10, b_score: 8, result: 'draw' } }
+
+    # Ranking should use score_sum as primary, so player A first
+    get tournament_path(t, locale: I18n.locale, tab: 2)
+    assert_response :success
+    body = @response.body
+    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split('<tr>')[1]
+    assert_includes first_row, match.a_user.username
   end
 end

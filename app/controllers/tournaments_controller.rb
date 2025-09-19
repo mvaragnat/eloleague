@@ -32,9 +32,11 @@ class TournamentsController < ApplicationController
     # Expose strategies for Admin dropdowns
     @pairing_strategies = Tournament::StrategyRegistry.pairing_strategies
     @tiebreak_strategies = Tournament::StrategyRegistry.tiebreak_strategies
+    @primary_strategies = Tournament::StrategyRegistry.primary_strategies
 
     standings_data = compute_standings_with_tiebreaks(@tournament)
     @standings = standings_data[:rows]
+    @primary_label = standings_data[:primary_label]
     @tiebreak1_label = standings_data[:tiebreak1_label]
     @tiebreak2_label = standings_data[:tiebreak2_label]
 
@@ -250,18 +252,31 @@ class TournamentsController < ApplicationController
   end
 
   def tournament_params
-    params.require(:tournament).permit(:name, :description, :game_system_id, :format, :rounds_count, :starts_at,
-                                       :ends_at,
-                                       :pairing_strategy_key, :tiebreak1_strategy_key, :tiebreak2_strategy_key,
-                                       :require_army_list_for_check_in, :non_competitive,
-                                       :location, :online, :max_players)
+    params.require(:tournament).permit(
+      :name,
+      :description,
+      :game_system_id,
+      :format,
+      :rounds_count,
+      :starts_at,
+      :ends_at,
+      :pairing_strategy_key,
+      :primary_strategy_key,
+      :tiebreak1_strategy_key,
+      :tiebreak2_strategy_key,
+      :require_army_list_for_check_in,
+      :non_competitive,
+      :location,
+      :online,
+      :max_players
+    )
   end
 
   def can_register?
     @tournament.state.in?(%w[draft registration])
   end
 
-  # Returns rows with points and tiebreak columns and labels
+  # Returns rows with primary, points and tiebreak columns and labels
   def compute_standings_with_tiebreaks(tournament)
     points = Hash.new(0.0)
     score_sum = Hash.new(0.0)
@@ -284,25 +299,35 @@ class TournamentsController < ApplicationController
       opponents_by_user_id: opponents
     }
 
-    strategies = Tournament::StrategyRegistry.tiebreak_strategies
+    tiebreaks = Tournament::StrategyRegistry.tiebreak_strategies
+    primaries = Tournament::StrategyRegistry.primary_strategies
     # Be tolerant to legacy/invalid keys by falling back to defaults
-    t1 = strategies[tournament.tiebreak1_key] || strategies[Tournament::StrategyRegistry.default_tiebreak1_key]
-    t2 = strategies[tournament.tiebreak2_key] || strategies[Tournament::StrategyRegistry.default_tiebreak2_key]
+    t1 = tiebreaks[tournament.tiebreak1_key] || tiebreaks[Tournament::StrategyRegistry.default_tiebreak1_key]
+    t2 = tiebreaks[tournament.tiebreak2_key] || tiebreaks[Tournament::StrategyRegistry.default_tiebreak2_key]
+    p1 = primaries[tournament.primary_key] || primaries[Tournament::StrategyRegistry.default_primary_key]
+
+    # Helper lambdas for fixed displayed metrics
+    sos_lambda = tiebreaks['sos'].last
 
     rows = users.map do |u|
       {
         user: u,
         points: points[u.id],
+        score_sum: score_sum[u.id],
+        secondary_score_sum: secondary_score_sum[u.id],
+        sos: sos_lambda.call(u.id, agg),
+        primary: p1.last.call(u.id, agg),
         tiebreak1: t1.last.call(u.id, agg),
         tiebreak2: t2.last.call(u.id, agg)
       }
     end
 
-    rows.sort_by! { |h| [-h[:points], -h[:tiebreak1], -h[:tiebreak2], h[:user].username] }
+    rows.sort_by! { |h| [-h[:primary], -h[:tiebreak1], -h[:tiebreak2], h[:user].username] }
 
+    primary_label = t("tournaments.show.strategies.names.primary.#{tournament.primary_key}", default: p1.first)
     t1_label = t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: t1.first)
     t2_label = t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: t2.first)
-    { rows: rows, tiebreak1_label: t1_label, tiebreak2_label: t2_label }
+    { rows: rows, primary_label: primary_label, tiebreak1_label: t1_label, tiebreak2_label: t2_label }
   end
 
   def aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents)

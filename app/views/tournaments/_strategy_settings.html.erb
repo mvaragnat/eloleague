@@ -5,6 +5,7 @@
 <%# Fallback keys: by_points_random_within_group explicitly %>
 <% pairing_explanations['by_points_random_within_group'] ||= t('tournaments.show.strategies.explanations.pairing.by_points_random_within_group', default: t('tournaments.show.strategies.explanations.pairing.default')) %>
 <% tiebreak_explanations = Tournament::StrategyRegistry.tiebreak_strategies.transform_values { |v| t("tournaments.show.strategies.explanations.tiebreak.#{v.first.parameterize(separator: '_')}", default: t('tournaments.show.strategies.explanations.tiebreak.default')) } %>
+<% primary_explanations = Tournament::StrategyRegistry.primary_strategies.transform_values { |v| t("tournaments.show.strategies.explanations.primary.#{v.first.parameterize(separator: '_')}", default: t('tournaments.show.strategies.explanations.primary.default')) } %>
 
 <div
   data-controller="strategy"
@@ -13,22 +14,21 @@
   data-strategy-show-pairing-value="<%= show_pairing %>"
   data-strategy-explain-pairing-value="<%= pairing_explanations.to_json %>"
   data-strategy-explain-tiebreak-value="<%= tiebreak_explanations.to_json %>"
+  data-strategy-explain-primary-value="<%= primary_explanations.to_json %>"
 >
   <div style="display:flex; flex-direction:column; gap:0.75rem;">
-    <% if show_pairing %>
-      <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
-        <div><%= t('tournaments.show.strategies.pairing_strategy', default: 'Pairing strategy') %></div>
-        <div>
-          <%= select_tag 'tournament[pairing_strategy_key]',
-                          options_for_select(@pairing_strategies.map { |k, v| [t("tournaments.show.strategies.names.pairing.#{k}", default: v.first), k] }, @tournament.pairing_key),
-                          class: 'input', style: 'width:100%;',
-                          data: { action: 'change->strategy#changed', field: 'pairing_strategy_key' } %>
-        </div>
-        <div class="card-date" id="pairing-explanation" data-strategy-target="pairingExplanation">
-          <%= t("tournaments.show.strategies.explanations.pairing.#{@tournament.pairing_key}", default: t('tournaments.show.strategies.explanations.pairing.default')) %>
-        </div>
+    <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+      <div><%= t('tournaments.show.strategies.primary', default: 'Primary') %></div>
+      <div>
+        <%= select_tag 'tournament[primary_strategy_key]',
+                        options_for_select(@primary_strategies.map { |k, v| [t("tournaments.show.strategies.names.primary.#{k}", default: v.first), k] }, @tournament.primary_key),
+                        class: 'input', style: 'width:100%;',
+                        data: { action: 'change->strategy#changed', field: 'primary_strategy_key' } %>
       </div>
-    <% end %>
+      <div class="card-date" id="primary-explanation" data-strategy-target="primaryExplanation">
+        <%= t("tournaments.show.strategies.explanations.primary.#{@tournament.primary_key}", default: t('tournaments.show.strategies.explanations.primary.default')) %>
+      </div>
+    </div>
 
     <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
       <div><%= t('tournaments.show.strategies.tiebreak1', default: 'Tie-break #1') %></div>
@@ -55,6 +55,21 @@
         <%= t("tournaments.show.strategies.explanations.tiebreak.#{@tournament.tiebreak2_key}", default: t('tournaments.show.strategies.explanations.tiebreak.default')) %>
       </div>
     </div>
+
+    <% if show_pairing %>
+      <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+        <div><%= t('tournaments.show.strategies.pairing_strategy', default: 'Pairing strategy') %></div>
+        <div>
+          <%= select_tag 'tournament[pairing_strategy_key]',
+                          options_for_select(@pairing_strategies.map { |k, v| [t("tournaments.show.strategies.names.pairing.#{k}", default: v.first), k] }, @tournament.pairing_key),
+                          class: 'input', style: 'width:100%;',
+                          data: { action: 'change->strategy#changed', field: 'pairing_strategy_key' } %>
+        </div>
+        <div class="card-date" id="pairing-explanation" data-strategy-target="pairingExplanation">
+          <%= t("tournaments.show.strategies.explanations.pairing.#{@tournament.pairing_key}", default: t('tournaments.show.strategies.explanations.pairing.default')) %>
+        </div>
+      </div>
+    <% end %>
 
     
   </div>
