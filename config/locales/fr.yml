@@ -254,11 +254,6 @@ fr:
     rating: "Classement"
     count: "Nombre de parties"
     select_system: "Sélectionner un système"
-    first_page: "Première"
-    prev_page: "Précédente"
-    next_page: "Suivante"
-    last_page: "Dernière"
-    page_of: "Page %{page} sur %{total}"
   time:
     formats:
       long: "Le %d/%m/%Y à %Hh%M"

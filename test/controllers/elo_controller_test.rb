@@ -13,38 +13,60 @@ class EloControllerTest < ActionDispatch::IntegrationTest
     user
   end
 
-  test 'paginates standings and defaults to page containing current user, highlights name' do
-    # Create 30 users ranked from 3000 down to 2971 (unique ratings)
-    users = (1..30).map do |i|
-      create_user_with_elo!(username: "user_#{i}", rating: 3001 - i)
-    end
+  test 'guest sees top 15 players (top 10 + next 5), no separators' do
+    (1..25).each { |i| create_user_with_elo!(username: "guest_user_#{i}", rating: 4001 - i) }
 
-    # Target user is rank 23 (page 3 when per=10)
-    target = users[22] # zero-based index => 23rd user
+    get elo_path, params: { game_system_id: @system.id }
+    assert_response :success
+
+    # Top 15 present
+    assert_match(/guest_user_1\b/, @response.body)
+    assert_match(/guest_user_15\b/, @response.body)
+    # 16th not present
+    assert_no_match(/guest_user_16\b/, @response.body)
+    # No separators for guests
+    assert_no_match(/\*\*\*/, @response.body)
+  end
+
+  test 'logged-in user in top 15 sees top 15 and bolded name without separators' do
+    users = (1..25).map { |i| create_user_with_elo!(username: "user_#{i}", rating: 3001 - i) }
+    target = users[11] # rank 12
 
     sign_in target
 
-    get elo_path, params: { game_system_id: @system.id, per: 10 }
+    get elo_path, params: { game_system_id: @system.id }
     assert_response :success
 
-    # Page indicator should read 3 of 3
-    assert_select 'span.card-date', text: I18n.t('elo.page_of', page: 3, total: 3)
-
-    # Current user is bolded in standings
+    # Bold current user
     assert_select 'tbody tr td strong', text: target.username
-
-    # A top-ranked user from page 1 should not be on page 3
-    assert_no_match(/user_1\b/, @response.body)
+    # Shows up to 15
+    assert_match(/user_15\b/, @response.body)
+    assert_no_match(/user_16\b/, @response.body)
+    # No separators
+    assert_no_match(/\*\*\*/, @response.body)
   end
 
-  test 'without login defaults to first page' do
-    (1..25).each { |i| create_user_with_elo!(username: "guest_user_#{i}", rating: 4001 - i) }
+  test 'logged-in user below top 15 sees neighbors with separators' do
+    users = (1..30).map { |i| create_user_with_elo!(username: "user_#{i}", rating: 3001 - i) }
+    target = users[22] # rank 23 (zero-based index)
 
-    get elo_path, params: { game_system_id: @system.id, per: 10 }
+    sign_in target
+
+    get elo_path, params: { game_system_id: @system.id }
     assert_response :success
 
-    # First page should contain top user and not contain an item from page 3
-    assert_match(/guest_user_1\b/, @response.body)
-    assert_no_match(/guest_user_21\b/, @response.body)
+    # Top still shows
+    assert_match(/user_1\b/, @response.body)
+
+    # Two separators present
+    assert_equal 2, @response.body.scan('***').size
+
+    # Neighbors around current user
+    assert_match(/user_22\b/, @response.body)
+    assert_select 'tbody tr td strong', text: target.username
+    assert_match(/user_24\b/, @response.body)
+
+    # Should not show the next-5 block (no user_15)
+    assert_no_match(/user_15\b/, @response.body)
   end
 end
