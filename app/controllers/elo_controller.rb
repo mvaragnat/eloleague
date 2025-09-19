@@ -42,34 +42,66 @@ class EloController < ApplicationController
     return [] unless system
 
     scope = ratings_scope(system)
-    combined = combine_top_and_around(scope)
+    combined = combine_top_and_neighbors(scope)
     with_ranks(scope, combined)
   end
 
   def ratings_scope(system)
-    EloRating.where(game_system: system).includes(:user).order(rating: :desc)
+    # Deterministic order within ties by user_id
+    EloRating.where(game_system: system).includes(:user).order(rating: :desc, user_id: :asc)
   end
 
-  def combine_top_and_around(scope)
-    top = scope.limit(10).to_a
-    around = around_current_user(scope)
-    (top + around).uniq(&:user_id)
+  def combine_top_and_neighbors(scope)
+    top10 = first_ten(scope)
+    user = current_user_row(scope)
+
+    return top10 + next_five(scope) unless user
+    return top10 + next_five(scope) if user_rank(scope, user) <= 15
+
+    top10 + neighbor_cluster(scope, user)
   end
 
-  def around_current_user(scope)
-    return [] unless Current.user
+  def first_ten(scope)
+    scope.limit(10).to_a
+  end
 
-    user_row = scope.find_by(user: Current.user)
-    return [] unless user_row
+  def next_five(scope)
+    scope.offset(10).limit(5).to_a
+  end
 
-    pos = scope.where('rating > ?', user_row.rating).count
-    offset = [pos - 3, 0].max
-    scope.offset(offset).limit(7).to_a
+  def current_user_row(scope)
+    return nil unless Current.user
+
+    scope.find_by(user: Current.user)
+  end
+
+  def user_rank(scope, user_row)
+    higher = scope.where('rating > ?', user_row.rating).count
+    higher + 1
+  end
+
+  def neighbor_cluster(scope, user_row)
+    higher = scope.where('rating > ?', user_row.rating).count
+    tie_before = scope.where('rating = ? AND user_id < ?', user_row.rating, user_row.user_id).count
+    pos = higher + tie_before
+    total = scope.count
+
+    neighbors = []
+    neighbors << :separator
+    neighbors << scope.offset(pos - 1).limit(1).first if pos >= 1
+    neighbors << user_row
+    neighbors << scope.offset(pos + 1).limit(1).first if (pos + 1) < total
+    neighbors << :separator
+    neighbors
   end
 
   def with_ranks(scope, rows)
-    rows
-      .map { |row| { rank: scope.where('rating > ?', row.rating).count + 1, row: row } }
-      .sort_by { |h| h[:rank] }
+    rows.map do |row|
+      if row == :separator
+        { separator: true }
+      else
+        { rank: scope.where('rating > ?', row.rating).count + 1, row: row }
+      end
+    end
   end
 end
