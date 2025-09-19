@@ -285,6 +285,11 @@ en:
     rating: "Rating"
     count: "Games count"
     select_system: "Select a system"
+    first_page: "First"
+    prev_page: "Previous"
+    next_page: "Next"
+    last_page: "Last"
+    page_of: "Page %{page} of %{total}"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"

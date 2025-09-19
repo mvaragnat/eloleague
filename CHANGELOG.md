@@ -158,3 +158,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 2025-09-19
 - Ranking tab now shows all relevant columns: Points, Score sum, Strength of Schedule (SoS), and Secondary score sum. Columns selected as primary or tie-break criteria are highlighted in pale yellow. Added EN/FR translations and tests.
+
+- ELO page: add server-side pagination of standings with localized controls; default to the page containing the signed-in user (if rated) and bold their username in the table. Tests and docs updated.
