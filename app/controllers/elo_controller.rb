@@ -8,7 +8,24 @@ class EloController < ApplicationController
     @system = selected_system(@systems)
     @events = load_events(@system)
     @elo_changes_map = load_elo_changes(@events)
-    @standings = compute_standings(@system)
+
+    if @system
+      scope = ratings_scope(@system)
+      @per_page = per_page_param
+      @total_count = scope.count
+      @total_pages = (@total_count / @per_page.to_f).ceil
+      @page = page_param(scope, @per_page, @total_pages)
+      offset = (@page - 1) * @per_page
+
+      rows = scope.offset(offset).limit(@per_page).to_a
+      @standings = with_ranks(scope, rows)
+    else
+      @standings = []
+      @per_page = 0
+      @total_count = 0
+      @total_pages = 0
+      @page = 1
+    end
   end
 
   private
@@ -38,33 +55,34 @@ class EloController < ApplicationController
     changes.index_by { |ec| [ec.game_event_id, ec.user_id] }
   end
 
-  def compute_standings(system)
-    return [] unless system
-
-    scope = ratings_scope(system)
-    combined = combine_top_and_around(scope)
-    with_ranks(scope, combined)
-  end
-
   def ratings_scope(system)
     EloRating.where(game_system: system).includes(:user).order(rating: :desc)
   end
 
-  def combine_top_and_around(scope)
-    top = scope.limit(10).to_a
-    around = around_current_user(scope)
-    (top + around).uniq(&:user_id)
+  # currently not a param sent by the front, so ends up at default value
+  def per_page_param
+    per = params[:per].to_i
+    per = 20 if per <= 0 || per > 100
+    per
   end
 
-  def around_current_user(scope)
-    return [] unless Current.user
+  def page_param(scope, per_page, total_pages)
+    return user_page(scope, per_page).clamp(1, total_pages) if params[:page].blank?
+
+    page = params[:page].to_i
+    page = 1 if page <= 0
+    page = total_pages if total_pages.positive? && page > total_pages
+    page
+  end
+
+  def user_page(scope, per_page)
+    return 1 unless Current.user
 
     user_row = scope.find_by(user: Current.user)
-    return [] unless user_row
+    return 1 unless user_row
 
-    pos = scope.where('rating > ?', user_row.rating).count
-    offset = [pos - 3, 0].max
-    scope.offset(offset).limit(7).to_a
+    higher = scope.where('rating > ?', user_row.rating).count
+    (higher / per_page) + 1
   end
 
   def with_ranks(scope, rows)

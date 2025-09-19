@@ -11,6 +11,8 @@
                        options_from_collection_for_select(@systems.sort_by(&:localized_name), :id, :localized_name, @system&.id),
                        include_blank: t('elo.select_system'),
                        onchange: 'this.form.submit()' %>
+        <%= hidden_field_tag :page, @page %>
+        <%= hidden_field_tag :per, @per_page %>
       <% end %>
     </div>
   </div>
@@ -34,15 +36,31 @@
           <tbody>
             <% @standings.each do |entry| %>
               <% row = entry[:row] %>
+              <% is_current = (Current.user && row.user_id == Current.user.id) %>
               <tr>
                 <td style="padding:0.25rem 0;"><%= entry[:rank] %></td>
-                <td style="padding:0.25rem 0;"><%= row.user.username %></td>
+                <td style="padding:0.25rem 0;"><%= is_current ? content_tag(:strong, row.user.username) : row.user.username %></td>
                 <td style="padding:0.25rem 0; text-align:right;"><%= row.rating %></td>
                 <td style="padding:0.25rem 0; text-align:right;"><%= row.games_played %></td>
               </tr>
             <% end %>
           </tbody>
         </table>
+
+        <% if @total_pages > 1 %>
+          <div class="pagination" style="display:flex; gap:0.5rem; justify-content:flex-end; margin-top:0.5rem;">
+            <% prev_page = (@page > 1) ? @page - 1 : nil %>
+            <% next_page = (@page < @total_pages) ? @page + 1 : nil %>
+
+            <%= link_to t('elo.first_page', default: 'First'), elo_path(game_system_id: @system&.id, page: 1, per: @per_page), class: "btn btn-secondary", disabled: @page == 1 %>
+            <%= link_to t('elo.prev_page', default: 'Previous'), prev_page ? elo_path(game_system_id: @system&.id, page: prev_page, per: @per_page) : '#', class: "btn btn-secondary", disabled: prev_page.nil? %>
+            <span class="card-date" style="align-self:center;">
+              <%= t('elo.page_of', default: 'Page %{page} of %{total}', page: @page, total: @total_pages) %>
+            </span>
+            <%= link_to t('elo.next_page', default: 'Next'), next_page ? elo_path(game_system_id: @system&.id, page: next_page, per: @per_page) : '#', class: "btn btn-secondary", disabled: next_page.nil? %>
+            <%= link_to t('elo.last_page', default: 'Last'), elo_path(game_system_id: @system&.id, page: @total_pages, per: @per_page), class: "btn btn-secondary", disabled: @page == @total_pages %>
+          </div>
+        <% end %>
       </div>
     </div>
   <% end %>
