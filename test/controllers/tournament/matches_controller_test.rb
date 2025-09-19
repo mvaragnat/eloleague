@@ -67,6 +67,71 @@ class TournamentMatchesControllerTest < ActionDispatch::IntegrationTest
     assert m.game_event.non_competitive
   end
 
+  test 'organizer can edit reported swiss match; next round remains unchanged and Elo not enqueued' do
+    # Swiss tournament with 4 players
+    sign_out @tournament.creator
+    sign_in @tournament.creator
+    @tournament.update!(format: 'swiss', rounds_count: 2, state: 'registration')
+
+    # Ensure two more players and register+check-in them
+    p3 = User.create!(username: 'p3', email: 'p3@example.com', password: 'password')
+    p4 = User.create!(username: 'p4', email: 'p4@example.com', password: 'password')
+
+    [p3, p4].each do |u|
+      sign_out @tournament.creator
+      sign_in u
+      post register_tournament_path(@tournament, locale: I18n.locale)
+      f = Game::Faction.find_or_create_by!(game_system: @system, name: "F-#{u.username}")
+      @tournament.registrations.find_by(user: u).update!(faction: f)
+      post check_in_tournament_path(@tournament, locale: I18n.locale)
+    end
+
+    # Check-in existing two players
+    [@user, @opponent].each do |u|
+      sign_out @tournament.creator
+      sign_in u
+      post check_in_tournament_path(@tournament, locale: I18n.locale)
+    end
+
+    # Lock and create round 1
+    sign_out p4
+    sign_in @tournament.creator
+    post lock_registration_tournament_path(@tournament, locale: I18n.locale)
+    post next_round_tournament_path(@tournament, locale: I18n.locale)
+
+    r1 = @tournament.rounds.order(:number).last
+    m1, m2 = r1.matches.to_a
+
+    # Report both matches (participants)
+    sign_out @tournament.creator
+    sign_in m1.a_user
+    patch tournament_tournament_match_path(@tournament, m1, locale: I18n.locale),
+          params: { tournament_match: { a_score: 1, b_score: 0 } }
+    sign_out m1.a_user
+    sign_in m2.a_user
+    patch tournament_tournament_match_path(@tournament, m2, locale: I18n.locale),
+          params: { tournament_match: { a_score: 2, b_score: 0 } }
+
+    # Generate next round
+    sign_out m2.a_user
+    sign_in @tournament.creator
+    post next_round_tournament_path(@tournament, locale: I18n.locale)
+    r2 = @tournament.rounds.order(:number).last
+    before_pairs = r2.matches.map { |mm| [mm.a_user_id, mm.b_user_id] }
+
+    # Edit a reported R1 match result as organizer to flip winner
+    # Ensure no Elo job is enqueued on edit
+    assert_no_enqueued_jobs only: EloUpdateJob do
+      patch tournament_tournament_match_path(@tournament, m1, locale: I18n.locale),
+            params: { tournament_match: { a_score: 0, b_score: 1 } }
+    end
+
+    # R2 pairings remain identical
+    r2.reload
+    after_pairs = r2.matches.map { |mm| [mm.a_user_id, mm.b_user_id] }
+    assert_equal before_pairs, after_pairs, 'Round 2 pairings should remain unchanged after editing previous round'
+  end
+
   test 'new preselects organizer as player A if also registered' do
     sign_out @tournament.creator
     sign_in @tournament.creator
@@ -155,6 +220,74 @@ module Tournament
 
       other_side = side == 'a' ? 'b' : 'a'
       assert parent.send("#{other_side}_user_id").present?, 'other side should be the bye-propagated top seed'
+    end
+
+    test 'editing elimination leaf updates parent when parent not played; does not when played' do
+      # Creator signs in and creates elimination tournament with 4 players
+      sign_in @creator
+      post tournaments_path(locale: I18n.locale), params: {
+        tournament: { name: 'KO Edit', description: 'Tree', game_system_id: @system.id, format: 'elimination' }
+      }
+      t = ::Tournament::Tournament.order(:created_at).last
+
+      [@creator, @p2, @p3, User.create!(username: 'p4', email: 'p4@example.com', password: 'password')].each do |u|
+        sign_out @creator
+        sign_in u
+        post register_tournament_path(t, locale: I18n.locale)
+        f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: "F-#{u.username}")
+        t.registrations.find_by(user: u).update!(faction: f)
+        post check_in_tournament_path(t, locale: I18n.locale)
+      end
+      sign_out @p3
+      sign_in @creator
+
+      # Lock to build bracket
+      post lock_registration_tournament_path(t, locale: I18n.locale)
+
+      # Pick a leaf with two players
+      leaf = t.matches.select { |m| m.child_matches.empty? && m.a_user_id.present? && m.b_user_id.present? }.first
+      assert leaf
+      parent = leaf.parent_match
+      assert parent
+
+      # Report initial result: a wins
+      sign_out @creator
+      sign_in leaf.a_user
+      patch tournament_tournament_match_path(t, leaf, locale: I18n.locale),
+            params: { tournament_match: { a_score: 3, b_score: 1 } }
+
+      # Parent should have a_user set to a (or b depending on child_slot)
+      parent.reload
+      side = leaf.child_slot
+      assert_equal leaf.a_user_id, parent.send("#{side}_user_id")
+
+      # As organizer, flip winner to b_win while parent not played -> parent updates
+      sign_out leaf.a_user
+      sign_in t.creator
+      patch tournament_tournament_match_path(t, leaf, locale: I18n.locale),
+            params: { tournament_match: { a_score: 1, b_score: 2 } }
+      parent.reload
+      assert_equal leaf.b_user_id, parent.send("#{side}_user_id"), 'Parent should reflect new winner when not played'
+
+      # Now simulate parent has been played: attach a game_event and set result
+      event = Game::Event.new(game_system: t.game_system, played_at: Time.current, tournament: t)
+      event.game_participations.build(user: parent.a_user, score: 2,
+                                      faction: t.registrations.find_by(user: parent.a_user)&.faction)
+      # Parent might not have b_user yet; use a second participant or mirror if nil
+      opp = parent.b_user || [@p2, @p3, t.creator, leaf.b_user, leaf.a_user].compact.uniq.find do |u|
+        u != parent.a_user
+      end
+      event.game_participations.build(user: opp, score: 0,
+                                      faction: t.registrations.find_by(user: opp)&.faction)
+      assert event.save!, event.errors.full_messages.to_sentence
+      parent.update!(game_event: event, result: 'a_win')
+
+      # Flip leaf winner again -> parent should NOT change now
+      previous_parent_side_id = parent.reload.send("#{side}_user_id")
+      patch tournament_tournament_match_path(t, leaf, locale: I18n.locale),
+            params: { tournament_match: { a_score: 5, b_score: 6 } }
+      assert_equal previous_parent_side_id, parent.reload.send("#{side}_user_id"),
+                   'Parent should stay unchanged when already played'
     end
   end
 

@@ -1,10 +1,16 @@
 ## 2025-09-18
 
+- Tournament: organizers can edit reported matches
+  - Editing updates the existing Game::Event (no new Elo application)
+  - Swiss: existing generated next-round pairings remain unchanged
+  - Elimination: parent assignment updates only if the next match has not been played
+
 - Feature — Organizer can swap pairings for unplayed matches in Swiss and Elimination:
   - On the match page, the A/B player names become admin-only dropdowns listing eligible players from the same round/depth with pending matches.
   - Selecting a player and clicking "Switch" swaps players across the two affected matches.
   - Backend validation ensures swaps only occur within the same round (Swiss) or same depth level (Elimination), and only for matches without results.
   - Fully localized (EN/FR), with controller tests for both formats.
+
 
 ## 2025-09-10
 

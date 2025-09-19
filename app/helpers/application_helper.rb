@@ -168,7 +168,8 @@ module ApplicationHelper
       b_style = pb&.score.to_i > pa&.score.to_i ? 'font-weight:700; fill:#16a34a;' : ''
       score_text = "#{pa&.score} - #{pb&.score}"
       # For open format listing, we may show secondary below or omit to reduce clutter. Keep compact here.
-      link = nil
+      both_present = match.a_user_id.present? && match.b_user_id.present?
+      link = admin && both_present ? tournament_tournament_match_path(tournament, match) : nil
     else
       a_style = ''
       b_style = ''
@@ -218,6 +219,15 @@ module ApplicationHelper
     end
 
     safe_join(parts)
+  end
+
+  # Controller-generated list item wrapper for small match boxes
+  def svg_match_list_item(tournament, match)
+    content_tag(:li, style: 'margin:0; display:flex; justify-content:center;') do
+      content_tag(:svg, width: 240, height: 88) do
+        small_match_box(tournament, match, 0, 0, width: 240, show_seeds: false)
+      end
+    end
   end
 
   private

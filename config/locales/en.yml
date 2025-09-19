@@ -62,6 +62,7 @@ en:
       fr: "Français"
     shared:
       cancel: "Cancel"
+      save: "Save"
   yes: "Yes"
   no: "No"
   footer:
@@ -247,6 +248,7 @@ en:
     not_allowed_state: "Not allowed in current state"
     draw_not_allowed: "Draw is not allowed in elimination"
     cannot_advance_pending: "All matches must be completed to move to the next round"
+    match_updated: "Match updated"
     faction_required_hint: "Please select your faction in the Participants tab before checking in."
     faction_required_to_check_in: "Please select your faction before checking in"
     army_list_required_hint: "Army list is required to check in"
