@@ -9,23 +9,7 @@ class EloController < ApplicationController
     @events = load_events(@system)
     @elo_changes_map = load_elo_changes(@events)
 
-    if @system
-      scope = ratings_scope(@system)
-      @per_page = per_page_param
-      @total_count = scope.count
-      @total_pages = (@total_count / @per_page.to_f).ceil
-      @page = page_param(scope, @per_page, @total_pages)
-      offset = (@page - 1) * @per_page
-
-      rows = scope.offset(offset).limit(@per_page).to_a
-      @standings = with_ranks(scope, rows)
-    else
-      @standings = []
-      @per_page = 0
-      @total_count = 0
-      @total_pages = 0
-      @page = 1
-    end
+    @standings = compute_standings(@system)
   end
 
   private
@@ -55,39 +39,70 @@ class EloController < ApplicationController
     changes.index_by { |ec| [ec.game_event_id, ec.user_id] }
   end
 
+  def compute_standings(system)
+    return [] unless system
+
+    scope = ratings_scope(system)
+    combined = combine_top_and_neighbors(scope)
+    with_ranks(scope, combined)
+  end
+
   def ratings_scope(system)
-    EloRating.where(game_system: system).includes(:user).order(rating: :desc)
+    # Deterministic order within ties by user_id
+    EloRating.where(game_system: system).includes(:user).order(rating: :desc, user_id: :asc)
   end
 
-  # currently not a param sent by the front, so ends up at default value
-  def per_page_param
-    per = params[:per].to_i
-    per = 20 if per <= 0 || per > 100
-    per
+  def combine_top_and_neighbors(scope)
+    top10 = first_ten(scope)
+    user = current_user_row(scope)
+
+    return top10 + next_five(scope) unless user
+    return top10 + next_five(scope) if user_rank(scope, user) <= 15
+
+    top10 + neighbor_cluster(scope, user)
   end
 
-  def page_param(scope, per_page, total_pages)
-    return user_page(scope, per_page).clamp(1, total_pages) if params[:page].blank?
-
-    page = params[:page].to_i
-    page = 1 if page <= 0
-    page = total_pages if total_pages.positive? && page > total_pages
-    page
+  def first_ten(scope)
+    scope.limit(10).to_a
   end
 
-  def user_page(scope, per_page)
-    return 1 unless Current.user
+  def next_five(scope)
+    scope.offset(10).limit(5).to_a
+  end
 
-    user_row = scope.find_by(user: Current.user)
-    return 1 unless user_row
+  def current_user_row(scope)
+    return nil unless Current.user
 
+    scope.find_by(user: Current.user)
+  end
+
+  def user_rank(scope, user_row)
     higher = scope.where('rating > ?', user_row.rating).count
-    (higher / per_page) + 1
+    higher + 1
+  end
+
+  def neighbor_cluster(scope, user_row)
+    higher = scope.where('rating > ?', user_row.rating).count
+    tie_before = scope.where('rating = ? AND user_id < ?', user_row.rating, user_row.user_id).count
+    pos = higher + tie_before
+    total = scope.count
+
+    neighbors = []
+    neighbors << :separator
+    neighbors << scope.offset(pos - 1).limit(1).first if pos >= 1
+    neighbors << user_row
+    neighbors << scope.offset(pos + 1).limit(1).first if (pos + 1) < total
+    neighbors << :separator
+    neighbors
   end
 
   def with_ranks(scope, rows)
-    rows
-      .map { |row| { rank: scope.where('rating > ?', row.rating).count + 1, row: row } }
-      .sort_by { |h| h[:rank] }
+    rows.map do |row|
+      if row == :separator
+        { separator: true }
+      else
+        { rank: scope.where('rating > ?', row.rating).count + 1, row: row }
+      end
+    end
   end
 end
