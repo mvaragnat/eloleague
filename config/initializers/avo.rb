@@ -14,7 +14,8 @@ Avo.configure do |config|
 
   ## == Set the context ==
   config.set_context do
-    # Return a context object that gets evaluated within Avo::ApplicationController
+    # Mirror Devise admin to Current
+    Current.admin = current_admin
   end
 
   ## == Authentication ==
@@ -152,7 +153,14 @@ Avo.configure do |config|
   #   end
 
   #   section "Resources", icon: "avo/resources" do
-  #     all_resources
+  #     # Exclude GameParticipation and TournamentRound from the main menu
+  #     visible_resources = Avo::App.resources.reject do |r|
+  #       [Avo::Resources::GameParticipation, Avo::Resources::TournamentRound].include?(r)
+  #     end
+
+  #     visible_resources.each do |resource|
+  #       resource resource
+  #     end
   #   end
 
   #   section "Tools", icon: "avo/tools" do

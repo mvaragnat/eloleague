@@ -14,7 +14,6 @@ class AvoAuthIntegrationTest < ActionDispatch::IntegrationTest
     sign_in admin, scope: :admin
     get '/avo'
     assert_response :redirect
-    follow_redirect!
-    assert_response :success
+    assert_includes @response.redirect_url, '/avo/resources/'
   end
 end

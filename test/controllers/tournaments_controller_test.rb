@@ -834,7 +834,9 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     assert_includes body, I18n.t('tournaments.show.standings.points', default: 'Points')
     assert_includes body, I18n.t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum')
-    assert_includes body, I18n.t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule')
+    sos_label = I18n.t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule')
+    sos_label_escaped = ERB::Util.html_escape(sos_label)
+    assert body.include?(sos_label) || body.include?(sos_label_escaped), 'Expected SoS label in standings header'
     assert_includes body,
                     I18n.t('tournaments.show.strategies.names.primary.secondary_score_sum',
                            default: 'Secondary score sum')

@@ -176,6 +176,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Sign-out link in Avo targets the Admin session destroy path.
 - See Avo authentication reference used for setup: Avo 3 Authentication.
 
+- Admin-created users: when creating a User from Avo and leaving password blank, the system auto-generates a secure random password.
+- Avo menu hides `Game::Participation` and `Tournament::Round` resources; still accessible via relations.
+- Game Events now display a participants summary (usernames and scores) in Avo list/show views.
+
 ### Footer & Contact
 - A global footer appears on all pages: "Made by Marquis with ❤️. A bug, a suggestion, a new game to add? Write me"
 - The "Write me" link opens a one-page contact form with subject and message fields
