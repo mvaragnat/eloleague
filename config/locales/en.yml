@@ -127,6 +127,9 @@ en:
       both_scores_required: "Both scores are required"
       both_factions_required: "Both players must select a faction"
     secondary_score_short: "Points"
+  avo:
+    fields:
+      participants_with_scores: "Participants & scores"
   tournaments:
     index_title: "Tournaments"
     new: 
@@ -250,6 +253,8 @@ en:
       actions:
         toggle_status_to_checked_in: "Check-in"
         toggle_status_to_pending: "Mark pending"
+      player_a: "Player A"
+      player_b: "Player B"
       type: "Tournament"
       settings: "Settings"
       online_label: "Online tournament"

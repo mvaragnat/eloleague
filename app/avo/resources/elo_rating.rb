@@ -11,7 +11,7 @@ module Avo
         field :user, as: :belongs_to, resource: Avo::Resources::User
         field :game_system, as: :belongs_to, resource: Avo::Resources::GameSystem
 
-        field :rating, as: :number
+        field :rating, as: :number, sortable: true
         field :games_played, as: :number
         field :last_updated_at, as: :date_time
         field :created_at, as: :date_time, readonly: true

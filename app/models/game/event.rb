@@ -24,6 +24,18 @@ module Game
     scope :competitive, -> { where(non_competitive: false) }
     scope :non_competitive, -> { where(non_competitive: true) }
 
+    def participants_summary
+      game_participations.includes(:user).map do |p|
+        username = p.user&.username || '?'
+        secondary = if p.secondary_score.present?
+                      " (#{I18n.t('games.secondary_score_short')}: #{p.secondary_score})"
+                    else
+                      ''
+                    end
+        "#{username}: #{p.score}#{secondary}"
+      end.join(' | ')
+    end
+
     def winner_user
       participations = game_participations.to_a
       return nil unless participations.size == 2

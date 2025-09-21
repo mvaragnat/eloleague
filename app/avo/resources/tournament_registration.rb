@@ -4,7 +4,7 @@ module Avo
   module Resources
     class TournamentRegistration < Avo::BaseResource
       self.model_class = ::Tournament::Registration
-      self.title = :id
+      self.title = :registration_label
 
       def fields
         field :id, as: :id

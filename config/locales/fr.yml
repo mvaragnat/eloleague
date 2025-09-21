@@ -98,6 +98,9 @@ fr:
       both_scores_required: "Les deux scores sont requis"
       both_factions_required: "Les deux joueurs doivent sélectionner une faction"
     secondary_score_short: "Points"
+  avo:
+    fields:
+      participants_with_scores: "Participants & scores"
   tournaments:
     index_title: "Tournois"
     new: 

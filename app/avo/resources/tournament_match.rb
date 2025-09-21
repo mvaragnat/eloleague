@@ -4,14 +4,14 @@ module Avo
   module Resources
     class TournamentMatch < Avo::BaseResource
       self.model_class = ::Tournament::Match
-      self.title = :id
+      self.title = :match_label
 
       def fields
         field :id, as: :id
         field :tournament, as: :belongs_to, resource: Avo::Resources::Tournament
         field :round, as: :belongs_to, resource: Avo::Resources::TournamentRound
-        field :a_user, as: :belongs_to, resource: Avo::Resources::User
-        field :b_user, as: :belongs_to, resource: Avo::Resources::User
+        field :a_user, as: :belongs_to, resource: Avo::Resources::User, name: I18n.t('tournaments.show.player_a')
+        field :b_user, as: :belongs_to, resource: Avo::Resources::User, name: I18n.t('tournaments.show.player_b')
         field :game_event, as: :belongs_to, resource: Avo::Resources::GameEvent
 
         field :result, as: :select, options: ::Tournament::Match::RESULTS
