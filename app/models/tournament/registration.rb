@@ -10,5 +10,11 @@ module Tournament
 
     validates :user_id, uniqueness: { scope: :tournament_id }
     validates :status, inclusion: { in: %w[pending checked_in] }
+
+    def registration_label
+      user_name = user&.username || '?'
+      tournament_name = tournament&.name || 'Tournament'
+      "#{tournament_name} – #{user_name}"
+    end
   end
 end

@@ -16,6 +16,8 @@ module Avo
         field :elo_applied, as: :boolean
         field :metadata, as: :code, language: 'json'
 
+        field :participants_summary, as: :text, name: I18n.t('avo.fields.participants_with_scores'), readonly: true
+
         field :game_participations, as: :has_many, resource: Avo::Resources::GameParticipation
         field :players, as: :has_many, through: :game_participations, resource: Avo::Resources::User
       end

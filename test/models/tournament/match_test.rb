@@ -19,6 +19,7 @@ module Tournament
       m = ::Tournament::Match.new(tournament: @t, a_user: @a, b_user: @b)
       assert m.valid?
       assert_equal 'pending', m.result
+      assert_match(/#{@a.username} .* #{@b.username}/, m.match_label)
     end
 
     test 'invalid result value' do

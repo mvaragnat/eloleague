@@ -31,6 +31,12 @@ module Tournament
       a_score > b_score ? 'a_win' : 'b_win'
     end
 
+    def match_label
+      a_name = a_user&.username || '?'
+      b_name = b_user&.username || '?'
+      "#{a_name} #{I18n.t('vs')} #{b_name}"
+    end
+
     private
 
     def copy_non_competitive_from_tournament

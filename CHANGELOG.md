@@ -1,3 +1,11 @@
+## [Unreleased] - 2025-09-21
+
+- Avo admin dashboard updates:
+  - New users created by admins now auto-generate a secure random password if left blank (fixes "password can't be blank").
+  - Usernames are displayed across Tournament Matches, Registrations, Elo Ratings, and Elo Changes via proper belongs_to association titles.
+  - Removed separate sidebar entries for Game Participation and Tournament Rounds in Avo.
+  - Game Events display a participants summary with usernames and scores.
+
 ## 2025-09-18
 
 - Tournament: organizers can edit reported matches
