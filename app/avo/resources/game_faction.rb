@@ -16,7 +16,7 @@ module Avo
       end
 
       def filters
-        [Avo::Filters::GameSystemFilter]
+        filter Avo::Filters::GameSystemFilter
       end
     end
   end
