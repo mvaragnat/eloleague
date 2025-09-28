@@ -130,6 +130,7 @@ en:
   avo:
     fields:
       participants_with_scores: "Participants & scores"
+      games_played: "Games played"
   tournaments:
     index_title: "Tournaments"
     new: 
