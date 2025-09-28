@@ -8,10 +8,15 @@ module Avo
 
       def fields
         field :id, as: :id
-        field :name, as: :text, required: true
+        field :name, as: :text, required: true, sortable: true
         field :game_system, as: :belongs_to, resource: Avo::Resources::GameSystem
 
+        field :games_count, as: :number, name: I18n.t('avo.fields.games_played'), readonly: true
         field :game_participations, as: :has_many, resource: Avo::Resources::GameParticipation
+      end
+
+      def filters
+        [Avo::Filters::GameSystemFilter]
       end
     end
   end

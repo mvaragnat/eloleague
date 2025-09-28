@@ -1,6 +1,7 @@
-## [Unreleased] - 2025-09-21
+## [Unreleased] - 2025-09-28
 
 - Avo admin dashboard updates:
+  - Game Factions: added filter by Game System, sortable Name column, and a Games Played column showing number of participations per faction.
   - New users created by admins now auto-generate a secure random password if left blank (fixes "password can't be blank").
   - Usernames are displayed across Tournament Matches, Registrations, Elo Ratings, and Elo Changes via proper belongs_to association titles.
   - Removed separate sidebar entries for Game Participation and Tournament Rounds in Avo.

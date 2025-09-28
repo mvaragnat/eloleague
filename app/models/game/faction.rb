@@ -11,6 +11,10 @@ module Game
     validates :name, presence: true, length: { maximum: 100 }
     validates :name, uniqueness: { scope: :game_system_id }
 
+    def games_count
+      game_participations.count
+    end
+
     def localized_name(locale = I18n.locale)
       translations = Game::Localization.find_faction_translations(game_system&.name, name)
       return name unless translations

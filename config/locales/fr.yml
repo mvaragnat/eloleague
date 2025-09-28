@@ -99,8 +99,11 @@ fr:
       both_factions_required: "Les deux joueurs doivent sélectionner une faction"
     secondary_score_short: "Points"
   avo:
+    filters:
+      game_system: "Système de jeu"
     fields:
       participants_with_scores: "Participants & scores"
+      games_played: "Matchs joués"
   tournaments:
     index_title: "Tournois"
     new: 
