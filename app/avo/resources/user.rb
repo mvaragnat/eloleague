@@ -12,7 +12,7 @@ module Avo
 
       def fields
         field :id, as: :id
-        field :username, as: :text
+        field :username, as: :text, sortable: true
         field :email, as: :text
         field :password, as: :password, only_on: :forms
         field :password_confirmation, as: :password, only_on: :forms
