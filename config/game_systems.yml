@@ -41,6 +41,7 @@ game_systems:
       - "Empire T'au"
       - "Orks de Ghazghkull"
       - "Orks Evil Sunz"
+      - "Orkimedes"
       - "Nécrons"
       - en: "Grey Knights"
         fr: "Chevaliers Gris"
