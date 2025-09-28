@@ -3,9 +3,6 @@
 module Avo
   module Filters
     class GameSystemFilter < Avo::Filters::SelectFilter
-      self.name = -> { I18n.t('avo.filters.game_system') }
-      self.button_label = -> { I18n.t('avo.filters.game_system_button') }
-
       def apply(_request, query, value)
         return query if value.blank?
 
