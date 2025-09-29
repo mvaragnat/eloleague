@@ -131,6 +131,17 @@ en:
     fields:
       participants_with_scores: "Participants & scores"
       games_played: "Games played"
+    actions:
+      bulk_destroy_factions:
+        name: "Delete selected factions"
+        confirm_title: "Delete %{count} selected factions?"
+        confirm_list_intro: "These factions will be permanently deleted:"
+        confirm_warning: "This action cannot be undone."
+        success: "Deleted %{count} faction(s)"
+        partial_success: "Deleted %{destroyed}, failed %{failed}"
+        failure: "Failed to delete: %{error}"
+        cancelled_warning: "No faction deleted. Some selected factions are referenced."
+        cancelled: "Deletion cancelled: %{error}"
   tournaments:
     index_title: "Tournaments"
     new: 
