@@ -22,7 +22,7 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     end
 
     # Verify game systems were created
-    epic = Game::System.find_by(name: 'Epic Armaggeddon - FERC')
+    epic = Game::System.find_by(name: 'Epic Armageddon - FERC')
     assert_not_nil epic
     assert_equal '6mm strategy – French community-maintained lists', epic.description
 
@@ -33,7 +33,7 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
 
   test 'does not duplicate existing game systems and factions' do
     # Create existing system and faction
-    existing_system = Game::System.create!(name: 'Epic Armaggeddon - FERC', description: 'Old description')
+    existing_system = Game::System.create!(name: 'Epic Armageddon - FERC', description: 'Old description')
     Game::Faction.create!(name: 'Steel Legion', game_system: existing_system)
 
     assert_difference 'Game::System.count', 1 do # Only Go should be created
