@@ -102,6 +102,7 @@ fr:
     fields:
       participants_with_scores: "Participants & scores"
       games_played: "Matchs joués"
+    actions: "Actions groupées"
   tournaments:
     index_title: "Tournois"
     new: 

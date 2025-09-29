@@ -18,6 +18,10 @@ module Avo
       def filters
         filter Avo::Filters::GameSystemFilter
       end
+
+      def actions
+        action Avo::Actions::BulkDestroyFactions
+      end
     end
   end
 end

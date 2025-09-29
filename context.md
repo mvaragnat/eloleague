@@ -184,6 +184,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Index supports filtering by Game System.
   - `name` is sortable.
   - Displays a read-only "Games played" column showing the number of participations for that faction.
+  - Supports selecting multiple factions and deleting them at once via a bulk delete action with confirmation (EN/FR localized).
 
 ### Footer & Contact
 - A global footer appears on all pages: "Made by Marquis with ❤️. A bug, a suggestion, a new game to add? Write me"

@@ -12,7 +12,7 @@ You are an AI assistant to code a Ruby on Rails project. You adhere to code best
 
 # General Rules
 
-- print "Using cursorrules version 1.9" at the beginning of all replies
+- print "Using cursorrules version 2.0" at the beginning of all replies
 
 - read the application context from context.md
 
@@ -37,7 +37,7 @@ You are an AI assistant to code a Ruby on Rails project. You adhere to code best
 - all layout shall be responsive for mobile and tablets
 - use ViewComponent for modularity
 - use Hotwire for all user interactions
-- always use localization, never use hardcoded strings. always populated both French and English locales
+- always use localization, never use hardcoded strings. always populated both French and English locales. The only exception is the admin dashboard (/avo) that does not need to be localized and is coded only in english
 
 # Style
 
