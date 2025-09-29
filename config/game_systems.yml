@@ -2,7 +2,7 @@
 # This file is used by the seed:game_systems rake task
 
 game_systems:
-  - name: "Epic Armaggeddon - FERC"
+  - name: "Epic Armageddon - FERC"
     description: 
       en: "6mm strategy – French community-maintained lists"
       fr: "Stratégie en 6mm – listes maintenues par la communauté française"
