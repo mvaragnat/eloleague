@@ -16,7 +16,7 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
 
   test 'seeds game systems and factions from YAML config' do
     assert_difference 'Game::System.count', 2 do
-      assert_difference 'Game::Faction.count', 64 do
+      assert_difference 'Game::Faction.count', 65 do
         Rake::Task['seed:game_systems'].execute
       end
     end
@@ -27,7 +27,7 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     assert_equal '6mm strategy – French community-maintained lists', epic.description
 
     # Verify factions were created
-    assert_equal 36, epic.factions.count
+    assert_equal 37, epic.factions.count
     assert epic.factions.pluck(:name).include?('Steel Legion')
   end
 
@@ -37,7 +37,7 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     Game::Faction.create!(name: 'Steel Legion', game_system: existing_system)
 
     assert_difference 'Game::System.count', 1 do # Only Go should be created
-      assert_difference 'Game::Faction.count', 63 do # Black for Chess, and both for Go
+      assert_difference 'Game::Faction.count', 64 do # Black for Chess, and both for Go
         Rake::Task['seed:game_systems'].execute
       end
     end
