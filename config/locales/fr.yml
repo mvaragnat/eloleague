@@ -102,17 +102,7 @@ fr:
     fields:
       participants_with_scores: "Participants & scores"
       games_played: "Matchs joués"
-    actions:
-      bulk_destroy_factions:
-        name: "Supprimer les factions sélectionnées"
-        confirm_title: "Supprimer %{count} faction(s) sélectionnée(s) ?"
-        confirm_list_intro: "Ces factions seront supprimées définitivement :"
-        confirm_warning: "Cette action est irréversible."
-        success: "%{count} faction(s) supprimée(s)"
-        partial_success: "%{destroyed} supprimée(s), %{failed} en échec"
-        failure: "Échec de suppression : %{error}"
-        cancelled_warning: "Aucune faction supprimée. Certaines sont encore référencées."
-        cancelled: "Suppression annulée : %{error}"
+    actions: "Actions groupées"
   tournaments:
     index_title: "Tournois"
     new: 
