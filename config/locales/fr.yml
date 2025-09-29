@@ -87,6 +87,7 @@ fr:
       score: "Score"
       faction: "Faction"
       select_player: "Sélectionner un joueur"
+      non_competitive_hint: "Non-compétitif : ignorer les mises à jour ELO pour cette partie"
     view_army_list: "Voir les listes d'armée"
     view_army_lists: "Listes d'armée"
     participants: "Participants"

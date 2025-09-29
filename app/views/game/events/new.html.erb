@@ -1,7 +1,8 @@
 <%= turbo_frame_tag "modal" do %>
-  <div class="modal-overlay">
+  <div class="modal-overlay" data-controller="modal">
     <div class="modal-card">
-      <h2><%= t('games.new.title') %></h2>
+      <h2 style="margin-right:2rem;"><%= t('games.new.title') %></h2>
+      <%= link_to "×", "#", class: "modal-close", aria: { label: t('layouts.shared.close', default: 'Close') }, data: { action: 'click->modal#close' } %>
 
       <%= form_with(model: @game, url: game_events_path, scope: :game_event, data: { controller: "game-form", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
         <div data-game-form-target="error" class="hidden" style="color:#dc2626;font-size:0.875rem;margin-bottom:1rem;"></div>
@@ -17,8 +18,15 @@
         <%= render partial: 'shared/participations_fields', locals: { form: form, preselected_user: Current.user, preselected_removable: false, tournament_id: nil } %>
 
         <div class="modal-actions">
-          <%= link_to t('layouts.shared.cancel'), "#", data: { action: "click->turbo-modal#close" }, class: "btn btn-secondary" %>
+          <%= link_to t('layouts.shared.cancel'), "#", data: { action: "click->modal#close" }, class: "btn btn-secondary" %>
           <%= form.submit t('games.new.submit'), class: "btn btn-primary" %>
+        </div>
+
+        <div class="form-group">
+          <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+            <%= form.check_box :non_competitive %>
+            <span class="card-date" style="font-style:normal;"><%= t('games.new.non_competitive_hint', default: 'Check to skip ELO updates for this game') %></span>
+          </label>
         </div>
       <% end %>
     </div>
@@ -42,10 +50,11 @@
       background: white;
       border-radius: 8px;
       padding: 2rem;
-      width: 90%;
-      max-width: 500px;
+      width: 90vw;
+      max-width: 900px;
       max-height: 90vh;
       overflow-y: auto;
+      position: relative;
     }
     
     .form-group {
@@ -196,6 +205,27 @@
     
     .btn-secondary:hover {
       background: #4b5563;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #6b7280;
+      font-size: 1.5rem;
+      line-height: 1;
+      border-radius: 6px;
+    }
+
+    .modal-close:hover {
+      background: #f3f4f6;
+      color: #111827;
     }
   </style>
 <% end %> 

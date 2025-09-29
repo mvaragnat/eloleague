@@ -11,6 +11,10 @@ module Game
              dependent: :destroy
     accepts_nested_attributes_for :game_participations
     has_many :players, through: :game_participations, source: :user
+    has_many :elo_changes,
+             foreign_key: 'game_event_id',
+             inverse_of: :game_event,
+             dependent: :destroy
 
     validates :played_at, presence: true
     validate :must_have_exactly_two_players
@@ -49,8 +53,11 @@ module Game
     private
 
     def apply_tournament_competitiveness
-      # Default events are competitive; copy tournament flag when present
-      self.non_competitive = tournament&.non_competitive || false
+      # Respect manual flag for non-tournament games; mirror tournament for tournament games
+      return self.non_competitive = tournament.non_competitive if tournament.present?
+
+      # For non-tournament events, keep any explicit value, defaulting to false
+      self.non_competitive = !!non_competitive
     end
 
     def must_have_exactly_two_players

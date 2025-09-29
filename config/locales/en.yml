@@ -116,6 +116,7 @@ en:
       score: "Score"
       faction: "Faction"
       select_player: "Select player"
+      non_competitive_hint: "Non-competitive: skip ELO updates for this game"
     view_army_list: "View my army list"
     view_army_lists: "Army lists"
     participants: "Participants"
