@@ -49,8 +49,11 @@ module Game
     private
 
     def apply_tournament_competitiveness
-      # Default events are competitive; copy tournament flag when present
-      self.non_competitive = tournament&.non_competitive || false
+      # Respect manual flag for non-tournament games; mirror tournament for tournament games
+      return self.non_competitive = tournament.non_competitive if tournament.present?
+
+      # For non-tournament events, keep any explicit value, defaulting to false
+      self.non_competitive = !!non_competitive
     end
 
     def must_have_exactly_two_players
