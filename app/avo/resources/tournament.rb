@@ -25,6 +25,7 @@ module Avo
         field :pairing_strategy_key, as: :text
         field :tiebreak1_strategy_key, as: :text
         field :tiebreak2_strategy_key, as: :text
+        field :score_for_bye, as: :number, help: 'Score awarded for bye (Swiss tournaments only)'
         field :slug, as: :text, readonly: true
         field :settings, as: :code, language: 'json'
 

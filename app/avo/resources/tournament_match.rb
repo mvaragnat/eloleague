@@ -18,6 +18,7 @@ module Avo
         field :reported_at, as: :date_time
         field :metadata, as: :code, language: 'json'
 
+        field :game_event, as: :has_one, resource: Avo::Resources::GameEvent
         field :parent_match, as: :belongs_to, resource: Avo::Resources::TournamentMatch
         field :child_slot, as: :select, options: %w[a b]
         field :child_matches, as: :has_many, resource: Avo::Resources::TournamentMatch

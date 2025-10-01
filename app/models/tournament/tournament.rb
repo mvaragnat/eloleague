@@ -30,6 +30,7 @@ module Tournament
     validates :format, presence: true
     validates :rounds_count, numericality: { greater_than: 0 }, allow_nil: true
     validates :max_players, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+    validates :score_for_bye, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: false
 
     validate :strategy_keys_are_known
 

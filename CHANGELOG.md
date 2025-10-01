@@ -1,3 +1,12 @@
+## 2025-10-01
+
+- Swiss tournaments: Added "Score for bye" option
+  - Organizers can set a score value (default 0) that bye players receive in their score_sum
+  - Configurable in Admin tab (Swiss tournaments only)
+  - Displayed in tournament Settings/Overview tab
+  - Previously, byes awarded 1.0 points but 0 score, causing ranking issues when using score as primary criterion
+  - Now organizers can set an appropriate bye score (e.g., match the average game score) for fair rankings
+
 ## [Unreleased] - 2025-09-29
 
 - Avo admin dashboard updates:

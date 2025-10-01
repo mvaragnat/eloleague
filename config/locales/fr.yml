@@ -125,6 +125,7 @@ fr:
       datetime_placeholder: "AAAA-MM-JJ HH:MM"
       require_army_list_for_check_in: "Exiger une liste d'armée au check-in"
       non_competitive: "Non-compétitif (sans impact Elo)"
+      score_for_bye: "Score pour exempt"
     formats:
       open: "Open"
       swiss: "Suisse"
