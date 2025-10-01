@@ -268,7 +268,8 @@ class TournamentsController < ApplicationController
       :non_competitive,
       :location,
       :online,
-      :max_players
+      :max_players,
+      :score_for_bye
     )
   end
 
@@ -334,6 +335,7 @@ class TournamentsController < ApplicationController
     tournament.matches.includes(:a_user, :b_user, :game_event).find_each do |m|
       if bye_win_for_single_participant?(m)
         apply_bye_points(points, m)
+        apply_bye_score(score_sum, m, tournament)
         next
       end
 
@@ -366,6 +368,15 @@ class TournamentsController < ApplicationController
       points[match.a_user.id] += 1.0
     elsif match.result == 'b_win' && match.b_user && match.a_user.nil?
       points[match.b_user.id] += 1.0
+    end
+  end
+
+  def apply_bye_score(score_sum, match, tournament)
+    bye_score = tournament.score_for_bye || 0
+    if match.result == 'a_win' && match.a_user && match.b_user.nil?
+      score_sum[match.a_user.id] += bye_score
+    elsif match.result == 'b_win' && match.b_user && match.a_user.nil?
+      score_sum[match.b_user.id] += bye_score
     end
   end
 

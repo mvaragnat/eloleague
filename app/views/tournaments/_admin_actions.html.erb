@@ -128,6 +128,18 @@
                    placeholder="<%= t('tournaments.new.max_players_placeholder', default: 'No limit') %>"
                    style="width:100%; max-width: 220px;" />
           </div>
+          <% if @tournament.swiss? %>
+            <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+              <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.score_for_bye', default: 'Score for bye') %></div>
+              <input type="number"
+                     value="<%= @tournament.score_for_bye %>"
+                     min="0"
+                     data-action="blur->strategy#changed"
+                     data-field="score_for_bye"
+                     placeholder="0"
+                     style="width:100%; max-width: 220px;" />
+            </div>
+          <% end %>
         </div>
       </div>
     </div>

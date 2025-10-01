@@ -128,6 +128,8 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 - Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by the selected primary strategy with tie-breakers applied. The Ranking tab shows four columns: Points, Score sum, Strength of Schedule (SoS), and Secondary score sum. Columns that correspond to the selected primary or tie-break strategies are highlighted in pale yellow to make the applied rules explicit.
 
+- Swiss tournaments support a "Score for bye" setting (integer, default 0) that determines the score value awarded to players receiving a bye. This score is included in their score_sum for tie-breaking and rankings. Organizers can configure this in the Admin tab, and it is displayed in the tournament's Overview tab.
+
 #### Pairing swap (Swiss & Elimination)
 - The tournament organizer can adjust pairings for unplayed matches directly from the match page.
 - For Swiss, eligible swap targets are players from other unreported matches within the same round.
