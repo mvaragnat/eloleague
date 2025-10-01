@@ -1060,7 +1060,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     # Check standings via the ranking page
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
-    
+
     # Verify all players appear (bye player has 1 point, regular match winner has 1 point, loser has 0)
     body = @response.body
     assert_includes body, bye_user.username
@@ -1072,12 +1072,9 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     t.reload
     bye_match.reload
     regular_match.reload
-    
-    # Calculate score_sum manually
-    bye_score_sum = 10.0  # from score_for_bye
-    winner_score_sum = 5.0
-    loser_score_sum = 3.0
-    
+
+    # Calculate score_sum manually # from score_for_bye
+
     # Just verify the tournament has the correct score_for_bye value
     assert_equal 10, t.score_for_bye, 'Tournament should have score_for_bye = 10'
   end
