@@ -59,5 +59,77 @@ module Tournament
       t.rounds_count = nil
       assert t.valid?
     end
+
+    test 'generates slug from name on creation' do
+      t = ::Tournament::Tournament.create!(
+        name: 'Spring Open Tournament',
+        creator: @creator,
+        game_system: @system,
+        format: 'open'
+      )
+      assert_equal 'spring_open_tournament', t.slug
+    end
+
+    test 'slug removes special characters and accents' do
+      t = ::Tournament::Tournament.create!(
+        name: 'Tournoi d\'Été 2025 - Spécial!',
+        creator: @creator,
+        game_system: @system,
+        format: 'open'
+      )
+      assert_equal 'tournoi_dete_2025_-_special', t.slug
+    end
+
+    test 'slug replaces spaces with underscores' do
+      t = ::Tournament::Tournament.create!(
+        name: 'My   Multiple   Spaces',
+        creator: @creator,
+        game_system: @system,
+        format: 'open'
+      )
+      assert_equal 'my_multiple_spaces', t.slug
+    end
+
+    test 'slug must be unique' do
+      ::Tournament::Tournament.create!(
+        name: 'Spring Open',
+        creator: @creator,
+        game_system: @system,
+        format: 'open'
+      )
+
+      duplicate = ::Tournament::Tournament.new(
+        name: 'Something else',
+        slug: 'spring_open',
+        creator: @creator,
+        game_system: @system,
+        format: 'open'
+      )
+      assert_not duplicate.valid?
+      assert duplicate.errors[:slug].present?
+    end
+
+    test 'slug does not change when name is updated' do
+      t = ::Tournament::Tournament.create!(
+        name: 'Original Name',
+        creator: @creator,
+        game_system: @system,
+        format: 'open'
+      )
+      original_slug = t.slug
+
+      t.update!(name: 'Updated Name')
+      assert_equal original_slug, t.slug
+    end
+
+    test 'to_param returns slug' do
+      t = ::Tournament::Tournament.create!(
+        name: 'Spring Open',
+        creator: @creator,
+        game_system: @system,
+        format: 'open'
+      )
+      assert_equal t.slug, t.to_param
+    end
   end
 end

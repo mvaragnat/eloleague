@@ -66,11 +66,16 @@
             <div class="card-date" style="font-style:normal;">
               <%= t('tournaments.new.name') %>
             </div>
-            <input type="text"
-                   value="<%= @tournament.name %>"
-                   data-action="blur->strategy#changed"
-                   data-field="name"
-                   style="width:100%;" />
+            <div style="width:100%;">
+              <input type="text"
+                     value="<%= @tournament.name %>"
+                     data-action="blur->strategy#changed"
+                     data-field="name"
+                     style="width:100%;" />
+              <p class="card-date" style="margin-top:0.25rem; font-size:0.85rem; color:#666;">
+                <%= t('tournaments.show.admin.slug_warning', default: 'Note: Changing the tournament name will not update the URL slug') %>
+              </p>
+            </div>
           </div>
         </div>
         

@@ -246,6 +246,7 @@ en:
       admin:
         actions: "Actions"
         strategies: "Strategies"
+        slug_warning: "Note: Changing the tournament name will not update the URL slug"
       tabs:
         overview: "Overview"
         bracket: "Bracket"
