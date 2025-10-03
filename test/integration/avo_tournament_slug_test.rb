@@ -37,7 +37,7 @@ class AvoTournamentSlugTest < ActionDispatch::IntegrationTest
 
   test 'admin can access tournament associations (rounds) via slug URL' do
     # Create a round for the tournament
-    round = Tournament::Round.create!(tournament: @tournament, number: 1, state: 'pending')
+    Tournament::Round.create!(tournament: @tournament, number: 1, state: 'pending')
 
     # Access the rounds association via slug
     get "/avo/resources/tournaments/#{@tournament.to_param}/rounds"
