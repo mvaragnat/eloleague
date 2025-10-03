@@ -70,14 +70,14 @@ module Tournament
       assert_equal 'spring_open_tournament', t.slug
     end
 
-    test 'slug removes special characters and accents' do
+    test 'slug removes special characters and accents and normalizes hyphens to underscores' do
       t = ::Tournament::Tournament.create!(
         name: 'Tournoi d\'Été 2025 - Spécial!',
         creator: @creator,
         game_system: @system,
         format: 'open'
       )
-      assert_equal 'tournoi_dete_2025_-_special', t.slug
+      assert_equal 'tournoi_dete_2025_special', t.slug
     end
 
     test 'slug replaces spaces with underscores' do

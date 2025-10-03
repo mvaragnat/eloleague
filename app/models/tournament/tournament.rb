@@ -83,8 +83,8 @@ module Tournament
                       .unicode_normalize(:nfd)
                       .gsub(/[\u0300-\u036f]/, '') # Remove accents
                       .downcase
-                      .gsub(/[^a-z0-9\s_-]/, '') # Remove special characters
-                      .gsub(/\s+/, '_') # Replace spaces with underscores
+                      .gsub(/[^a-z0-9\s-]/, '') # Remove special characters (keep spaces & hyphens as separators)
+                      .gsub(/[-\s]+/, '_') # Replace spaces and hyphens with underscores
                       .gsub(/_+/, '_') # Remove multiple underscores
                       .gsub(/^_|_$/, '') # Remove leading/trailing underscores
 

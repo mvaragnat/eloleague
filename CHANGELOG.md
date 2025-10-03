@@ -2,7 +2,7 @@
 
 - Tournament slug URLs
   - All tournaments now have a URL-friendly slug based on their title (generated at creation)
-  - Slugs normalize names: convert to lowercase, replace spaces with underscores, remove special characters, replace accents with similar non-accented letters
+- Slugs normalize names: convert to lowercase, replace spaces and hyphens with underscores, remove special characters, replace accents with similar non-accented letters
   - Tournament URLs now use slugs instead of database IDs for better SEO and readability (e.g., `/tournaments/spring-championship-2025`)
   - Backward compatibility maintained: tournaments can still be accessed by ID
   - Slug is immutable after creation; changing the tournament name does not update the slug

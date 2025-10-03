@@ -23,6 +23,7 @@ module Avo
         field :starts_at, as: :date_time
         field :ends_at, as: :date_time
         field :state, as: :text
+        field :slug, as: :text
         field :require_army_list_for_check_in, as: :boolean
         field :online, as: :boolean
         field :location, as: :text
@@ -31,7 +32,6 @@ module Avo
         field :tiebreak1_strategy_key, as: :text
         field :tiebreak2_strategy_key, as: :text
         field :score_for_bye, as: :number, help: 'Score awarded for bye (Swiss tournaments only)'
-        field :slug, as: :text
         field :settings, as: :code, language: 'json'
 
         field :registrations, as: :has_many, resource: Avo::Resources::TournamentRegistration
