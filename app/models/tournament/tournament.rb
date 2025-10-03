@@ -31,8 +31,11 @@ module Tournament
     validates :rounds_count, numericality: { greater_than: 0 }, allow_nil: true
     validates :max_players, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
     validates :score_for_bye, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: false
+    validates :slug, presence: true, uniqueness: true
 
     validate :strategy_keys_are_known
+
+    before_validation :generate_slug, on: :create
 
     scope :competitive, -> { where(non_competitive: false) }
     scope :non_competitive, -> { where(non_competitive: true) }
@@ -67,7 +70,26 @@ module Tournament
       primary_strategy_key.presence || ::Tournament::StrategyRegistry.default_primary_key
     end
 
+    def to_param
+      slug
+    end
+
     private
+
+    def generate_slug
+      return if slug.present?
+
+      base_slug = name.to_s
+                      .unicode_normalize(:nfd)
+                      .gsub(/[\u0300-\u036f]/, '') # Remove accents
+                      .downcase
+                      .gsub(/[^a-z0-9\s_-]/, '') # Remove special characters
+                      .gsub(/\s+/, '_') # Replace spaces with underscores
+                      .gsub(/_+/, '_') # Remove multiple underscores
+                      .gsub(/^_|_$/, '') # Remove leading/trailing underscores
+
+      self.slug = base_slug.presence || SecureRandom.hex(8)
+    end
 
     def strategy_keys_are_known
       pairings = ::Tournament::StrategyRegistry.pairing_strategies

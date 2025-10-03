@@ -217,6 +217,7 @@ fr:
       admin:
         actions: "Actions"
         strategies: "Stratégies"
+        slug_warning: "Note : Modifier le nom du tournoi ne changera pas l'URL"
       tabs:
         overview: "Vue d'ensemble"
         bracket: "Arbre"

@@ -31,10 +31,11 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 ### Tournament Domain
 - `Tournament::Tournament`
-  - Root entity for a competition. Attributes: `name`, `description`, `creator_id`, `game_system_id`, `format` (open|swiss|elimination), `rounds_count` (for Swiss), `starts_at`, `ends_at`, `state` (draft|registration|running|completed), `settings`.
+  - Root entity for a competition. Attributes: `name`, `description`, `creator_id`, `game_system_id`, `format` (open|swiss|elimination), `rounds_count` (for Swiss), `starts_at`, `ends_at`, `state` (draft|registration|running|completed), `settings`, `slug`.
   - Associations: `has_many :registrations` (participants), `has_many :rounds`, `has_many :matches`.
-  - New optional fields: `location` (string) and `online` (boolean, default false). If `online` is true, the address field is hidden and the Overview tab shows an “Online tournament” badge. When `location` is present and `online` is false, the Overview tab displays the address and a small Google Maps embed.
-  - New optional `max_players` (integer). When set, registrations are blocked once the number of registrations reaches this cap; UI shows a “Tournament is full” message and the register button is hidden.
+  - New optional fields: `location` (string) and `online` (boolean, default false). If `online` is true, the address field is hidden and the Overview tab shows an "Online tournament" badge. When `location` is present and `online` is false, the Overview tab displays the address and a small Google Maps embed.
+  - New optional `max_players` (integer). When set, registrations are blocked once the number of registrations reaches this cap; UI shows a "Tournament is full" message and the register button is hidden.
+  - `slug` (string, unique): URL-friendly identifier generated automatically from the tournament name at creation. Normalizes to lowercase, replaces spaces with underscores, removes special characters, and replaces accents. Once set, the slug never changes even if the tournament name is updated. Tournament routes use slug instead of ID for better SEO. The admin form shows a warning that changing the name won't update the slug.
 - `Tournament::Registration`
   - Join between a `Tournament::Tournament` and a `User` with optional `seed` (Elo snapshot), `status` (`pending|approved|checked_in`), and optional `faction_id`.
   - Optional `army_list` (text) per registration.

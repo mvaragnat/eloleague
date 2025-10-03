@@ -22,6 +22,36 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'tournaments can be accessed by slug URL' do
+    t = ::Tournament::Tournament.create!(
+      name: 'Spring Championship 2025',
+      description: 'Test tournament',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user
+    )
+
+    # Access tournament by slug
+    get tournament_path(t.slug, locale: I18n.locale)
+    assert_response :success
+    assert_includes @response.body, 'Spring Championship 2025'
+  end
+
+  test 'tournaments can still be accessed by ID for backward compatibility' do
+    t = ::Tournament::Tournament.create!(
+      name: 'Legacy Tournament',
+      description: 'Test tournament',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user
+    )
+
+    # Access tournament by ID
+    get tournament_path(t.id, locale: I18n.locale)
+    assert_response :success
+    assert_includes @response.body, 'Legacy Tournament'
+  end
+
   test 'show tolerates unknown tiebreak keys for accepting tournament' do
     # Create a tournament in accepting signups with bogus tie-break keys
     t = ::Tournament::Tournament.create!(

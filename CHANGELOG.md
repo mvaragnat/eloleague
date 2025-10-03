@@ -1,3 +1,15 @@
+## 2025-10-02
+
+- Tournament slug URLs
+  - All tournaments now have a URL-friendly slug based on their title (generated at creation)
+  - Slugs normalize names: convert to lowercase, replace spaces with underscores, remove special characters, replace accents with similar non-accented letters
+  - Tournament URLs now use slugs instead of database IDs for better SEO and readability (e.g., `/tournaments/spring-championship-2025`)
+  - Backward compatibility maintained: tournaments can still be accessed by ID
+  - Slug is immutable after creation; changing the tournament name does not update the slug
+  - Admin form displays a warning notice when editing tournament names
+  - Rake task added to backfill slugs for existing tournaments without slugs
+  - Full test coverage and localization (EN/FR)
+
 ## 2025-10-01
 
 - Swiss tournaments: Added "Score for bye" option

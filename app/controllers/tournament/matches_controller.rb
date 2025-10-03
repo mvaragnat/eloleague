@@ -141,7 +141,8 @@ module Tournament
     # Devise provides authentication; Current.user is set at ApplicationController
 
     def set_tournament
-      @tournament = ::Tournament::Tournament.find(params[:tournament_id])
+      @tournament = ::Tournament::Tournament.find_by(slug: params[:tournament_id]) ||
+                    ::Tournament::Tournament.find(params[:tournament_id])
     end
 
     def set_match

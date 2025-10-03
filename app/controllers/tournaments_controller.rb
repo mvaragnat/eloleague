@@ -239,7 +239,8 @@ class TournamentsController < ApplicationController
   end
 
   def set_tournament
-    @tournament = ::Tournament::Tournament.find(params[:id])
+    @tournament = ::Tournament::Tournament.find_by(slug: params[:id]) ||
+                  ::Tournament::Tournament.find(params[:id])
   end
 
   def authorize_admin!
