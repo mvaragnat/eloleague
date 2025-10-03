@@ -6,6 +6,11 @@ module Avo
       self.model_class = ::Tournament::Tournament
       self.title = :name
 
+      # Override find_record to support slug-based URLs
+      def find_record(id, **_args)
+        model_class.find_by(slug: id) || model_class.find(id)
+      end
+
       def fields
         field :id, as: :id
         field :name, as: :text, required: true
