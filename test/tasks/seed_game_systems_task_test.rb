@@ -15,8 +15,8 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
   end
 
   test 'seeds game systems and factions from YAML config' do
-    assert_difference 'Game::System.count', 2 do
-      assert_difference 'Game::Faction.count', 66 do
+    assert_difference 'Game::System.count', 3 do
+      assert_difference 'Game::Faction.count', 109 do
         Rake::Task['seed:game_systems'].execute
       end
     end
@@ -26,9 +26,14 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     assert_not_nil epic
     assert_equal '6mm strategy – French community-maintained lists', epic.description
 
-    # Verify factions were created
+    # Verify factions were created for FERC
     assert_equal 38, epic.factions.count
     assert epic.factions.pluck(:name).include?('Steel Legion')
+
+    # Verify Epic UK was created
+    epic_uk = Game::System.find_by(name: 'Epic UK')
+    assert_not_nil epic_uk
+    assert_equal 43, epic_uk.factions.count
   end
 
   test 'does not duplicate existing game systems and factions' do
@@ -36,8 +41,8 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     existing_system = Game::System.create!(name: 'Epic Armageddon - FERC', description: 'Old description')
     Game::Faction.create!(name: 'Steel Legion', game_system: existing_system)
 
-    assert_difference 'Game::System.count', 1 do # Only Go should be created
-      assert_difference 'Game::Faction.count', 65 do # Black for Chess, and both for Go
+    assert_difference 'Game::System.count', 2 do # New systems should be created
+      assert_difference 'Game::Faction.count', 108 do # All factions except existing Steel Legion
         Rake::Task['seed:game_systems'].execute
       end
     end
