@@ -82,6 +82,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Full internationalization support with English and French translations
 - Game systems and factions are localized via `config/game_systems.yml` which now contains `en`/`fr` entries for `name`, `description`, and each faction. Database stores the default (English) values; views resolve display through `Game::System#localized_name` and `Game::Faction#localized_name` using `en` by default with `fr` fallback.
 
+#### Epic UK Game System
+- Added `Epic UK` as a supported game system with factions sourced from the official Epic UK army lists. See [Epic UK Army Lists](https://epic-uk.co.uk/wp/army-lists/).
+- Factions for `Epic UK` are provided in English only; French translations are not required for these factions.
+
 ### Tournaments
 - Create and browse tournaments by game system and format (open, swiss, elimination)
 - Register/unregister and check-in to tournaments

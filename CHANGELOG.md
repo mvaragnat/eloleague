@@ -1,3 +1,10 @@
+## 2025-10-03
+
+- Add new game system: Epic UK
+  - Seeded from `config/game_systems.yml` with factions sourced from Epic UK official army lists.
+  - Factions are English-only per requirement (no FR translations).
+  - Docs updated in `context.md`. Tests adjusted for new counts.
+
 ## 2025-10-02
 
 - Tournament slug URLs
