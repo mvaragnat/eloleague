@@ -17,6 +17,10 @@
   - Rake task added to backfill slugs for existing tournaments without slugs
   - Full test coverage and localization (EN/FR)
 
+## 2025-10-03
+
+- Avo admin: add search by username on Users resource index.
+
 ## 2025-10-01
 
 - Swiss tournaments: Added "Score for bye" option
