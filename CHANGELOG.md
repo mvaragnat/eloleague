@@ -1,3 +1,10 @@
+## 2025-10-05
+
+- Fixed Avo Tournament Registration creation from tournament page
+  - Creating a new tournament registration from Avo now works correctly when using slug-based tournament URLs
+  - Fixed `find_record` method in Tournament Avo resource to be a class method (was incorrectly defined as instance method)
+  - Added integration test to verify both slug and ID-based registration creation
+  
 ## 2025-10-03
 
 - Add new game system: Epic UK

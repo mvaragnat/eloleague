@@ -195,6 +195,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Displays a read-only "Games played" column showing the number of participations for that faction.
   - Supports selecting multiple factions and deleting them at once via a bulk delete action with confirmation (EN/FR localized).
 
+- Tournament resource:
+  - The `find_record` class method is overridden to support slug-based lookups in addition to ID-based lookups.
+  - This enables creating tournament registrations and accessing related resources via slug URLs (e.g., when clicking "Add Registration" from a tournament page).
+
 ### Footer & Contact
 - A global footer appears on all pages: "Made by Marquis with ❤️. A bug, a suggestion, a new game to add? Write me"
 - The "Write me" link opens a one-page contact form with subject and message fields
