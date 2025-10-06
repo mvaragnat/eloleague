@@ -7,7 +7,7 @@ module Avo
       # self.includes = []
       # self.attachments = []
       self.search = {
-        query: -> { query.ransack(username_cont: q).result(distinct: false) }
+        query: -> { query.where('username ILIKE ? OR email ILIKE ?', "%#{q}%", "%#{q}%") }
       }
 
       def fields
