@@ -11,7 +11,7 @@ module Tournament
                        inverse_of: :matches
     belongs_to :a_user, class_name: 'User', optional: true
     belongs_to :b_user, class_name: 'User', optional: true
-    belongs_to :game_event, class_name: 'Game::Event', optional: true
+    belongs_to :game_event, class_name: 'Game::Event', optional: true, dependent: :destroy
 
     belongs_to :parent_match, class_name: 'Tournament::Match', optional: true, inverse_of: :child_matches
     has_many :child_matches, class_name: 'Tournament::Match', foreign_key: 'parent_match_id', dependent: :nullify,
