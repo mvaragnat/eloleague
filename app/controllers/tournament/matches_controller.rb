@@ -29,12 +29,8 @@ module Tournament
         @game.game_participations.build(user: Current.user)
         @preselected_user = Current.user
         @preselected_removable = false
-      elsif Current.user && @tournament.creator_id == Current.user.id
-        # Organizer flow: do NOT preselect any player
-        @preselected_user = nil
-        @preselected_removable = true
       else
-        # Fallback (should not generally happen due to can_add_match?): no preselection
+        # Organizer or non-registered viewer: no preselection
         @preselected_user = nil
         @preselected_removable = true
       end

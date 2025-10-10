@@ -2,7 +2,7 @@
 
 require 'application_system_test_case'
 
-class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
+class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase # rubocop:disable Metrics/ClassLength
   setup do
     @organizer = users(:player_one)
     @participant = users(:player_two)
