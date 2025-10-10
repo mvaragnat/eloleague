@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "results", "selected", "container"]
-  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String, removable: Boolean, tournamentId: String }
+  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String, preselectedFactionId: Number, removable: Boolean, tournamentId: String }
 
   connect() {
     this.selectedPlayers = []
@@ -14,6 +14,9 @@ export default class extends Controller {
       if (!this.selectedPlayers.includes(id)) {
         this.selectedPlayers.push(id)
         this.selectedTarget.insertAdjacentHTML('beforeend', this.selectedPlayerTemplate(id, name))
+        // Emit selection so game_form can set hidden user_id and faction
+        const factionId = this.hasPreselectedFactionIdValue ? String(this.preselectedFactionIdValue) : undefined
+        this.element.dispatchEvent(new CustomEvent('player-selected', { bubbles: true, detail: { userId: id, username: name, factionId } }))
       }
     }
 

@@ -8,7 +8,18 @@
       <div style="grid-column: 1 / -1;">
         <% if i == 1 && preselected_user.present? %>
           <% removable_attr = preselected_removable ? 'true' : 'false' %>
-          <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="<%= removable_attr %>" data-player-search-preselected-user-id-value="<%= preselected_user.id %>" data-player-search-preselected-username-value="<%= preselected_user.username %>" <%= tournament_id.present? ? "data-player-search-tournament-id-value=\"#{tournament_id}\"" : "" %>>
+          <% preselected_faction_id = nil %>
+          <% if tournament_id.present? %>
+            <% reg = Tournament::Registration.find_by(tournament_id: tournament_id, user_id: preselected_user.id) %>
+            <% preselected_faction_id = reg&.faction_id %>
+          <% end %>
+          <div data-controller="player-search"
+               data-player-search-max-selections-value="1"
+               data-player-search-removable-value="<%= removable_attr %>"
+               data-player-search-preselected-user-id-value="<%= preselected_user.id %>"
+               data-player-search-preselected-username-value="<%= preselected_user.username %>"
+               <%= preselected_faction_id.present? ? "data-player-search-preselected-faction-id-value=\"#{preselected_faction_id}\"" : "" %>
+               <%= tournament_id.present? ? "data-player-search-tournament-id-value=\"#{tournament_id}\"" : "" %>>
         <% else %>
           <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="true" <%= tournament_id.present? ? "data-player-search-tournament-id-value=\"#{tournament_id}\"" : "" %>>
         <% end %>
