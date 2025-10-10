@@ -44,8 +44,8 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
       within('[data-player-search-target="container"]') do
         fill_in I18n.t('games.new.search_placeholder'), with: username
       end
+      find("[data-player-search-username='#{username}']").click
     end
-    find("[data-player-search-username='#{username}']").click
   end
 
   def select_in_second_block(username)
@@ -53,8 +53,8 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
       within('[data-player-search-target="container"]') do
         fill_in I18n.t('games.new.search_placeholder'), with: username
       end
+      find("[data-player-search-username='#{username}']").click
     end
-    find("[data-player-search-username='#{username}']").click
   end
 
   def choose_factions_for_both_players(label: 'White')
@@ -142,7 +142,7 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
     end
   end
 
-  test "organizer form shows only registered players, presets system and preselects factions" do
+  test 'organizer form shows only registered players, presets system and preselects factions' do
     tournament = create_open_running_tournament!(creator: @organizer)
     white = game_factions(:chess_white)
 
@@ -162,7 +162,8 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
     assert_no_selector '.selected-player'
 
     # System is auto set to tournament system (hidden select exists and has selected option)
-    assert_selector "select[name='game_event[game_system_id]'] option[value='#{tournament.game_system_id}'][selected]", visible: false
+    assert_selector "select[name='game_event[game_system_id]'] option[value='#{tournament.game_system_id}'][selected]",
+                    visible: false
 
     # Search should only return registered players, not outsider
     within first('.participation-block') do

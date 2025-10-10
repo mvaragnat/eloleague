@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "results", "selected", "container"]
-  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String, removable: Boolean }
+  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String, removable: Boolean, tournamentId: String }
 
   connect() {
     this.selectedPlayers = []
@@ -18,16 +18,15 @@ export default class extends Controller {
     }
 
     this.updateContainerVisibility()
+
+    // Prefetch results so the list is not empty on open
+    this.search()
   }
 
   search() {
-    const query = this.inputTarget.value
-    if (query.length < 1) {
-      this.resultsTarget.innerHTML = ''
-      return
-    }
-
-    const tId = this.inputTarget.dataset.tournamentId
+    const query = this.hasInputTarget ? (this.inputTarget.value || '') : ''
+    const rawTid = this.hasTournamentIdValue ? this.tournamentIdValue : null
+    const tId = rawTid ? String(rawTid).replace(/^\"+|\"+$/g, '').replace(/^'+|'+$/g, '') : null
     const url = tId ? `/users/search?q=${encodeURIComponent(query)}&tournament_id=${encodeURIComponent(tId)}`
                     : `/users/search?q=${encodeURIComponent(query)}`
 

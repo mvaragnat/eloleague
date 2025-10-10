@@ -2,10 +2,30 @@
 
 class UsersController < ApplicationController
   def search
-    @users = User.where('username ILIKE ?', "%#{params[:q]}%")
+    term = params[:q].to_s.strip
+    @users = if term.present?
+               User.where('username ILIKE ?', "%#{term}%")
+             else
+               User.all
+             end
 
+    # Resolve tournament id either from param or from referer path (fallback)
+    resolved_tid = nil
     if params[:tournament_id].present?
-      ids = Tournament::Registration.where(tournament_id: params[:tournament_id]).pluck(:user_id)
+      resolved_tid = params[:tournament_id].to_s.gsub(/[^0-9]/, '')
+    elsif request.referer.present?
+      # Try to parse "/tournaments/:slug" from referer (works for Open matches modal)
+      m = request.referer.match(%r{/tournaments/([^/?#]+)})
+      if m
+        slug = CGI.unescape(m[1])
+        t = Tournament::Tournament.find_by(slug: slug) || Tournament::Tournament.where(id: slug.gsub(/[^0-9]/,
+                                                                                                     '')).first
+        resolved_tid = t&.id&.to_s if t
+      end
+    end
+
+    if resolved_tid.present?
+      ids = Tournament::Registration.where(tournament_id: resolved_tid).pluck(:user_id)
       @users = @users.where(id: ids)
       # In tournament context, include the current user if registered (e.g., organizer who is checked in)
     elsif Current.user
@@ -17,11 +37,13 @@ class UsersController < ApplicationController
 
     # When searching within a tournament, include registered faction_id to preselect factions in the UI
     registrations_by_user_id = {}
-    if params[:tournament_id].present?
-      regs = Tournament::Registration.where(tournament_id: params[:tournament_id], user_id: @users.pluck(:id))
+    if resolved_tid.present?
+      regs = Tournament::Registration.where(tournament_id: resolved_tid, user_id: @users.pluck(:id))
       registrations_by_user_id = regs.index_by(&:user_id)
     end
 
-    render json: @users.map { |u| { id: u.id, username: u.username, faction_id: registrations_by_user_id[u.id]&.faction_id } }
+    render json: @users.map { |u|
+      { id: u.id, username: u.username, faction_id: registrations_by_user_id[u.id]&.faction_id }
+    }
   end
 end

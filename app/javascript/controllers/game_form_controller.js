@@ -174,19 +174,24 @@ export default class extends Controller {
     if (factionId) {
       const factionSelect = block.querySelector('select[name^="game_event[game_participations_attributes]"][name$="[faction_id]"]')
       if (factionSelect) {
-        // Ensure options are loaded; if not yet, schedule after microtask
-        const setFaction = () => {
-          const hasOption = Array.from(factionSelect.options).some(o => o.value === String(factionId))
+        const desired = String(factionId)
+        // Try immediately, then retry a few times while factions load
+        let attempts = 0
+        const trySet = () => {
+          attempts += 1
+          const hasOption = Array.from(factionSelect.options).some(o => o.value === desired)
           if (hasOption) {
-            factionSelect.value = String(factionId)
+            factionSelect.value = desired
             factionSelect.dispatchEvent(new Event('change', { bubbles: true }))
+            return true
           }
+          return false
         }
-        // If empty (only placeholder), defer slightly to allow loadFactions to populate
-        if (factionSelect.options.length <= 1) {
-          setTimeout(setFaction, 50)
-        } else {
-          setFaction()
+
+        if (!trySet()) {
+          const interval = setInterval(() => {
+            if (trySet() || attempts >= 20) clearInterval(interval)
+          }, 50)
         }
       }
     }

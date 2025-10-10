@@ -8,16 +8,15 @@
       <div style="grid-column: 1 / -1;">
         <% if i == 1 && preselected_user.present? %>
           <% removable_attr = preselected_removable ? 'true' : 'false' %>
-          <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="<%= removable_attr %>" data-player-search-preselected-user-id-value="<%= preselected_user.id %>" data-player-search-preselected-username-value="<%= preselected_user.username %>">
+          <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="<%= removable_attr %>" data-player-search-preselected-user-id-value="<%= preselected_user.id %>" data-player-search-preselected-username-value="<%= preselected_user.username %>" <%= tournament_id.present? ? "data-player-search-tournament-id-value=\"#{tournament_id}\"" : "" %>>
         <% else %>
-          <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="true">
+          <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="true" <%= tournament_id.present? ? "data-player-search-tournament-id-value=\"#{tournament_id}\"" : "" %>>
         <% end %>
             <label><%= t('games.new.select_player', default: 'Select player') %></label>
             <div data-player-search-target="container">
               <input type="text"
                      data-player-search-target="input"
                      data-action="input->player-search#search"
-                     <%= tournament_id.present? ? "data-tournament-id=\"#{tournament_id}\"" : "" %>
                      placeholder="<%= t('games.new.search_placeholder') %>">
               <div data-player-search-target="results" class="card" style="padding:0.25rem; margin-top:0.25rem; max-height: 220px; overflow:auto;"></div>
             </div>
