@@ -12,6 +12,10 @@ export default class extends Controller {
 
     // Keep player names visible above each participation block
     this.updatePlayerNames()
+
+    // Try to apply any preset factions coming from preselected players (participant flow)
+    // This is especially needed if the player-selected event fired before this controller connected.
+    this.applyPresetFactions()
   }
 
   validate(event) {
@@ -89,6 +93,8 @@ export default class extends Controller {
       factionSelects.forEach(select => this.populateSelect(select, []))
     } finally {
       this.toggleScores()
+      // After factions options are populated, apply any preset faction ids
+      this.applyPresetFactions()
     }
   }
 
@@ -163,12 +169,38 @@ export default class extends Controller {
 
   // Map selection events to the correct hidden input within the same participation block
   onPlayerSelected(event) {
-    const { userId } = event.detail || {}
+    const { userId, factionId } = event.detail || {}
     if (!userId) return
     const block = event.target?.closest('.participation-block')
     if (!block) return
     const input = block.querySelector('input[name^="game_event[game_participations_attributes]"][name$="[user_id]"]')
     if (input) input.value = String(userId)
+
+    // If a factionId is provided (tournament context), preselect it for this block
+    if (factionId) {
+      const factionSelect = block.querySelector('select[name^="game_event[game_participations_attributes]"][name$="[faction_id]"]')
+      if (factionSelect) {
+        const desired = String(factionId)
+        // Try immediately, then retry a few times while factions load
+        let attempts = 0
+        const trySet = () => {
+          attempts += 1
+          const hasOption = Array.from(factionSelect.options).some(o => o.value === desired)
+          if (hasOption) {
+            factionSelect.value = desired
+            factionSelect.dispatchEvent(new Event('change', { bubbles: true }))
+            return true
+          }
+          return false
+        }
+
+        if (!trySet()) {
+          const interval = setInterval(() => {
+            if (trySet() || attempts >= 20) clearInterval(interval)
+          }, 50)
+        }
+      }
+    }
   }
 
   onPlayerRemoved(event) {
@@ -176,5 +208,24 @@ export default class extends Controller {
     if (!block) return
     const input = block.querySelector('input[name^="game_event[game_participations_attributes]"][name$="[user_id]"]')
     if (input) input.value = ''
+  }
+
+  // Read any already-selected chips in each participation block and set faction selects accordingly
+  applyPresetFactions() {
+    const blocks = Array.from(this.element.querySelectorAll('.participation-block'))
+    blocks.forEach(block => {
+      const chip = block.querySelector('[data-player-search-target="selected"] .selected-player')
+      if (!chip) return
+      const factionId = chip.getAttribute('data-faction-id')
+      if (!factionId) return
+      const select = block.querySelector('select[name^="game_event[game_participations_attributes]"][name$="[faction_id]"]')
+      if (!select) return
+      const desired = String(factionId)
+      const hasOption = Array.from(select.options).some(o => o.value === desired)
+      if (hasOption) {
+        select.value = desired
+        select.dispatchEvent(new Event('change', { bubbles: true }))
+      }
+    })
   }
 } 

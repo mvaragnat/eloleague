@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "results", "selected", "container"]
-  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String, removable: Boolean }
+  static values = { maxSelections: Number, preselectedUserId: Number, preselectedUsername: String, preselectedFactionId: Number, removable: Boolean, tournamentId: String }
 
   connect() {
     this.selectedPlayers = []
@@ -14,20 +14,29 @@ export default class extends Controller {
       if (!this.selectedPlayers.includes(id)) {
         this.selectedPlayers.push(id)
         this.selectedTarget.insertAdjacentHTML('beforeend', this.selectedPlayerTemplate(id, name))
+        const last = this.selectedTarget.lastElementChild
+        if (last && this.hasPreselectedFactionIdValue) {
+          last.setAttribute('data-faction-id', String(this.preselectedFactionIdValue))
+        }
+        // Emit selection so game_form can set hidden user_id and faction
+        const factionId = this.hasPreselectedFactionIdValue ? String(this.preselectedFactionIdValue) : undefined
+        this.element.dispatchEvent(new CustomEvent('player-selected', { bubbles: true, detail: { userId: id, username: name, factionId } }))
       }
     }
 
     this.updateContainerVisibility()
+
+    // Do not prefetch; keep list empty until user types
   }
 
   search() {
-    const query = this.inputTarget.value
+    const query = this.hasInputTarget ? (this.inputTarget.value || '') : ''
     if (query.length < 1) {
-      this.resultsTarget.innerHTML = ''
+      if (this.hasResultsTarget) this.resultsTarget.innerHTML = ''
       return
     }
-
-    const tId = this.inputTarget.dataset.tournamentId
+    const rawTid = this.hasTournamentIdValue ? this.tournamentIdValue : null
+    const tId = rawTid ? String(rawTid).replace(/^\"+|\"+$/g, '').replace(/^'+|'+$/g, '') : null
     const url = tId ? `/users/search?q=${encodeURIComponent(query)}&tournament_id=${encodeURIComponent(tId)}`
                     : `/users/search?q=${encodeURIComponent(query)}`
 
@@ -55,6 +64,7 @@ export default class extends Controller {
   selectPlayer(event) {
     const userId = event.currentTarget.dataset.playerSearchUserId
     const username = event.currentTarget.dataset.playerSearchUsername
+    const factionId = event.currentTarget.dataset.playerSearchFactionId
     if (this.selectedPlayers.includes(String(userId))) return
 
     const maxSel = this.hasMaxSelectionsValue ? this.maxSelectionsValue : 1
@@ -62,12 +72,16 @@ export default class extends Controller {
 
     this.selectedPlayers.push(String(userId))
     this.selectedTarget.insertAdjacentHTML('beforeend', this.selectedPlayerTemplate(userId, username))
+    const last = this.selectedTarget.lastElementChild
+    if (last && factionId) {
+      last.setAttribute('data-faction-id', String(factionId))
+    }
     this.resultsTarget.innerHTML = ''
     this.inputTarget.value = ''
 
     this.updateContainerVisibility()
 
-    this.element.dispatchEvent(new CustomEvent('player-selected', { bubbles: true, detail: { userId, username } }))
+    this.element.dispatchEvent(new CustomEvent('player-selected', { bubbles: true, detail: { userId, username, factionId } }))
   }
 
   removePlayer(event) {
@@ -90,7 +104,8 @@ export default class extends Controller {
     return `
       <div data-action="click->player-search#selectPlayer"
            data-player-search-user-id="${user.id}"
-           data-player-search-username="${user.username}">
+           data-player-search-username="${user.username}"
+           data-player-search-faction-id="${user.faction_id || ''}">
         <strong>${user.username}</strong>
       </div>
     `

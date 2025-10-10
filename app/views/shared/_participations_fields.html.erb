@@ -8,16 +8,26 @@
       <div style="grid-column: 1 / -1;">
         <% if i == 1 && preselected_user.present? %>
           <% removable_attr = preselected_removable ? 'true' : 'false' %>
-          <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="<%= removable_attr %>" data-player-search-preselected-user-id-value="<%= preselected_user.id %>" data-player-search-preselected-username-value="<%= preselected_user.username %>">
+          <% preselected_faction_id = nil %>
+          <% if tournament_id.present? %>
+            <% reg = Tournament::Registration.find_by(tournament_id: tournament_id, user_id: preselected_user.id) %>
+            <% preselected_faction_id = reg&.faction_id %>
+          <% end %>
+          <div data-controller="player-search"
+               data-player-search-max-selections-value="1"
+               data-player-search-removable-value="<%= removable_attr %>"
+               data-player-search-preselected-user-id-value="<%= preselected_user.id %>"
+               data-player-search-preselected-username-value="<%= preselected_user.username %>"
+               <%= preselected_faction_id.present? ? "data-player-search-preselected-faction-id-value=\"#{preselected_faction_id}\"" : "" %>
+               <%= tournament_id.present? ? "data-player-search-tournament-id-value=\"#{tournament_id}\"" : "" %>>
         <% else %>
-          <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="true">
+          <div data-controller="player-search" data-player-search-max-selections-value="1" data-player-search-removable-value="true" <%= tournament_id.present? ? "data-player-search-tournament-id-value=\"#{tournament_id}\"" : "" %>>
         <% end %>
             <label><%= t('games.new.select_player', default: 'Select player') %></label>
             <div data-player-search-target="container">
               <input type="text"
                      data-player-search-target="input"
                      data-action="input->player-search#search"
-                     <%= tournament_id.present? ? "data-tournament-id=\"#{tournament_id}\"" : "" %>
                      placeholder="<%= t('games.new.search_placeholder') %>">
               <div data-player-search-target="results" class="card" style="padding:0.25rem; margin-top:0.25rem; max-height: 220px; overflow:auto;"></div>
             </div>
@@ -30,7 +40,16 @@
         <%= p_form.label :secondary_score, t('games.new.secondary_score', default: 'Secondary score'), style: 'display:block; margin-top:0.25rem;' %>
         <%= p_form.number_field :secondary_score, min: 0 %>
         <%= p_form.label :faction_id, t('games.new.faction', default: 'Faction'), style: 'display:block; margin-top:0.5rem;' %>
-        <%= p_form.select :faction_id, [], { prompt: t('games.new.select_faction', default: 'Select faction') }, { data: { faction_select: true } } %>
+        <% options = (defined?(initial_factions) && initial_factions.present?) ? initial_factions.map { |fa| [fa.localized_name(I18n.locale), fa.id] } : [] %>
+        <% default_faction_id = nil %>
+        <% if i == 1 && preselected_user.present? && tournament_id.present? %>
+          <% reg = Tournament::Registration.find_by(tournament_id: tournament_id, user_id: preselected_user.id) %>
+          <% default_faction_id = reg&.faction_id %>
+        <% end %>
+        <%= p_form.select :faction_id,
+                          options,
+                          { prompt: t('games.new.select_faction', default: 'Select faction'), selected: default_faction_id },
+                          { data: { faction_select: true } } %>
         <%= p_form.hidden_field :user_id %>
       </div>
       <div>

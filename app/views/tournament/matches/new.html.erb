@@ -11,7 +11,12 @@
 					<option value="<%= @tournament.game_system_id %>" selected="selected"></option>
 				</select>
 
-				<%= render partial: 'shared/participations_fields', locals: { form: form, preselected_user: @preselected_user, preselected_removable: @preselected_removable, tournament_id: @tournament.id } %>
+				<%= render partial: 'shared/participations_fields',
+						 locals: { form: form,
+									 preselected_user: @preselected_user,
+									 preselected_removable: @preselected_removable,
+									 tournament_id: @tournament.id,
+									 initial_factions: Game::Faction.where(game_system_id: @tournament.game_system_id).to_a } %>
 
 				<div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem;">
 					<%= link_to t('layouts.shared.cancel'), "#", data: { action: "click->modal#close" }, class: "btn" %>
