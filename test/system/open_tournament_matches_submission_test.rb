@@ -35,6 +35,10 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
     Tournament::Registration.create!(tournament: tournament, user: user)
   end
 
+  def register_with_faction!(tournament, user, faction)
+    Tournament::Registration.create!(tournament: tournament, user: user, faction: faction)
+  end
+
   def select_in_first_block(username)
     within first('.participation-block') do
       within('[data-player-search-target="container"]') do
@@ -104,8 +108,10 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
 
   test 'organizer who is also a player can submit an Open tournament match' do
     tournament = create_open_running_tournament!(creator: @organizer)
-    register!(tournament, @organizer)
-    register!(tournament, @participant)
+    # Register two other players with factions
+    white = game_factions(:chess_white)
+    register_with_faction!(tournament, @participant, white)
+    register_with_faction!(tournament, @player_b, white)
 
     login_as(@organizer)
     visit tournament_path(tournament, locale: I18n.locale)
@@ -113,15 +119,20 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
     click_on I18n.t('games.add')
     assert_selector 'h2', text: I18n.t('tournaments.show.matches', default: 'Matches')
 
-    # Organizer is preselected and can remove themselves
-    within first('.participation-block') do
-      assert_selector '.selected-player button'
-    end
-    select_in_second_block(@participant.username)
+    # New behavior: organizer opens form with no preselected players
+    assert_no_selector '.selected-player'
+
+    # Select two registered players
+    select_in_first_block(@participant.username)
+    select_in_second_block(@player_b.username)
 
     fill_in 'game_event[game_participations_attributes][0][score]', with: '12'
     fill_in 'game_event[game_participations_attributes][1][score]', with: '9'
-    choose_factions_for_both_players
+    # Factions should auto-preselect to registered faction
+    first_faction_select = find("select[name='game_event[game_participations_attributes][0][faction_id]']")
+    second_faction_select = find("select[name='game_event[game_participations_attributes][1][faction_id]']")
+    assert_equal white.id.to_s, first_faction_select.value
+    assert_equal white.id.to_s, second_faction_select.value
 
     assert_difference -> { Game::Event.count }, 1 do
       assert_difference -> { Tournament::Match.count }, 1 do
@@ -129,6 +140,46 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
         assert_no_selector 'turbo-frame#modal', wait: 5
       end
     end
+  end
+
+  test "organizer form shows only registered players, presets system and preselects factions" do
+    tournament = create_open_running_tournament!(creator: @organizer)
+    white = game_factions(:chess_white)
+
+    # Register two players with factions
+    register_with_faction!(tournament, @participant, white)
+    register_with_faction!(tournament, @player_b, white)
+
+    # Create a non-registered outsider
+    outsider = User.create!(username: 'outsider', email: 'out@example.com', password: 'password')
+
+    login_as(@organizer)
+    visit tournament_path(tournament, locale: I18n.locale)
+    click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
+    click_on I18n.t('games.add')
+
+    # No preselected players for organizer
+    assert_no_selector '.selected-player'
+
+    # System is auto set to tournament system (hidden select exists and has selected option)
+    assert_selector "select[name='game_event[game_system_id]'] option[value='#{tournament.game_system_id}'][selected]", visible: false
+
+    # Search should only return registered players, not outsider
+    within first('.participation-block') do
+      within('[data-player-search-target="container"]') do
+        fill_in I18n.t('games.new.search_placeholder'), with: outsider.username
+      end
+    end
+    assert_no_selector "[data-player-search-username='#{outsider.username}']"
+
+    # Now select two registered players; factions auto preselect
+    select_in_first_block(@participant.username)
+    select_in_second_block(@player_b.username)
+
+    first_faction_select = find("select[name='game_event[game_participations_attributes][0][faction_id]']")
+    second_faction_select = find("select[name='game_event[game_participations_attributes][1][faction_id]']")
+    assert_equal white.id.to_s, first_faction_select.value
+    assert_equal white.id.to_s, second_faction_select.value
   end
 
   test 'organizer-player can unselect self and submit a match between A and B' do

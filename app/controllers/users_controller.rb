@@ -15,6 +15,13 @@ class UsersController < ApplicationController
 
     @users = @users.limit(10)
 
-    render json: @users.map { |u| { id: u.id, username: u.username } }
+    # When searching within a tournament, include registered faction_id to preselect factions in the UI
+    registrations_by_user_id = {}
+    if params[:tournament_id].present?
+      regs = Tournament::Registration.where(tournament_id: params[:tournament_id], user_id: @users.pluck(:id))
+      registrations_by_user_id = regs.index_by(&:user_id)
+    end
+
+    render json: @users.map { |u| { id: u.id, username: u.username, faction_id: registrations_by_user_id[u.id]&.faction_id } }
   end
 end

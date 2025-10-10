@@ -163,12 +163,33 @@ export default class extends Controller {
 
   // Map selection events to the correct hidden input within the same participation block
   onPlayerSelected(event) {
-    const { userId } = event.detail || {}
+    const { userId, factionId } = event.detail || {}
     if (!userId) return
     const block = event.target?.closest('.participation-block')
     if (!block) return
     const input = block.querySelector('input[name^="game_event[game_participations_attributes]"][name$="[user_id]"]')
     if (input) input.value = String(userId)
+
+    // If a factionId is provided (tournament context), preselect it for this block
+    if (factionId) {
+      const factionSelect = block.querySelector('select[name^="game_event[game_participations_attributes]"][name$="[faction_id]"]')
+      if (factionSelect) {
+        // Ensure options are loaded; if not yet, schedule after microtask
+        const setFaction = () => {
+          const hasOption = Array.from(factionSelect.options).some(o => o.value === String(factionId))
+          if (hasOption) {
+            factionSelect.value = String(factionId)
+            factionSelect.dispatchEvent(new Event('change', { bubbles: true }))
+          }
+        }
+        // If empty (only placeholder), defer slightly to allow loadFactions to populate
+        if (factionSelect.options.length <= 1) {
+          setTimeout(setFaction, 50)
+        } else {
+          setFaction()
+        }
+      }
+    }
   }
 
   onPlayerRemoved(event) {

@@ -55,6 +55,7 @@ export default class extends Controller {
   selectPlayer(event) {
     const userId = event.currentTarget.dataset.playerSearchUserId
     const username = event.currentTarget.dataset.playerSearchUsername
+    const factionId = event.currentTarget.dataset.playerSearchFactionId
     if (this.selectedPlayers.includes(String(userId))) return
 
     const maxSel = this.hasMaxSelectionsValue ? this.maxSelectionsValue : 1
@@ -67,7 +68,7 @@ export default class extends Controller {
 
     this.updateContainerVisibility()
 
-    this.element.dispatchEvent(new CustomEvent('player-selected', { bubbles: true, detail: { userId, username } }))
+    this.element.dispatchEvent(new CustomEvent('player-selected', { bubbles: true, detail: { userId, username, factionId } }))
   }
 
   removePlayer(event) {
@@ -90,7 +91,8 @@ export default class extends Controller {
     return `
       <div data-action="click->player-search#selectPlayer"
            data-player-search-user-id="${user.id}"
-           data-player-search-username="${user.username}">
+           data-player-search-username="${user.username}"
+           data-player-search-faction-id="${user.faction_id || ''}">
         <strong>${user.username}</strong>
       </div>
     `
