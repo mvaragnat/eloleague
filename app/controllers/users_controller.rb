@@ -3,11 +3,11 @@
 class UsersController < ApplicationController
   def search
     term = params[:q].to_s.strip
-    @users = if term.present?
-               User.where('username ILIKE ?', "%#{term}%")
-             else
-               User.all
-             end
+
+    # Return empty list when no query provided; the UI shows options as the user types
+    return render json: [] if term.blank?
+
+    @users = User.where('username ILIKE ?', "%#{term}%")
 
     # Resolve tournament id either from param or from referer path (fallback)
     resolved_tid = nil
@@ -35,7 +35,6 @@ class UsersController < ApplicationController
 
     @users = @users.limit(10)
 
-    # When searching within a tournament, include registered faction_id to preselect factions in the UI
     registrations_by_user_id = {}
     if resolved_tid.present?
       regs = Tournament::Registration.where(tournament_id: resolved_tid, user_id: @users.pluck(:id))

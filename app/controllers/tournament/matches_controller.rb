@@ -24,25 +24,22 @@ module Tournament
 
       @game = Game::Event.new
       # Prebuild two participations with role-specific defaults
-      if Current.user && @tournament.creator_id == Current.user.id
-        # Organizer flow: do NOT preselect any player
-        @preselected_user = nil
-        @preselected_removable = true
-        @game.game_participations.build
-        @game.game_participations.build
-      elsif Current.user && @tournament.registrations.exists?(user_id: Current.user.id)
+      if Current.user && @tournament.registrations.exists?(user_id: Current.user.id)
         # Registered participant flow: preselect current user as Player A, cannot remove
         @game.game_participations.build(user: Current.user)
         @preselected_user = Current.user
         @preselected_removable = false
-        @game.game_participations.build
+      elsif Current.user && @tournament.creator_id == Current.user.id
+        # Organizer flow: do NOT preselect any player
+        @preselected_user = nil
+        @preselected_removable = true
       else
         # Fallback (should not generally happen due to can_add_match?): no preselection
         @preselected_user = nil
         @preselected_removable = true
-        @game.game_participations.build
-        @game.game_participations.build
       end
+      # Ensure exactly two participation slots are present
+      @game.game_participations.build while @game.game_participations.size < 2
     end
 
     def create

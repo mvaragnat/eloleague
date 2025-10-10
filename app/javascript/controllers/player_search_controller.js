@@ -19,12 +19,15 @@ export default class extends Controller {
 
     this.updateContainerVisibility()
 
-    // Prefetch results so the list is not empty on open
-    this.search()
+    // Do not prefetch; keep list empty until user types
   }
 
   search() {
     const query = this.hasInputTarget ? (this.inputTarget.value || '') : ''
+    if (query.length < 1) {
+      if (this.hasResultsTarget) this.resultsTarget.innerHTML = ''
+      return
+    }
     const rawTid = this.hasTournamentIdValue ? this.tournamentIdValue : null
     const tId = rawTid ? String(rawTid).replace(/^\"+|\"+$/g, '').replace(/^'+|'+$/g, '') : null
     const url = tId ? `/users/search?q=${encodeURIComponent(query)}&tournament_id=${encodeURIComponent(tId)}`
