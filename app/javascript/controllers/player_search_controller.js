@@ -14,6 +14,10 @@ export default class extends Controller {
       if (!this.selectedPlayers.includes(id)) {
         this.selectedPlayers.push(id)
         this.selectedTarget.insertAdjacentHTML('beforeend', this.selectedPlayerTemplate(id, name))
+        const last = this.selectedTarget.lastElementChild
+        if (last && this.hasPreselectedFactionIdValue) {
+          last.setAttribute('data-faction-id', String(this.preselectedFactionIdValue))
+        }
         // Emit selection so game_form can set hidden user_id and faction
         const factionId = this.hasPreselectedFactionIdValue ? String(this.preselectedFactionIdValue) : undefined
         this.element.dispatchEvent(new CustomEvent('player-selected', { bubbles: true, detail: { userId: id, username: name, factionId } }))
@@ -68,6 +72,10 @@ export default class extends Controller {
 
     this.selectedPlayers.push(String(userId))
     this.selectedTarget.insertAdjacentHTML('beforeend', this.selectedPlayerTemplate(userId, username))
+    const last = this.selectedTarget.lastElementChild
+    if (last && factionId) {
+      last.setAttribute('data-faction-id', String(factionId))
+    }
     this.resultsTarget.innerHTML = ''
     this.inputTarget.value = ''
 

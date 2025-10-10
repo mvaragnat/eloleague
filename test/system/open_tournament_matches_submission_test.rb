@@ -44,7 +44,10 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
       within('[data-player-search-target="container"]') do
         fill_in I18n.t('games.new.search_placeholder'), with: username
       end
-      find("[data-player-search-username='#{username}']").click
+      within('[data-player-search-target="results"]') do
+        assert_selector "[data-player-search-username='#{username}']", wait: 3
+        find("[data-player-search-username='#{username}']").click
+      end
     end
   end
 
@@ -53,7 +56,10 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
       within('[data-player-search-target="container"]') do
         fill_in I18n.t('games.new.search_placeholder'), with: username
       end
-      find("[data-player-search-username='#{username}']").click
+      within('[data-player-search-target="results"]') do
+        assert_selector "[data-player-search-username='#{username}']", wait: 3
+        find("[data-player-search-username='#{username}']").click
+      end
     end
   end
 
@@ -64,6 +70,43 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase
 
     select label, from: 'game_event[game_participations_attributes][0][faction_id]'
     select label, from: 'game_event[game_participations_attributes][1][faction_id]'
+  end
+
+  test 'participant preselected faction is set from registration (captures regression)' do
+    tournament = create_open_running_tournament!
+    white = game_factions(:chess_white)
+    register_with_faction!(tournament, @participant, white)
+    register_with_faction!(tournament, @organizer, white)
+
+    login_as(@participant)
+    visit tournament_path(tournament, locale: I18n.locale)
+    click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
+    click_on I18n.t('games.add')
+
+    # Faction for current user (first block) should be preselected. If not, surface a clear failure.
+    assert_selector "select[name='game_event[game_participations_attributes][0][faction_id]']"
+    actual = find("select[name='game_event[game_participations_attributes][0][faction_id]']").value
+    assert_equal white.id.to_s, actual,
+                 "Expected Player A faction to be preselected to #{white.id}, got #{actual.inspect}"
+  end
+
+  test 'selecting opponent sets their faction automatically' do
+    tournament = create_open_running_tournament!
+    white = game_factions(:chess_white)
+    register_with_faction!(tournament, @participant, white)
+    register_with_faction!(tournament, @organizer, white)
+
+    login_as(@participant)
+    visit tournament_path(tournament, locale: I18n.locale)
+    click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
+    click_on I18n.t('games.add')
+
+    # Select opponent in second block; their faction should auto-fill
+    select_in_second_block(@organizer.username)
+    assert_selector "select[name='game_event[game_participations_attributes][1][faction_id]']"
+    # Wait briefly for faction fetch and preselection
+    assert_equal white.id.to_s,
+                 find("select[name='game_event[game_participations_attributes][1][faction_id]']", wait: 3).value
   end
 
   test 'participant can submit an Open tournament match from the tournament page' do
