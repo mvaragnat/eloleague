@@ -143,8 +143,9 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Security/validation: only the organizer can swap; only pending matches are eligible; swaps are constrained to the same round/depth.
 
 #### Open match reporting
-- In Open format, the organizer (or any registered participant when allowed) can add games from the Matches panel. The modal now lets you select Player A and Player B from registered participants.
-- If the organizer is also a registered participant, they are preselected as Player A by default but can be removed to enter a different pairing.
+- In Open format, the organizer (or any registered participant when allowed) can add games from the Matches panel. The modal lets you select Player A and Player B from registered participants.
+- Participant flow: when a normal participant opens the modal, they are preselected as Player A and cannot remove themselves (ensures they report their own match).
+- Organizer flow: when the organizer opens the modal and is registered, they are preselected as Player A but can remove themselves to select any other pairing. If the organizer is not registered, no preselection.
 - The form uses Stimulus controllers: `player-search` supports selecting two players and `game-form` validates that both players, scores, and factions are provided. Factions are populated dynamically based on the tournament's game system.
 
 - Tie-break strategies in standings:

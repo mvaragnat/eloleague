@@ -903,9 +903,17 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     score_sum_label = I18n.t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum')
     assert_match(%r{<th[^>]*#{Regexp.escape(highlight_style)}[^>]*>\s*#{Regexp.escape(score_sum_label)}\s*</th>}, body)
 
-    # SoS header highlighted
+    # SoS header highlighted (tolerate HTML escaping of apostrophes)
     sos_label = I18n.t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule')
-    assert_match(%r{<th[^>]*#{Regexp.escape(highlight_style)}[^>]*>\s*#{Regexp.escape(sos_label)}\s*</th>}, body)
+    sos_label_escaped = ERB::Util.html_escape(sos_label)
+    regex = %r{
+      <th[^>]*#{Regexp.escape(highlight_style)}[^>]*>
+      \s*
+      (#{Regexp.escape(sos_label)}|#{Regexp.escape(sos_label_escaped)})
+      \s*
+      </th>
+    }x
+    assert_match(regex, body)
   end
 
   test 'organizer can update description in open tournament' do

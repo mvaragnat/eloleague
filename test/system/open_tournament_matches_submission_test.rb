@@ -162,8 +162,12 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase # rubocop:
     click_on I18n.t('games.add')
     assert_selector 'h2', text: I18n.t('tournaments.show.matches', default: 'Matches')
 
-    # New behavior: organizer opens form with no preselected players
-    assert_no_selector '.selected-player'
+    # Organizer is registered: organizer is preselected but removable
+    within first('.participation-block') do
+      assert_selector '.selected-player', count: 1
+      # Organizer can remove themselves
+      assert_selector '.selected-player button'
+    end
 
     # Select two registered players
     select_in_first_block(@participant.username)
@@ -201,7 +205,7 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase # rubocop:
     click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
     click_on I18n.t('games.add')
 
-    # No preselected players for organizer
+    # Organizer is preselected when registered; here organizer not registered -> no preselection
     assert_no_selector '.selected-player'
 
     # System is auto set to tournament system (hidden select exists and has selected option)
