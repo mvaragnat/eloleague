@@ -132,12 +132,12 @@ class TournamentMatchesControllerTest < ActionDispatch::IntegrationTest
     assert_equal before_pairs, after_pairs, 'Round 2 pairings should remain unchanged after editing previous round'
   end
 
-  test 'new preselects organizer as player A if also registered' do
+  test 'new preselects organizer as player A if registered (removable)' do
     sign_out @tournament.creator
     sign_in @tournament.creator
     get new_tournament_tournament_match_path(@tournament, locale: I18n.locale)
     assert_response :success
-    assert_select 'div[data-controller="player-search"][data-player-search-preselected-user-id-value]', true
+    assert_select 'div[data-controller="player-search"][data-player-search-preselected-user-id-value]'
   end
 end
 

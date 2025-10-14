@@ -1,3 +1,11 @@
+## 2025-10-13
+
+- Open tournaments: organizer preselected as Player A if registered (removable)
+  - In the Open format match modal, participants still see themselves preselected as Player A and cannot remove themselves
+  - Organizers who are registered are preselected as Player A but can unselect themselves to pick any two registered players; if not registered, no preselection
+  - Server-side guard: non-organizers must include themselves among the two selected players; organizers are exempt
+  - Updated tests to cover organizer and participant flows; fixed escaping in SoS header highlight test
+
 ## 2025-10-05
 
 - Fixed Avo Tournament Registration creation from tournament page

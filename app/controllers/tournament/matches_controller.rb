@@ -24,16 +24,8 @@ module Tournament
 
       @game = Game::Event.new
       # Prebuild two participations with role-specific defaults
-      if Current.user && @tournament.registrations.exists?(user_id: Current.user.id)
-        # Registered participant flow: preselect current user as Player A, cannot remove
-        @game.game_participations.build(user: Current.user)
-        @preselected_user = Current.user
-        @preselected_removable = false
-      else
-        # Organizer or non-registered viewer: no preselection
-        @preselected_user = nil
-        @preselected_removable = true
-      end
+      set_preselection_flags
+      @game.game_participations.build(user: @preselected_user) if @preselected_user.present?
       # Ensure exactly two participation slots are present
       @game.game_participations.build while @game.game_participations.size < 2
     end
@@ -42,6 +34,19 @@ module Tournament
       unless can_add_match?
         return redirect_back(fallback_location: tournament_path(@tournament),
                              alert: t('tournaments.unauthorized', default: 'Not authorized'))
+      end
+
+      # For non-organizers, ensure they are one of the two selected players
+      unless @tournament.creator_id == Current.user.id
+        selected_user_ids = extract_participation_user_ids_from(game_params)
+        unless selected_user_ids.include?(Current.user.id)
+          flash.now[:alert] = t('tournaments.unauthorized', default: 'Not authorized')
+          # Re-render the form with the same defaults as #new
+          @game = Game::Event.new
+          set_preselection_flags
+          @game.game_participations.build while @game.game_participations.size < 2
+          return render :new, status: :unprocessable_content
+        end
       end
 
       game = Game::Event.new(
@@ -137,6 +142,41 @@ module Tournament
     end
 
     private
+
+    def set_preselection_flags
+      registered_current_user =
+        Current.user &&
+        @tournament.registrations.exists?(user_id: Current.user.id)
+
+      is_organizer = Current.user && (@tournament.creator_id == Current.user.id)
+
+      if registered_current_user
+        @preselected_user = Current.user
+        # Participants cannot remove themselves; organizers can
+        @preselected_removable = is_organizer
+      else
+        @preselected_user = nil
+        @preselected_removable = true
+      end
+    end
+
+    def extract_participation_user_ids_from(g_params)
+      attrs = g_params[:game_participations_attributes]
+      return [] if attrs.blank?
+
+      # attrs can be an Array of hashes or a Hash with numeric keys
+      participations =
+        if attrs.is_a?(Array)
+          attrs
+        else
+          attrs.values
+        end
+
+      participations
+        .map { |h| h[:user_id].presence || h['user_id'] }
+        .compact
+        .map(&:to_i)
+    end
 
     # Devise provides authentication; Current.user is set at ApplicationController
 
