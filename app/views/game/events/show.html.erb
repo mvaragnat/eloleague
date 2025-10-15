@@ -4,6 +4,16 @@
       <h2><%= t('games.view_army_lists', default: 'Army lists') %></h2>
 
       <% parts = @game.game_participations.includes(:user).to_a %>
+      <% if @game.tournament.present? %>
+        <div class="card" style="margin-bottom:0.75rem;">
+          <div class="card-header">
+            <h3 style="margin:0; font-size:1rem;">
+              <%= t('games.tournament_label', default: 'Tournament') %>:
+              <%= link_to @game.tournament.name, tournament_path(@game.tournament) %>
+            </h3>
+          </div>
+        </div>
+      <% end %>
       <% parts.each do |p| %>
         <div class="card" style="margin-bottom:0.75rem;">
           <div class="card-header">

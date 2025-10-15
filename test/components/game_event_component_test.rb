@@ -15,6 +15,22 @@ class GameEventComponentTest < ViewComponent::TestCase
     assert_text @game.game_system.localized_name
   end
 
+  test 'renders tournament label and name when event has tournament' do
+    tournament = Tournament::Tournament.create!(
+      name: 'Autumn Open',
+      description: 'Test',
+      creator: @user,
+      game_system: @game.game_system,
+      format: :open,
+      score_for_bye: 0
+    )
+    @game.update!(tournament: tournament)
+
+    render_inline(GameEventComponent.new(event: @game, current_user: @user))
+    assert_text I18n.t('games.tournament_label')
+    assert_text tournament.name
+  end
+
   test 'renders game date' do
     render_inline(@component)
     assert_text I18n.l(@game.played_at, format: :card)
