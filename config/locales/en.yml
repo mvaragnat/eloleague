@@ -128,6 +128,7 @@ en:
       both_scores_required: "Both scores are required"
       both_factions_required: "Both players must select a faction"
     secondary_score_short: "Points"
+    tournament_label: "Tournament"
   avo:
     fields:
       participants_with_scores: "Participants & scores"
