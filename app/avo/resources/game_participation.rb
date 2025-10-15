@@ -12,17 +12,11 @@ module Avo
         field :user, as: :belongs_to, resource: Avo::Resources::User, attach_scope: -> { query.order(username: :asc) }
         field :faction, as: :belongs_to, resource: Avo::Resources::GameFaction,
                         attach_scope: lambda {
-                          # Prefer scoping by the parent Game::Event when creating via relation
-                          # Fallback to alphabetical ordering
-                          ev = nil
-                          if params[:via_record_id].present?
-                            # via_record_id is numeric for Game::Event
-                            ev_id = params[:via_record_id].to_s.gsub(/[^0-9]/, '')
-                            ev = Game::Event.where(id: ev_id).first if ev_id.present?
-                          end
+                          gsid = Avo::Resources::GameParticipation
+                                 .resolve_event_game_system_id(params)
 
-                          if ev&.game_system_id
-                            query.where(game_system_id: ev.game_system_id).order(:name)
+                          if gsid.present?
+                            query.where(game_system_id: gsid).order(:name)
                           else
                             query.order(:name)
                           end
@@ -32,6 +26,28 @@ module Avo
         field :secondary_score, as: :number
         field :army_list, as: :textarea
         field :metadata, as: :code, language: 'json'
+      end
+
+      def self.resolve_event_game_system_id(params)
+        conn = ActiveRecord::Base.connection
+
+        ev_id = params[:via_record_id]
+        if ev_id.present? && ev_id.to_s.match?(/\A\d+\z/)
+          return conn.select_value(
+            "SELECT game_system_id FROM game_events WHERE id = #{conn.quote(ev_id.to_i)} LIMIT 1"
+          )
+        end
+
+        gp_id = params[:id]
+        return nil unless gp_id.present? && gp_id.to_s.match?(/\A\d+\z/)
+
+        conn.select_value(
+          "SELECT ge.game_system_id
+             FROM game_participations gp
+             JOIN game_events ge ON gp.game_event_id = ge.id
+            WHERE gp.id = #{conn.quote(gp_id.to_i)}
+            LIMIT 1"
+        )
       end
     end
   end

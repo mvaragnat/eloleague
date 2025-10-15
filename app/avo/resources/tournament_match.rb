@@ -13,7 +13,7 @@ module Avo
         field :a_user, as: :belongs_to, resource: Avo::Resources::User, name: I18n.t('tournaments.show.player_a'), attach_scope: -> { query.order(username: :asc) }
         field :b_user, as: :belongs_to, resource: Avo::Resources::User, name: I18n.t('tournaments.show.player_b'), attach_scope: -> { query.order(username: :asc) }
         field :game_event, as: :belongs_to, resource: Avo::Resources::GameEvent
-        # Factions selection is not directly on this resource; selection happens in GameParticipation/TournamentRegistration
+        # Factions are chosen on related resources (participation/registration)
 
         field :result, as: :select, options: ::Tournament::Match::RESULTS
         field :reported_at, as: :date_time

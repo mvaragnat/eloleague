@@ -12,20 +12,11 @@ module Avo
         field :user, as: :belongs_to, resource: Avo::Resources::User, attach_scope: -> { query.order(username: :asc) }
         field :faction, as: :belongs_to, resource: Avo::Resources::GameFaction,
                         attach_scope: lambda {
-                          # Resolve tournament's game_system_id without constantizing models
-                          via_id = params[:via_record_id]
-                          game_system_id = nil
-                          if via_id.present?
-                            conn = ActiveRecord::Base.connection
-                            if via_id.to_s.match?(/\A\d+\z/)
-                              game_system_id = conn.select_value("SELECT game_system_id FROM tournaments WHERE id = #{conn.quote(via_id.to_i)} LIMIT 1")
-                            else
-                              game_system_id = conn.select_value("SELECT game_system_id FROM tournaments WHERE slug = #{conn.quote(via_id)} LIMIT 1")
-                            end
-                          end
+                          gsid = Avo::Resources::TournamentRegistration
+                                 .resolve_tournament_game_system_id(params)
 
-                          if game_system_id.present?
-                            query.where(game_system_id: game_system_id).order(:name)
+                          if gsid.present?
+                            query.where(game_system_id: gsid).order(:name)
                           else
                             query.order(:name)
                           end
@@ -36,6 +27,34 @@ module Avo
         field :army_list, as: :textarea
         field :created_at, as: :date_time, readonly: true
         field :updated_at, as: :date_time, readonly: true
+      end
+
+      # Keep helper minimal and isolated to reduce fields method complexity.
+      def self.resolve_tournament_game_system_id(params)
+        conn = ActiveRecord::Base.connection
+
+        via_id = params[:via_record_id]
+        if via_id.present?
+          if via_id.to_s.match?(/\A\d+\z/)
+            return conn.select_value(
+              "SELECT game_system_id FROM tournaments WHERE id = #{conn.quote(via_id.to_i)} LIMIT 1"
+            )
+          end
+          return conn.select_value(
+            "SELECT game_system_id FROM tournaments WHERE slug = #{conn.quote(via_id)} LIMIT 1"
+          )
+        end
+
+        reg_id = params[:id]
+        return nil unless reg_id.present? && reg_id.to_s.match?(/\A\d+\z/)
+
+        conn.select_value(
+          "SELECT t.game_system_id
+             FROM tournament_registrations tr
+             JOIN tournaments t ON tr.tournament_id = t.id
+            WHERE tr.id = #{conn.quote(reg_id.to_i)}
+            LIMIT 1"
+        )
       end
     end
   end
