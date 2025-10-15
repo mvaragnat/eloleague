@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_01_085822) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_15_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -75,6 +75,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_01_085822) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "game_participations_count", default: 0, null: false
     t.index ["game_system_id", "name"], name: "index_game_factions_on_game_system_id_and_name", unique: true
     t.index ["game_system_id"], name: "index_game_factions_on_game_system_id"
   end
@@ -178,6 +179,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_01_085822) do
     t.integer "max_players"
     t.string "primary_strategy_key", default: "points", null: false
     t.integer "score_for_bye", default: 0, null: false
+    t.integer "tournament_registrations_count", default: 0, null: false
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"

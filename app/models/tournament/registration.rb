@@ -4,7 +4,7 @@ module Tournament
   class Registration < ApplicationRecord
     self.table_name = 'tournament_registrations'
 
-    belongs_to :tournament, class_name: 'Tournament::Tournament'
+    belongs_to :tournament, class_name: 'Tournament::Tournament', counter_cache: :tournament_registrations_count
     belongs_to :user
     belongs_to :faction, class_name: 'Game::Faction', optional: true
 

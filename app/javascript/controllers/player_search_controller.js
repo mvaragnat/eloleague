@@ -56,9 +56,15 @@ export default class extends Controller {
       return
     }
 
-    this.resultsTarget.innerHTML = filtered
-      .map(user => this.userTemplate(user))
-      .join('')
+    const sorted = filtered.slice().sort((a, b) => {
+      const an = (a.username || '').toLowerCase()
+      const bn = (b.username || '').toLowerCase()
+      if (an < bn) return -1
+      if (an > bn) return 1
+      return 0
+    })
+
+    this.resultsTarget.innerHTML = sorted.map(user => this.userTemplate(user)).join('')
   }
 
   selectPlayer(event) {

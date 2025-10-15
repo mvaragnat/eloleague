@@ -186,7 +186,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 - Admin-created users: when creating a User from Avo and leaving password blank, the system auto-generates a secure random password.
 - Avo menu hides `Game::Participation` and `Tournament::Round` resources; still accessible via relations.
-- Game Events now display a participants summary (usernames and scores) in Avo list/show views.
+- Game Events list/show display a participants summary (usernames and scores). Participants are visible as related records.
+- ELO-specific Avo resources are removed from the sidebar; ELO data remains in the app but is not navigable via Avo.
+- Game Factions index can be sorted by Games played.
+- Tournament index shows a Registrations count column.
 
 - Users resource: supports searching by `username` on the index page.
 
