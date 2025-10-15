@@ -36,6 +36,8 @@ module Avo
         field :score_for_bye, as: :number, help: 'Score awarded for bye (Swiss tournaments only)'
         field :settings, as: :code, language: 'json'
 
+        field :tournament_registrations_count, as: :number, name: I18n.t('tournaments.show.registrations')
+
         field :registrations, as: :has_many, resource: Avo::Resources::TournamentRegistration
         field :rounds, as: :has_many, resource: Avo::Resources::TournamentRound
         field :matches, as: :has_many, resource: Avo::Resources::TournamentMatch

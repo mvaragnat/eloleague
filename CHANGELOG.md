@@ -1,3 +1,10 @@
+## 2025-10-15
+
+- Avo: Removed ELO resources and `GameEvent` ELO relation (Avo free plan limitation workaround).
+- Avo: `GameFaction` index now sortable by “Games played” via counter cache.
+- Avo: `Tournament` index shows registrations count via counter cache.
+- Avo: Sorted `User` selections alphabetically; scoped `Faction` selections to the relevant game system on `GameParticipation` and `TournamentRegistration`.
+- UX: Player search results sorted A→Z; tournament match modal loads initial factions ordered A→Z.
 ## 2025-10-13
 
 - Open tournaments: organizer preselected as Player A if registered (removable)

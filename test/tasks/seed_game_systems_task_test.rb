@@ -7,11 +7,11 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
   def setup
     Rails.application.load_tasks if Rake::Task.tasks.empty?
 
-    # Clean DB to avoid uniqueness conflicts between tests
-    Game::Participation.destroy_all
-    Game::Event.destroy_all
-    Game::Faction.destroy_all
-    Game::System.destroy_all
+    # Clean DB to avoid uniqueness conflicts between tests (bypass callbacks to avoid dependent restrictions)
+    Game::Participation.delete_all
+    Game::Event.delete_all
+    Game::Faction.delete_all
+    Game::System.delete_all
   end
 
   test 'seeds game systems and factions from YAML config' do

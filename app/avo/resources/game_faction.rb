@@ -11,7 +11,8 @@ module Avo
         field :name, as: :text, required: true, sortable: true
         field :game_system, as: :belongs_to, resource: Avo::Resources::GameSystem
 
-        field :games_count, as: :number, name: I18n.t('avo.fields.games_played'), readonly: true
+        field :game_participations_count, as: :number, name: I18n.t('avo.fields.games_played'), sortable: true,
+                                          readonly: true
         field :game_participations, as: :has_many, resource: Avo::Resources::GameParticipation
       end
 

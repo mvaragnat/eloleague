@@ -11,7 +11,7 @@ class UsersController < ApplicationController
 
     @users = scope_to_tournament(@users, resolved_tid)
     @users = exclude_current_user_if_needed(@users, resolved_tid)
-    @users = @users.limit(10)
+    @users = @users.order(username: :asc).limit(10)
 
     registrations_by_user_id = registrations_index(resolved_tid, @users)
 
