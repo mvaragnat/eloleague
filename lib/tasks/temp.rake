@@ -2,6 +2,47 @@
 
 # rubocop:disable Metrics/BlockLength
 namespace :temp do
+  desc 'Backdate tournament events to a target date and rebuild Elo. '
+       'Usage: rake temp:backdate_tournament[TOURNAMENT_ID,YYYY-MM-DD]'
+  task :backdate_tournament, %i[tournament_id date] => :environment do |_task, args|
+    tournament_id = args[:tournament_id].to_s.strip
+    date_str = args[:date].to_s.strip
+
+    if tournament_id.blank? || date_str.blank?
+      puts 'ERROR: Provide tournament_id and date. Example: rake temp:backdate_tournament[135,2025-06-27]'
+      next
+    end
+
+    tournament = Tournament::Tournament.find(tournament_id)
+
+    begin
+      parsed = Time.zone.parse(date_str)
+    rescue StandardError
+      parsed = nil
+    end
+
+    if parsed.blank?
+      puts "ERROR: Could not parse date '#{date_str}'. Expected format like 2025-06-27."
+      next
+    end
+
+    new_time = Time.zone.local(parsed.year, parsed.month, parsed.day, 12, 0, 0)
+
+    puts "Backdating events for Tournament ##{tournament.id} '#{tournament.name}' to #{base_time.to_date}..."
+
+    events = Game::Event.where(tournament_id: tournament.id).includes(:tournament)
+    if events.blank?
+      puts 'No events found for this tournament. Nothing to do.'
+      next
+    end
+
+    events.update_all(played_at: new_time)
+    
+    # then play elo rebuild
+    Rake::Task['elo:rebuild'].reenable
+    Rake::Task['elo:rebuild'].invoke(tournament.game_system_id)
+  end
+
   # reset de la base le 03/09/25
   # EloChange.destroy_all
   # Tournament::Match.destroy_all
