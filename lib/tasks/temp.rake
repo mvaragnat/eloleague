@@ -3,7 +3,6 @@
 # rubocop:disable Metrics/BlockLength
 namespace :temp do
   desc 'Backdate tournament events to a target date and rebuild Elo. '
-       'Usage: rake temp:backdate_tournament[TOURNAMENT_ID,YYYY-MM-DD]'
   task :backdate_tournament, %i[tournament_id date] => :environment do |_task, args|
     tournament_id = args[:tournament_id].to_s.strip
     date_str = args[:date].to_s.strip
@@ -36,8 +35,11 @@ namespace :temp do
       next
     end
 
-    events.update_all(played_at: new_time)
-    
+    # insert a small offset to have consistent ELO ordering
+    events.each_with_index do |event, i|
+      event.update(played_at: new_time + i.minutes)
+    end
+
     # then play elo rebuild
     Rake::Task['elo:rebuild'].reenable
     Rake::Task['elo:rebuild'].invoke(tournament.game_system_id)
