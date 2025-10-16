@@ -8,7 +8,7 @@ namespace :temp do
     date_str = args[:date].to_s.strip
 
     if tournament_id.blank? || date_str.blank?
-      puts 'ERROR: Provide tournament_id and date. Example: rake temp:backdate_tournament[135,2025-06-27]'
+      puts "ERROR: Provide tournament_id and date. Example: heroku run rails 'temp:backdate_tournament[135,2025-06-27]'"
       next
     end
 
@@ -27,7 +27,7 @@ namespace :temp do
 
     new_time = Time.zone.local(parsed.year, parsed.month, parsed.day, 12, 0, 0)
 
-    puts "Backdating events for Tournament ##{tournament.id} '#{tournament.name}' to #{base_time.to_date}..."
+    puts "Backdating events for Tournament ##{tournament.id} '#{tournament.name}' to #{new_time.to_date}..."
 
     events = Game::Event.where(tournament_id: tournament.id).includes(:tournament)
     if events.blank?
