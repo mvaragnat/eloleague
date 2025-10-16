@@ -24,7 +24,8 @@ class TournamentsController < ApplicationController
 
     @rounds = @tournament.rounds.includes(matches: %i[a_user b_user]).order(:number)
     @registrations = @tournament.registrations.includes(:user)
-    @matches = @tournament.matches.order(created_at: :desc).limit(20)
+    # Load all matches for Open view; grid will auto-wrap to multiple rows
+    @matches = @tournament.matches.includes(:a_user, :b_user, :game_event).order(created_at: :desc)
     @active_tab_index = (params[:tab].presence || 0).to_i
     @is_registered = Current.user && @tournament.registrations.exists?(user_id: Current.user.id)
     @my_registration = Current.user && @tournament.registrations.find_by(user_id: Current.user.id)
