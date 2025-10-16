@@ -24,9 +24,9 @@ Rails.application.routes.draw do
       resources :factions, only: %i[index]
     end
 
-    # Users search (used by player search UI)
+    # Users search (used by player search UI) and public profile
     get 'users/search', to: 'users#search', as: :users_search
-    resources :users, only: %i[index]
+    resources :users, only: %i[index show]
 
     # Contact
     resources :contacts, only: %i[new create]

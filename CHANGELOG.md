@@ -1,3 +1,9 @@
+## 2025-10-16
+- Add Player profile page (`/users/:id`) with:
+  - Current ELO by game system
+  - ELO over time multi-series chart (per game system)
+  - Full list of the player's games
+- Link player profile from Elo standings, tournament participants, and ranking tables
 ## 2025-10-15
 
 - Avo: Removed ELO resources and `GameEvent` ELO relation (Avo free plan limitation workaround).

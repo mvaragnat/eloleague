@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
+  skip_before_action :authenticate_user!, only: %i[show search]
+
   def search
     term = params[:q].to_s.strip
 
@@ -18,6 +20,30 @@ class UsersController < ApplicationController
     render json: @users.map { |u|
       { id: u.id, username: u.username, faction_id: registrations_by_user_id[u.id]&.faction_id }
     }
+  end
+
+  def show
+    # Public player profile
+    Current.user = current_user
+    @user = User.find(params[:id])
+
+    @elo_ratings = EloRating.where(user: @user).includes(:game_system).order(:game_system_id)
+
+    # All elo changes for the user across systems, newest first
+    @elo_changes = EloChange.where(user: @user).includes(:game_system, :game_event).order(game_event_id: :desc)
+
+    # Build a timeline per system for the chart: [{system_id, system_name, points: [{t, r}...]}]
+    @elo_series_by_system = @elo_changes.group_by(&:game_system_id).map do |gs_id, changes|
+      system = changes.first.game_system
+      points = changes.sort_by { |ch| ch.game_event&.played_at || Time.zone.at(0) }.map do |ch|
+        { t: (ch.game_event&.played_at || Time.zone.at(0)).to_i * 1000, r: ch.rating_after }
+      end
+      { id: gs_id, name: system.localized_name, points: points }
+    end
+
+    # Recent games (all systems)
+    @events = @user.game_events.includes(:game_system, :game_participations, :players,
+                                         :tournament).order(played_at: :desc)
   end
 
   private

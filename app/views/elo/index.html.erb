@@ -42,7 +42,10 @@
                 <% is_current = (Current.user && row.user_id == Current.user.id) %>
                 <tr>
                   <td style="padding:0.25rem 0;"><%= entry[:rank] %></td>
-                  <td style="padding:0.25rem 0;"><%= is_current ? content_tag(:strong, row.user.username) : row.user.username %></td>
+              <td style="padding:0.25rem 0;">
+                <% name = is_current ? content_tag(:strong, row.user.username) : row.user.username %>
+                <%= link_to name, user_path(row.user) %>
+              </td>
                   <td style="padding:0.25rem 0; text-align:right;"><%= row.rating %></td>
                   <td style="padding:0.25rem 0; text-align:right;"><%= row.games_played %></td>
                 </tr>

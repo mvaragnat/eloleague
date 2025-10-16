@@ -1,0 +1,62 @@
+<div class="games-container">
+  <div class="page-header">
+    <h1><%= t('players.title', username: @user.username) %></h1>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3><%= t('players.current_elo_by_system') %></h3>
+    </div>
+    <div class="card-body">
+      <% if @elo_ratings.any? %>
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:0.25rem 0;"><%= t('players.system') %></th>
+              <th style="text-align:right; padding:0.25rem 0;"><%= t('elo.rating') %></th>
+              <th style="text-align:right; padding:0.25rem 0;"><%= t('elo.count') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @elo_ratings.each do |row| %>
+              <tr>
+                <td style="padding:0.25rem 0;"><%= row.game_system.localized_name %></td>
+                <td style="padding:0.25rem 0; text-align:right;"><%= row.rating %></td>
+                <td style="padding:0.25rem 0; text-align:right;"><%= row.games_played %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p class="card-date"><%= t('players.no_ratings') %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h3><%= t('players.elo_over_time') %></h3>
+    </div>
+    <div class="card-body">
+      <% if @elo_series_by_system.any? %>
+        <div data-controller="elo-chart"
+             data-elo-chart-series-value="<%= @elo_series_by_system.to_json %>">
+          <svg data-elo-chart-target="chart" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;"></svg>
+        </div>
+      <% else %>
+        <p class="card-date"><%= t('players.no_history') %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <div id="games-list">
+    <% @events.each do |event| %>
+      <%= render(GameEventComponent.new(event: event, current_user: @user)) %>
+    <% end %>
+    <% if @events.blank? %>
+      <p class="card-date"><%= t('games.no_games') %></p>
+    <% end %>
+  </div>
+</div>
+
+

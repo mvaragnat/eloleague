@@ -2,7 +2,7 @@
   <div class="card-body">
     <div style="display:grid; grid-template-columns: 1fr 1fr auto; column-gap:1rem; row-gap:0.25rem; align-items:center;">
       <% registrations.each do |r| %>
-        <div><%= r.user.username %></div>
+        <div><%= link_to r.user.username, user_path(r.user) %></div>
         <div>
           <% can_edit = (Current.user && (Current.user.id == r.user_id || Current.user.id == tournament.creator_id)) %>
           <% if can_edit %>
