@@ -23,6 +23,8 @@ export default class extends Controller {
     const allPoints = series.flatMap(s => s.points)
     let minT = Math.min(...allPoints.map(p => p.t))
     let maxT = Math.max(...allPoints.map(p => p.t))
+    const now = Date.now()
+    if (now > maxT) maxT = now
     const minR = Math.min(...allPoints.map(p => p.r))
     const maxR = Math.max(...allPoints.map(p => p.r))
 
@@ -61,28 +63,39 @@ export default class extends Controller {
     this._drawXTicks(svg, { padding, iw, ih, minT, maxT, sx, locale })
     this._drawYTicks(svg, { padding, ih, yMin, yMax, sy })
 
-    const colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+    const colors = [
+      "#1f77b4", 
+      "#ff7f0e", 
+      "#2ca02c", 
+      "#d62728", 
+      "#9467bd", 
+      "#8c564b"
+    ]
 
     series.forEach((s, idx) => {
-      const pts = s.points
+      // Extend flat to now so the line reaches present
+      const pts = [...(s.points || [])]
+      if (pts.length) {
+        const last = pts[pts.length - 1]
+        if (last.t < now) pts.push({ t: now, r: last.r })
+      }
       if (!pts || pts.length === 0) return
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
       const color = colors[idx % colors.length]
-      let d = ""
-      pts.forEach((p, i) => {
-        const x = sx(p.t)
-        const y = sy(p.r)
-        d += i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`
-      })
+      const points = pts.map(p => ({ x: sx(p.t), y: sy(p.r) }))
+      const d = this._smoothPath(points)
       path.setAttribute("d", d)
       path.setAttribute("fill", "none")
       path.setAttribute("stroke", color)
       path.setAttribute("stroke-width", "2")
+      path.setAttribute("stroke-linecap", "round")
+      path.setAttribute("stroke-linejoin", "round")
       svg.appendChild(path)
 
       // Label last point
       const last = pts[pts.length - 1]
-      const tx = sx(last.t) + 6
+      const maxX = padding.left + iw - 2
+      const tx = Math.min(sx(last.t) + 6, maxX)
       const ty = sy(last.r)
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text")
       label.setAttribute("x", tx)
@@ -122,8 +135,8 @@ export default class extends Controller {
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text")
       label.setAttribute("x", x)
       label.setAttribute("y", padding.top + ih + 14)
-      label.setAttribute("fill", "#6b7280")
-      label.setAttribute("font-size", "10")
+      label.setAttribute("fill", "currentColor")
+      label.setAttribute("font-size", "15")
       label.setAttribute("text-anchor", "middle")
       label.textContent = this._formatDate(t, locale)
       group.appendChild(label)
@@ -151,8 +164,8 @@ export default class extends Controller {
       const label = document.createElementNS("http://www.w3.org/2000/svg", "text")
       label.setAttribute("x", padding.left - 6)
       label.setAttribute("y", y + 3)
-      label.setAttribute("fill", "#6b7280")
-      label.setAttribute("font-size", "10")
+      label.setAttribute("fill", "currentColor")
+      label.setAttribute("font-size", "15")
       label.setAttribute("text-anchor", "end")
       label.textContent = Math.round(r)
       group.appendChild(label)
@@ -176,6 +189,28 @@ export default class extends Controller {
     const seg = path.split('/')[1]
     if (seg === 'en' || seg === 'fr') return seg
     return document.documentElement.lang || navigator.language || 'en'
+  }
+
+  // Smooth path using quadratic curves through midpoints
+  _smoothPath(points) {
+    if (!points || points.length === 0) return ''
+    if (points.length === 1) return `M ${points[0].x} ${points[0].y}`
+
+    let d = `M ${points[0].x} ${points[0].y}`
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i]
+      const p1 = points[i + 1]
+      const mx = (p0.x + p1.x) / 2
+      const my = (p0.y + p1.y) / 2
+      if (i === 0) {
+        d += ` Q ${p0.x} ${p0.y} ${mx} ${my}`
+      } else {
+        d += ` T ${mx} ${my}`
+      }
+    }
+    const last = points[points.length - 1]
+    d += ` T ${last.x} ${last.y}`
+    return d
   }
 }
 
