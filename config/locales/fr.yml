@@ -263,6 +263,13 @@ fr:
     rating: "Classement"
     count: "Nombre de parties"
     select_system: "Sélectionner un système"
+  players:
+    title: "%{username}"
+    current_elo_by_system: "ELO actuel par système"
+    elo_over_time: "Évolution de l'ELO"
+    system: "Jeu"
+    no_ratings: "Aucun classement ELO pour le moment"
+    no_history: "Aucun historique ELO pour le moment"
   time:
     formats:
       long: "Le %d/%m/%Y à %Hh%M"

@@ -47,7 +47,7 @@
           <% standings.each_with_index do |row, idx| %>
             <tr>
               <td style="padding:0.25rem 0;"><%= idx + 1 %></td>
-              <td style="padding:0.25rem 0;"><%= row[:user].username %></td>
+              <td style="padding:0.25rem 0;"><%= link_to row[:user].username, user_path(row[:user]) %></td>
               <td style="padding:0.25rem 0; text-align:right;"><%= tournament.matches.where(a_user: row[:user]).or(tournament.matches.where(b_user: row[:user])).where.not(result: 'pending').count %></td>
 
               <%# Points cell %>

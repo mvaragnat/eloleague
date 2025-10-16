@@ -296,6 +296,13 @@ en:
     rating: "Rating"
     count: "Games count"
     select_system: "Select a system"
+  players:
+    title: "%{username}"
+    current_elo_by_system: "Current ELO by game system"
+    elo_over_time: "ELO over time"
+    system: "Game"
+    no_ratings: "No ELO ratings yet"
+    no_history: "No ELO history yet"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"

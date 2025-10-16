@@ -23,3 +23,6 @@ application.register("modal", ModalController)
 
 import PlaceAutocompleteController from "controllers/place_autocomplete_controller"
 application.register("place-autocomplete", PlaceAutocompleteController)
+
+import EloChartController from "controllers/elo_chart_controller"
+application.register("elo-chart", EloChartController)

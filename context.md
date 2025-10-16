@@ -66,6 +66,14 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Exactly two players are required for each game. The form provides two independent player selectors; front-end prevents submission unless both players, scores, and factions are provided; back-end enforces the same validations.
 - Game cards on the Dashboard and Elo pages display each player's faction (localized) beneath their username.
 
+### Player Profile Page
+- Public page at `/users/:id` showing a player's cross-system profile
+- Sections:
+  - Current ELO by game system (rating and games played)
+  - ELO over time chart (one color per game system)
+  - All games played by the user across systems (same card component used elsewhere)
+- Profile links are available from Elo standings, tournament participants, and tournament ranking tables.
+
 ### ELO Rankings Page
 - `/elo` lists player ELO standings per selected game system.
 - Standings are server-paginated (default 25 per page; configurable via `?per=`, max 100).
