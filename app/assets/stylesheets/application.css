@@ -35,6 +35,10 @@ body {
   flex-direction: column;
 }
 
+/* Links: keep underline, inherit color (no default blue) */
+a { color: inherit; text-decoration: underline; }
+a:hover, a:focus { text-decoration-thickness: from-font; }
+
 h1, h2, h3 { color: var(--text-strong); margin: 0 0 0.5rem 0; }
 h1 { font-size: 2.25rem; font-weight: 700; }
 h2 { font-size: 1.5rem; font-weight: 700; }

@@ -73,17 +73,23 @@ export default class extends Controller {
     ]
 
     series.forEach((s, idx) => {
+      // Apply moving average smoothing on rating values
+      const original = [...(s.points || [])]
+      const smoothed = this._movingAverage(original, 3)
       // Extend flat to now so the line reaches present
-      const pts = [...(s.points || [])]
-      if (pts.length) {
-        const last = pts[pts.length - 1]
-        if (last.t < now) pts.push({ t: now, r: last.r })
+      if (smoothed.length) {
+        const last = smoothed[smoothed.length - 1]
+        if (last.t < now) smoothed.push({ t: now, r: last.r })
       }
-      if (!pts || pts.length === 0) return
+      if (!smoothed.length) return
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
       const color = colors[idx % colors.length]
-      const points = pts.map(p => ({ x: sx(p.t), y: sy(p.r) }))
-      const d = this._smoothPath(points)
+      const points = smoothed.map(p => ({ x: sx(p.t), y: sy(p.r) }))
+      // Straight line segments
+      let d = ""
+      points.forEach((pt, i) => {
+        d += i === 0 ? `M ${pt.x} ${pt.y}` : ` L ${pt.x} ${pt.y}`
+      })
       path.setAttribute("d", d)
       path.setAttribute("fill", "none")
       path.setAttribute("stroke", color)
@@ -93,7 +99,7 @@ export default class extends Controller {
       svg.appendChild(path)
 
       // Label last point
-      const last = pts[pts.length - 1]
+      const last = smoothed[smoothed.length - 1]
       const maxX = padding.left + iw - 2
       const tx = Math.min(sx(last.t) + 6, maxX)
       const ty = sy(last.r)
@@ -191,26 +197,18 @@ export default class extends Controller {
     return document.documentElement.lang || navigator.language || 'en'
   }
 
-  // Smooth path using quadratic curves through midpoints
-  _smoothPath(points) {
-    if (!points || points.length === 0) return ''
-    if (points.length === 1) return `M ${points[0].x} ${points[0].y}`
-
-    let d = `M ${points[0].x} ${points[0].y}`
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[i]
-      const p1 = points[i + 1]
-      const mx = (p0.x + p1.x) / 2
-      const my = (p0.y + p1.y) / 2
-      if (i === 0) {
-        d += ` Q ${p0.x} ${p0.y} ${mx} ${my}`
-      } else {
-        d += ` T ${mx} ${my}`
-      }
+  // Simple moving average smoothing on rating values (window size n)
+  _movingAverage(points, n = 3) {
+    if (!points || points.length === 0) return []
+    const out = []
+    let sum = 0
+    for (let i = 0; i < points.length; i++) {
+      sum += points[i].r
+      if (i >= n) sum -= points[i - n].r
+      const count = Math.min(i + 1, n)
+      out.push({ t: points[i].t, r: sum / count })
     }
-    const last = points[points.length - 1]
-    d += ` T ${last.x} ${last.y}`
-    return d
+    return out
   }
 }
 
