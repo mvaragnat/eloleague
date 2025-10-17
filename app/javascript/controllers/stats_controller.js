@@ -137,6 +137,10 @@ export default class extends Controller {
       state.key = key
       state.dir = 'asc'
     }
+    // Update header visual states
+    tableEl.querySelectorAll('th.sortable').forEach(h => { h.classList.remove('is-sorted'); h.removeAttribute('aria-sort') })
+    th.classList.add('is-sorted')
+    th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending')
     const data = this[dataKey] || []
     data.sort((a, b) => {
       const va = a[key]

@@ -1,7 +1,9 @@
 <% content_for :title, t('stats.title', default: 'Stats') %>
 
-<div class="container" data-controller="stats">
-  <h1 class="page-title"><%= t('stats.title', default: 'Stats') %></h1>
+<div class="stats-container" data-controller="stats">
+  <div class="page-header">
+    <h1><%= t('stats.title', default: 'Stats') %></h1>
+  </div>
 
   <div class="card">
     <label for="system-select"><%= t('stats.system_label', default: 'Game system') %></label>
@@ -19,13 +21,13 @@
       <table class="table" data-stats-target="factionsTable">
         <thead>
           <tr>
-            <th data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
-            <th data-action="click->stats#sort" data-key="total_games"><%= t('stats.total_games', default: 'Games') %></th>
-            <th data-action="click->stats#sort" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
-            <th data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
-            <th data-action="click->stats#sort" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
-            <th data-action="click->stats#sort" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
-            <th data-action="click->stats#sort" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
+            <th class="sortable" data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
+            <th class="sortable" data-action="click->stats#sort" data-key="total_games"><%= t('stats.total_games', default: 'Games') %></th>
+            <th class="sortable" data-action="click->stats#sort" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
+            <th class="sortable" data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
+            <th class="sortable" data-action="click->stats#sort" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
+            <th class="sortable" data-action="click->stats#sort" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
+            <th class="sortable" data-action="click->stats#sort" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -39,21 +41,23 @@
       <option value=""><%= t('stats.select_faction', default: 'Select a faction') %></option>
     </select>
 
-    <div id="faction-graph" class="mt-4" hidden data-stats-target="chart" data-controller="elo-chart" data-elo-chart-series-value="[]">
-      <svg data-elo-chart-target="chart" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;"></svg>
+    <div class="card-body">
+      <div id="faction-graph" class="mt-2 chart-wrapper" hidden data-stats-target="chart" data-controller="elo-chart" data-elo-chart-series-value="[]">
+        <svg data-elo-chart-target="chart" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;"></svg>
+      </div>
     </div>
 
     <div id="versus-table" class="mt-4" hidden>
       <table class="table" data-stats-target="versusTable">
         <thead>
           <tr>
-            <th data-action="click->stats#sortVs" data-key="opponent_faction_name"><%= t('stats.opponent', default: 'Opponent') %></th>
-            <th data-action="click->stats#sortVs" data-key="games"><%= t('stats.games', default: 'Games') %></th>
-            <th data-action="click->stats#sortVs" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
-            <th data-action="click->stats#sortVs" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
-            <th data-action="click->stats#sortVs" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
-            <th data-action="click->stats#sortVs" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
-            <th data-action="click->stats#sortVs" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
+            <th class="sortable" data-action="click->stats#sortVs" data-key="opponent_faction_name"><%= t('stats.opponent', default: 'Opponent') %></th>
+            <th class="sortable" data-action="click->stats#sortVs" data-key="games"><%= t('stats.games', default: 'Games') %></th>
+            <th class="sortable" data-action="click->stats#sortVs" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
+            <th class="sortable" data-action="click->stats#sortVs" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
+            <th class="sortable" data-action="click->stats#sortVs" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
+            <th class="sortable" data-action="click->stats#sortVs" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
+            <th class="sortable" data-action="click->stats#sortVs" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
             <th><%= t('stats.mirrors', default: 'Mirrors') %></th>
           </tr>
         </thead>
