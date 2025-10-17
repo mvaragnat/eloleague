@@ -39,8 +39,8 @@
       <option value=""><%= t('stats.select_faction', default: 'Select a faction') %></option>
     </select>
 
-    <div id="faction-graph" class="mt-4" hidden>
-      <svg data-controller="elo-chart" data-elo-chart-series-value="[]" data-stats-target="chart" viewBox="0 0 800 300"></svg>
+    <div id="faction-graph" class="mt-4" hidden data-stats-target="chart" data-controller="elo-chart" data-elo-chart-series-value="[]">
+      <svg data-elo-chart-target="chart" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;"></svg>
     </div>
 
     <div id="versus-table" class="mt-4" hidden>

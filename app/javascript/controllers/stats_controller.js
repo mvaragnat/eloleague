@@ -88,11 +88,15 @@ export default class extends Controller {
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
     const series = data.series || []
-    // Update the elo-chart controller value
-    this.chartTarget.dataset.eloChartSeriesValue = JSON.stringify(series)
-    // Re-dispatch connect-like behavior
+    // Update the elo-chart controller value directly to avoid timing issues
     const ctrl = this.application.getControllerForElementAndIdentifier(this.chartTarget, 'elo-chart')
-    if (ctrl && ctrl.render) ctrl.render()
+    if (ctrl) {
+      ctrl.seriesValue = series
+      if (ctrl.render) ctrl.render()
+    } else {
+      // Fallback: set dataset so when controller connects it renders
+      this.chartTarget.dataset.eloChartSeriesValue = JSON.stringify(series)
+    }
     // Show both wrapper and svg
     this._setHidden(this.chartTarget.closest('#faction-graph'), false)
     this.chartTarget.hidden = false
