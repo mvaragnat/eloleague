@@ -1,0 +1,66 @@
+<% content_for :title, t('stats.title', default: 'Stats') %>
+
+<div class="container" data-controller="stats">
+  <h1 class="page-title"><%= t('stats.title', default: 'Stats') %></h1>
+
+  <div class="card">
+    <label for="system-select"><%= t('stats.system_label', default: 'Game system') %></label>
+    <select id="system-select" class="input" data-stats-target="system" data-action="change->stats#onSystemChange">
+      <option value=""><%= t('stats.select_system', default: 'Select a game system') %></option>
+      <% @systems.sort_by(&:localized_name).each do |sys| %>
+        <option value="<%= sys.id %>"><%= sys.localized_name %></option>
+      <% end %>
+    </select>
+
+    <div id="factions-table" class="mt-3" hidden>
+      <div class="hint text-sm text-gray-500">
+        <%= t('stats.mirror_hint', default: 'Mirror games are counted in total but excluded from W/L/D and Win%.') %>
+      </div>
+      <table class="table" data-stats-target="factionsTable">
+        <thead>
+          <tr>
+            <th data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
+            <th data-action="click->stats#sort" data-key="total_games"><%= t('stats.total_games', default: 'Games') %></th>
+            <th data-action="click->stats#sort" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
+            <th data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
+            <th data-action="click->stats#sort" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
+            <th data-action="click->stats#sort" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
+            <th data-action="click->stats#sort" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mt-6">
+    <label for="faction-select"><%= t('stats.faction_label', default: 'Faction') %></label>
+    <select id="faction-select" class="input" data-stats-target="faction" data-action="change->stats#onFactionChange" disabled>
+      <option value=""><%= t('stats.select_faction', default: 'Select a faction') %></option>
+    </select>
+
+    <div id="faction-graph" class="mt-4" hidden>
+      <svg data-controller="elo-chart" data-elo-chart-series-value="[]" data-stats-target="chart" viewBox="0 0 800 300"></svg>
+    </div>
+
+    <div id="versus-table" class="mt-4" hidden>
+      <table class="table" data-stats-target="versusTable">
+        <thead>
+          <tr>
+            <th data-action="click->stats#sortVs" data-key="opponent_faction_name"><%= t('stats.opponent', default: 'Opponent') %></th>
+            <th data-action="click->stats#sortVs" data-key="games"><%= t('stats.games', default: 'Games') %></th>
+            <th data-action="click->stats#sortVs" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
+            <th data-action="click->stats#sortVs" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
+            <th data-action="click->stats#sortVs" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
+            <th data-action="click->stats#sortVs" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
+            <th data-action="click->stats#sortVs" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
+            <th><%= t('stats.mirrors', default: 'Mirrors') %></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
