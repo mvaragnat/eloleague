@@ -18,6 +18,14 @@ Rails.application.routes.draw do
     # Dashboard
     resource :dashboard, only: :show
 
+    # Admin-only Stats
+    authenticate :admin do
+      get 'stats', to: 'stats#index', as: :stats
+      get 'stats/factions', to: 'stats#factions', as: :stats_factions
+      get 'stats/faction_vs', to: 'stats#faction_vs', as: :stats_faction_vs
+      get 'stats/faction_winrate_series', to: 'stats#faction_winrate_series', as: :stats_faction_winrate_series
+    end
+
     # Game events and factions
     namespace :game do
       resources :events, only: %i[new create show]

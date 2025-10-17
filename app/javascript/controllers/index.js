@@ -26,3 +26,6 @@ application.register("place-autocomplete", PlaceAutocompleteController)
 
 import EloChartController from "controllers/elo_chart_controller"
 application.register("elo-chart", EloChartController)
+
+import StatsController from "controllers/stats_controller"
+application.register("stats", StatsController)

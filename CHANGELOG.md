@@ -1,3 +1,10 @@
+## 2025-10-17
+
+- Add admin-only Stats page:
+  - System selector shows per-faction win rates table (sortable). Mirrors counted in totals but excluded from W/L/D and Win%.
+  - Faction selector shows winrate-over-time graph and versus table against all factions (sortable). Mirror row shows only mirror count.
+  - Uses Stimulus and importmap; localized EN/FR.
+
 ## 2025-10-16
 - Add Player profile page (`/users/:id`) with:
   - Current ELO by game system
