@@ -15,7 +15,8 @@ module Stats
       draws = 0
       points = []
 
-      ordered_events.find_each do |ev|
+      # Use each to respect played_at ordering (find_each ignores custom order and batches by id)
+      ordered_events.each do |ev|
         mine, other = two_participants_for(ev)
         next unless mine && other
 
