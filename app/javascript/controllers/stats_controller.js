@@ -20,9 +20,13 @@ export default class extends Controller {
     // Reset faction select and views
     this.factionTarget.innerHTML = `<option value="">${this._t('stats.select_faction', 'Select a faction')}</option>`
     this.factionTarget.disabled = !systemId
-    this._setHidden(this.factionsTableTarget, true)
+    // Hide wrappers, not inner elements
+    this._setHidden(this.factionsTableTarget.closest('#factions-table'), true)
     this._setHidden(this.chartTarget?.closest('#faction-graph'), true)
     this._setHidden(this.versusTableTarget.closest('#versus-table'), true)
+    // Ensure inner elements are not stuck hidden from a previous state
+    this.factionsTableTarget.hidden = false
+    if (this.chartTarget) this.chartTarget.hidden = false
     if (!systemId) return
 
     await this._loadFactionsTable(systemId)
@@ -60,7 +64,10 @@ export default class extends Controller {
         <td>${row.win_percent?.toFixed(2)}%</td>
       </tr>
     `)
-    this._setHidden(this.factionsTableTarget.closest('#factions-table'), false)
+    // Show both wrapper and table
+    const wrapper = this.factionsTableTarget.closest('#factions-table')
+    this._setHidden(wrapper, false)
+    this.factionsTableTarget.hidden = false
   }
 
   async _loadFactionOptions(systemId) {
@@ -86,7 +93,9 @@ export default class extends Controller {
     // Re-dispatch connect-like behavior
     const ctrl = this.application.getControllerForElementAndIdentifier(this.chartTarget, 'elo-chart')
     if (ctrl && ctrl.render) ctrl.render()
+    // Show both wrapper and svg
     this._setHidden(this.chartTarget.closest('#faction-graph'), false)
+    this.chartTarget.hidden = false
   }
 
   async _loadVersusTable(factionId) {
