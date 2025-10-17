@@ -15,8 +15,13 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
   end
 
   test 'seeds game systems and factions from YAML config' do
-    assert_difference 'Game::System.count', 3 do
-      assert_difference 'Game::Faction.count', 109 do
+    config = YAML.load_file(Rails.root.join('config/game_systems.yml'))
+    systems_data = config['game_systems']
+    total_systems = systems_data.size
+    total_factions = systems_data.sum { |s| (s['factions'] || []).size }
+
+    assert_difference 'Game::System.count', total_systems do
+      assert_difference 'Game::Faction.count', total_factions do
         Rake::Task['seed:game_systems'].execute
       end
     end
@@ -26,14 +31,30 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     assert_not_nil epic
     assert_equal '6mm strategy – French community-maintained lists', epic.description
 
-    # Verify factions were created for FERC
-    assert_equal 38, epic.factions.count
+    # Verify factions were created for FERC (count from YAML)
+    ferc_config = systems_data.find do |s|
+      name = s['name']
+      names = name.is_a?(Hash) ? name : { 'en' => name, 'fr' => name }
+      names.value?('Epic Armageddon - FERC')
+    end
+    assert_equal (ferc_config['factions'] || []).size, epic.factions.count
     assert epic.factions.pluck(:name).include?('Steel Legion')
 
     # Verify Epic UK was created
     epic_uk = Game::System.find_by(name: 'Epic UK')
     assert_not_nil epic_uk
-    assert_equal 43, epic_uk.factions.count
+
+    epic_uk_config = systems_data.find do |s|
+      name = s['name']
+      names = name.is_a?(Hash) ? name : { 'en' => name, 'fr' => name }
+      names.value?('Epic UK')
+    end
+    assert_equal (epic_uk_config['factions'] || []).size, epic_uk.factions.count
+
+    # Verify OPR Grimdark Future was created
+    opr = Game::System.find_by(name: 'OPR Grimdark Future')
+    assert_not_nil opr
+    assert opr.factions.exists?(name: 'Battle Brothers')
   end
 
   test 'does not duplicate existing game systems and factions' do
@@ -41,8 +62,16 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     existing_system = Game::System.create!(name: 'Epic Armageddon - FERC', description: 'Old description')
     Game::Faction.create!(name: 'Steel Legion', game_system: existing_system)
 
-    assert_difference 'Game::System.count', 2 do # New systems should be created
-      assert_difference 'Game::Faction.count', 108 do # All factions except existing Steel Legion
+    config = YAML.load_file(Rails.root.join('config/game_systems.yml'))
+    systems_data = config['game_systems']
+
+    # One system already exists (FERC), so expect all others to be created
+    expected_new_systems = systems_data.size - 1
+    # Total factions minus the pre-existing 'Steel Legion'
+    expected_new_factions = systems_data.sum { |s| (s['factions'] || []).size } - 1
+
+    assert_difference 'Game::System.count', expected_new_systems do # New systems should be created
+      assert_difference 'Game::Faction.count', expected_new_factions do # All factions except existing Steel Legion
         Rake::Task['seed:game_systems'].execute
       end
     end

@@ -90,6 +90,11 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Full internationalization support with English and French translations
 - Game systems and factions are localized via `config/game_systems.yml` which now contains `en`/`fr` entries for `name`, `description`, and each faction. Database stores the default (English) values; views resolve display through `Game::System#localized_name` and `Game::Faction#localized_name` using `en` by default with `fr` fallback.
 
+#### OPR Grimdark Future Game System
+- Added `OPR Grimdark Future` as a supported game system.
+- Factions sourced from the official Army Forge "Official books" for Grimdark Future. See [Army Forge Grimdark Future](https://army-forge.onepagerules.com/armyBookSelection?gameSystem=gf).
+- Factions are provided primarily in English; French mirrors English where specific translations are not provided.
+
 ### Stats (Admin-only)
 - Admins can access a `Stats` page (`/stats`) to explore per-system and per-faction performance.
 - Selecting a game system reveals a sortable table of all factions with: total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%).
