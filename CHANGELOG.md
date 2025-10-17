@@ -1,6 +1,10 @@
 ## 2025-10-17
 
 - Add admin-only Stats page:
+- Add new game system: OPR Grimdark Future
+  - Seeded from `config/game_systems.yml` with factions sourced from the Army Forge "Official books" for Grimdark Future.
+  - See reference: [Army Forge Grimdark Future](https://army-forge.onepagerules.com/armyBookSelection?gameSystem=gf)
+  - Docs updated in `context.md`. Seeding tests updated to compute counts dynamically from YAML.
   - System selector shows per-faction win rates table (sortable). Mirrors counted in totals but excluded from W/L/D and Win%.
   - Faction selector shows winrate-over-time graph and versus table against all factions (sortable). Mirror row shows only mirror count.
   - Uses Stimulus and importmap; localized EN/FR.
