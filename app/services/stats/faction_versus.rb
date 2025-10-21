@@ -89,7 +89,7 @@ module Stats
       min_players = Rails.application.config.x.stats.min_players
       min_games = Rails.application.config.x.stats.min_games
       rows.select do |r|
-        r.opponent_faction_id == @faction.id || (r.unique_players >= min_players && r.games >= min_games)
+        r.opponent_faction_id != @faction.id && r.unique_players >= min_players && r.games >= min_games
       end
     end
 
