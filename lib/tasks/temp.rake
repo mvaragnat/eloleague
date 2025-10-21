@@ -103,5 +103,41 @@ namespace :temp do
 
     puts "\nSuccessfully populated slugs for #{count} tournament(s)."
   end
+
+  desc 'Backfill Game::Event.tournament_id from associated Tournament::Match'
+  task backfill_event_tournament: :environment do
+    matches_scope = Tournament::Match
+                    .joins(:game_event)
+                    .where.not(game_event_id: nil)
+                    .where.not(tournament_id: nil)
+                    .where(game_events: { tournament_id: nil })
+
+    missing = matches_scope.distinct.count(:game_event_id)
+    puts "Found #{missing} game event(s) without tournament but with a match."
+
+    updated = 0
+    updated_event_ids = Set.new
+
+    matches_scope.includes(:game_event).find_each do |match|
+      event = match.game_event
+      next unless event
+      next if updated_event_ids.include?(event.id)
+
+      # rubocop:disable Rails/SkipsModelValidations
+      event.update_columns(tournament_id: match.tournament_id, updated_at: Time.current)
+      # rubocop:enable Rails/SkipsModelValidations
+      updated_event_ids << event.id
+      updated += 1
+    end
+
+    remaining = Tournament::Match
+                .joins(:game_event)
+                .where.not(game_event_id: nil)
+                .where(game_events: { tournament_id: nil })
+                .distinct
+                .count(:game_event_id)
+    puts "Updated #{updated} game event(s)."
+    puts "Remaining events with missing tournament: #{remaining}"
+  end
 end
 # rubocop:enable Metrics/BlockLength
