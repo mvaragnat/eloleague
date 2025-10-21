@@ -24,7 +24,7 @@ module Stats
     private
 
     def preload_parts
-      event_ids = Game::Event.where(game_system: @system).pluck(:id)
+      event_ids = Game::Event.where(game_system: @system).competitive.pluck(:id)
       parts = Game::Participation.where(game_event_id: event_ids).includes(:faction, :user)
       [parts, parts.group_by(&:game_event_id)]
     end
@@ -61,31 +61,50 @@ module Stats
 
     def finalize_rows(rows, my_parts, parts_by_event)
       rows.each do |row|
-        next if row.opponent_faction_id == @faction.id
-
-        user_ids = my_parts.select do |p|
-          opp = find_opponent(p, parts_by_event)
-          opp && opp.faction_id == row.opponent_faction_id && opp.faction_id != p.faction_id
-        end.map(&:user_id)
-        row.unique_players = user_ids.uniq.size
-
-        denom = row.wins + row.losses + row.draws
-        row.win_percent = denom.zero? ? 0.0 : (row.wins.to_f * 100.0 / denom).round(2)
+        populate_unique_players!(row, my_parts, parts_by_event)
+        compute_row_win_percent!(row)
       end
 
-      rows.map do |r|
-        {
-          opponent_faction_id: r.opponent_faction_id,
-          opponent_faction_name: r.opponent_faction_name,
-          games: r.games,
-          unique_players: r.unique_players,
-          wins: r.wins,
-          losses: r.losses,
-          draws: r.draws,
-          win_percent: r.win_percent,
-          mirror_count: r.mirror_count
-        }
+      filter_rows_by_thresholds(rows).map do |r|
+        build_row_hash(r)
       end
+    end
+
+    def populate_unique_players!(row, my_parts, parts_by_event)
+      return if row.opponent_faction_id == @faction.id
+
+      user_ids = my_parts.select do |p|
+        opp = find_opponent(p, parts_by_event)
+        opp && opp.faction_id == row.opponent_faction_id && opp.faction_id != p.faction_id
+      end.map(&:user_id)
+      row.unique_players = user_ids.uniq.size
+    end
+
+    def compute_row_win_percent!(row)
+      denom = row.wins + row.losses + row.draws
+      row.win_percent = denom.zero? ? 0.0 : (row.wins.to_f * 100.0 / denom).round(2)
+    end
+
+    def filter_rows_by_thresholds(rows)
+      min_players = Rails.application.config.x.stats.min_players
+      min_games = Rails.application.config.x.stats.min_games
+      rows.select do |r|
+        r.opponent_faction_id == @faction.id || (r.unique_players >= min_players && r.games >= min_games)
+      end
+    end
+
+    def build_row_hash(row)
+      {
+        opponent_faction_id: row.opponent_faction_id,
+        opponent_faction_name: row.opponent_faction_name,
+        games: row.games,
+        unique_players: row.unique_players,
+        wins: row.wins,
+        losses: row.losses,
+        draws: row.draws,
+        win_percent: row.win_percent,
+        mirror_count: row.mirror_count
+      }
     end
 
     def find_opponent(part, parts_by_event)

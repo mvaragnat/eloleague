@@ -9,6 +9,14 @@
   - Faction selector shows winrate-over-time graph and versus table against all factions (sortable). Mirror row shows only mirror count.
   - Uses Stimulus and importmap; localized EN/FR.
 
+## 2025-10-21
+
+- Stats: Show only statistically significant rows
+  - Add ENV-configurable thresholds `STATS_MIN_PLAYERS` (default 4) and `STATS_MIN_GAMES` (default 10)
+  - Global faction winrate table and faction vs table now hide rows unless counts are strictly greater than thresholds
+  - Non-competitive games excluded from all stats (tables and time series)
+  - Added explanatory note on the Stats page with localized copy (EN/FR)
+
 ## 2025-10-16
 - Add Player profile page (`/users/:id`) with:
   - Current ELO by game system

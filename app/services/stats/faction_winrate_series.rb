@@ -40,7 +40,7 @@ module Stats
     private
 
     def ordered_events
-      Game::Event.where(game_system: @system).includes(:game_participations).order(:played_at)
+      Game::Event.where(game_system: @system).competitive.includes(:game_participations).order(:played_at)
     end
 
     def two_participants_for(event)

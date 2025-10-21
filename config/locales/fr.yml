@@ -281,6 +281,7 @@ fr:
     faction_label: "Faction"
     select_faction: "Sélectionnez une faction"
     mirror_hint: "Les miroirs sont comptés dans le total mais exclus des V/D/N et du % de victoire."
+    threshold_hint: "Les tableaux affichent uniquement les lignes avec suffisamment de données : au moins %{players} joueurs uniques et %{games} matchs. Les parties non-compétitives sont exclues."
     faction: "Faction"
     total_games: "Matchs"
     unique_players: "Joueurs"

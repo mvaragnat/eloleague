@@ -13,15 +13,18 @@ module Stats
 
     def call
       parts, parts_by_event = preload_parts
-      @system.factions.map do |f|
+      rows = @system.factions.map do |f|
         build_row_for_faction(f, parts, parts_by_event)
+      end
+      rows.select do |row|
+        row[:unique_players] >= thresholds.min_players && row[:total_games] >= thresholds.min_games
       end
     end
 
     private
 
     def preload_parts
-      event_ids = Game::Event.where(game_system: @system).pluck(:id)
+      event_ids = Game::Event.where(game_system: @system).competitive.pluck(:id)
       parts = Game::Participation.where(game_event_id: event_ids).includes(:faction, :user)
       [parts, parts.group_by(&:game_event_id)]
     end
@@ -40,6 +43,10 @@ module Stats
         draws: totals[:draws],
         win_percent: totals[:win_percent]
       ).to_h
+    end
+
+    def thresholds
+      Rails.application.config.x.stats
     end
 
     def totals_for(faction_parts, parts_by_event)
