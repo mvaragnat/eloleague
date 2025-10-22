@@ -49,6 +49,8 @@ game_systems:
         fr: "Chevaliers Gris"
       - "Adeptus Custodes"
       - "Hérésie d'Horus 30k"
+      - en: "Chaos Daemons"
+        fr: "Démons du Chaos"
 
   - name: "Warhammer 40k"
     description: "The best known Games Workshop game"
