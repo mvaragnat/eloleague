@@ -35,12 +35,14 @@
             <% end %>
             <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule') %></th>
 
-            <%# Secondary score sum %>
-            <% th_style = 'text-align:right; padding:0.25rem 0;' %>
-            <% if primary_key == 'secondary_score_sum' || tiebreak1_key == 'secondary_score_sum' || tiebreak2_key == 'secondary_score_sum' %>
-              <% th_style = th_style + highlight_bg %>
+            <%# Secondary score sum (only when selected as primary/tiebreak) %>
+            <% if [primary_key, tiebreak1_key, tiebreak2_key].include?('secondary_score_sum') %>
+              <% th_style = 'text-align:right; padding:0.25rem 0;' %>
+              <% if primary_key == 'secondary_score_sum' || tiebreak1_key == 'secondary_score_sum' || tiebreak2_key == 'secondary_score_sum' %>
+                <% th_style = th_style + highlight_bg %>
+              <% end %>
+              <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.secondary_score_sum', default: 'Secondary score sum') %></th>
             <% end %>
-            <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.secondary_score_sum', default: 'Secondary score sum') %></th>
           </tr>
         </thead>
         <tbody>
@@ -71,12 +73,14 @@
               <% end %>
               <td style="<%= td_style %>"><%= row[:sos].to_f %></td>
 
-              <%# Secondary score sum cell %>
-              <% td_style = 'padding:0.25rem 0; text-align:right;' %>
-              <% if primary_key == 'secondary_score_sum' || tiebreak1_key == 'secondary_score_sum' || tiebreak2_key == 'secondary_score_sum' %>
-                <% td_style = td_style + highlight_bg %>
+              <%# Secondary score sum cell (conditionally shown) %>
+              <% if [primary_key, tiebreak1_key, tiebreak2_key].include?('secondary_score_sum') %>
+                <% td_style = 'padding:0.25rem 0; text-align:right;' %>
+                <% if primary_key == 'secondary_score_sum' || tiebreak1_key == 'secondary_score_sum' || tiebreak2_key == 'secondary_score_sum' %>
+                  <% td_style = td_style + highlight_bg %>
+                <% end %>
+                <td style="<%= td_style %>"><%= row[:secondary_score_sum].to_f %></td>
               <% end %>
-              <td style="<%= td_style %>"><%= row[:secondary_score_sum].to_f %></td>
             </tr>
           <% end %>
         </tbody>

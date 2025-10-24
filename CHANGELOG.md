@@ -11,6 +11,13 @@
 
 ## 2025-10-21
 
+## 2025-10-23
+
+- Avo: Fix deletion of Game Event and Tournament Match (avoid querying non-existent tournament_matches.event_id) by clarifying FK on `Game::Event` → `Tournament::Match`.
+- Swiss/Open: Ranking table now shows the Secondary score sum column only when 'Secondary score sum' is selected as primary or a tie-break strategy.
+- Tournament Match form: Show Secondary score inputs only when 'Secondary score sum' is selected as a tie-break/primary.
+- My Dashboard → New Game: Hide Secondary score fields (secondary is tournament-only).
+
 - Stats: Show only statistically significant rows
   - Add ENV-configurable thresholds `STATS_MIN_PLAYERS` (default 4) and `STATS_MIN_GAMES` (default 10)
   - Global faction winrate table and faction vs table now hide rows unless counts are strictly greater than thresholds

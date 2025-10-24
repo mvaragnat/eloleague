@@ -37,8 +37,11 @@
       <div>
         <%= p_form.label :score, t('games.new.score', default: 'Score') %>
         <%= p_form.number_field :score, min: 0 %>
-        <%= p_form.label :secondary_score, t('games.new.secondary_score', default: 'Secondary score'), style: 'display:block; margin-top:0.25rem;' %>
-        <%= p_form.number_field :secondary_score, min: 0 %>
+        <%# Show secondary only when explicitly requested by caller (tournament + selected criterion) %>
+        <% if local_assigns[:show_secondary] %>
+          <%= p_form.label :secondary_score, t('games.new.secondary_score', default: 'Secondary score'), style: 'display:block; margin-top:0.25rem;' %>
+          <%= p_form.number_field :secondary_score, min: 0 %>
+        <% end %>
         <%= p_form.label :faction_id, t('games.new.faction', default: 'Faction'), style: 'display:block; margin-top:0.5rem;' %>
         <% options = (defined?(initial_factions) && initial_factions.present?) ? initial_factions.map { |fa| [fa.localized_name(I18n.locale), fa.id] } : [] %>
         <% default_faction_id = nil %>
