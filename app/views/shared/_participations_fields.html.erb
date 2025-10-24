@@ -37,8 +37,8 @@
       <div>
         <%= p_form.label :score, t('games.new.score', default: 'Score') %>
         <%= p_form.number_field :score, min: 0 %>
-        <%# Hide secondary score on dashboard games (no tournament), show in tournament contexts %>
-        <% if local_assigns[:tournament_id].present? %>
+        <%# Show secondary only when explicitly requested by caller (tournament + selected criterion) %>
+        <% if local_assigns[:show_secondary] %>
           <%= p_form.label :secondary_score, t('games.new.secondary_score', default: 'Secondary score'), style: 'display:block; margin-top:0.25rem;' %>
           <%= p_form.number_field :secondary_score, min: 0 %>
         <% end %>
