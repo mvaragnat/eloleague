@@ -266,7 +266,7 @@ en:
       online_label: "Online tournament"
     full: "Tournament is full"
     state:
-      draft: "Draft"
+      draft: "Accepting Registration"
       registration: "Registration"
       running: "Running"
       completed: "Completed"

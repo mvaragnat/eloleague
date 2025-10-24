@@ -235,7 +235,7 @@ fr:
       online_label: "Tournoi en ligne"
     full: "Le tournoi est complet"
     state:
-      draft: "Brouillon"
+      draft: "Inscriptions ouvertes"
       registration: "Inscriptions"
       running: "En cours"
       completed: "Terminé"
