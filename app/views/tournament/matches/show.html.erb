@@ -54,7 +54,7 @@
           <div class="player" style="<%= a.score > b.score ? 'color: var(--green-500); font-weight:700;' : '' %>"><%= @match.a_user.username %></div>
           <div class="score">
             <%= a.score %> - <%= b.score %>
-            <% if a.secondary_score.present? || b.secondary_score.present? %>
+            <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') && (a.secondary_score.present? || b.secondary_score.present?) %>
               <div class="card-date" style="text-align:center;">
                 <%= t('tournaments.show.secondary_score_short', default: 'TB') %>: <%= a.secondary_score || 0 %> - <%= b.secondary_score || 0 %>
               </div>
@@ -66,22 +66,26 @@
           <div style="margin-top:1rem; border-top:1px solid var(--gray-200); padding-top:1rem;">
             <%= form_with model: @match, url: tournament_tournament_match_path(@tournament, @match), method: :patch do |f| %>
               <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0.75rem; align-items:center;">
-                <div>
+            <div>
                   <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.a_user.username %></label>
                   <%= number_field_tag 'tournament_match[a_score]', a.score, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
-                  <div style="margin-top:0.25rem;">
-                    <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
-                    <%= number_field_tag 'tournament_match[a_secondary_score]', a.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
-                  </div>
+              <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
+                <div style="margin-top:0.25rem;">
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
+                  <%= number_field_tag 'tournament_match[a_secondary_score]', a.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                </div>
+              <% end %>
                 </div>
                 <div style="text-align:center; font-weight:700; font-size:1.25rem;">vs</div>
-                <div>
+            <div>
                   <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.b_user.username %></label>
                   <%= number_field_tag 'tournament_match[b_score]', b.score, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
-                  <div style="margin-top:0.25rem;">
-                    <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
-                    <%= number_field_tag 'tournament_match[b_secondary_score]', b.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
-                  </div>
+              <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
+                <div style="margin-top:0.25rem;">
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
+                  <%= number_field_tag 'tournament_match[b_secondary_score]', b.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                </div>
+              <% end %>
                 </div>
               </div>
               <div style="margin-top:0.75rem;">
@@ -96,19 +100,23 @@
             <div>
               <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.a_user.username %></label>
               <%= number_field_tag 'tournament_match[a_score]', nil, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
-              <div style="margin-top:0.25rem;">
-                <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
-                <%= number_field_tag 'tournament_match[a_secondary_score]', nil, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
-              </div>
+              <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
+                <div style="margin-top:0.25rem;">
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
+                  <%= number_field_tag 'tournament_match[a_secondary_score]', nil, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                </div>
+              <% end %>
             </div>
             <div style="text-align:center; font-weight:700; font-size:1.25rem;">vs</div>
             <div>
               <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.b_user.username %></label>
               <%= number_field_tag 'tournament_match[b_score]', nil, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
-              <div style="margin-top:0.25rem;">
-                <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
-                <%= number_field_tag 'tournament_match[b_secondary_score]', nil, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
-              </div>
+              <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
+                <div style="margin-top:0.25rem;">
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
+                  <%= number_field_tag 'tournament_match[b_secondary_score]', nil, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                </div>
+              <% end %>
             </div>
           </div>
           <div style="margin-top:0.75rem;">

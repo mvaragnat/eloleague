@@ -4,7 +4,8 @@ module Game
   class Event < ApplicationRecord
     belongs_to :game_system, class_name: 'Game::System'
     belongs_to :tournament, class_name: 'Tournament::Tournament', optional: true
-    has_one :match, class_name: 'Tournament::Match', dependent: :destroy
+    has_one :match, class_name: 'Tournament::Match', foreign_key: 'game_event_id', inverse_of: :game_event,
+                    dependent: :destroy
 
     has_many :game_participations,
              class_name: 'Game::Participation',

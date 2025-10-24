@@ -842,7 +842,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_includes first_row, b.username
   end
 
-  test 'ranking displays points, score sum, SoS, and secondary score sum columns' do
+  test 'ranking displays points, score sum, SoS columns; Secondary only when selected' do
     sign_in @user
     post tournaments_path(locale: I18n.locale), params: {
       tournament: { name: 'Columns', description: 'S', game_system_id: game_systems(:chess).id, format: 'open' }
@@ -867,9 +867,18 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     sos_label = I18n.t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule')
     sos_label_escaped = ERB::Util.html_escape(sos_label)
     assert body.include?(sos_label) || body.include?(sos_label_escaped), 'Expected SoS label in standings header'
-    assert_includes body,
-                    I18n.t('tournaments.show.strategies.names.primary.secondary_score_sum',
-                           default: 'Secondary score sum')
+    # By default, Secondary header cell should be absent
+    secondary_label = I18n.t('tournaments.show.strategies.names.primary.secondary_score_sum',
+                             default: 'Secondary score sum')
+    assert_no_match(%r{<th[^>]*>\s*#{Regexp.escape(secondary_label)}\s*</th>}m, body)
+
+    # When selecting Secondary as a tiebreak, the column appears
+    patch tournament_path(t, locale: I18n.locale), params: {
+      tournament: { tiebreak1_strategy_key: 'secondary_score_sum' }
+    }
+    get tournament_path(t, locale: I18n.locale, tab: 2)
+    body = @response.body
+    assert_match(%r{<th[^>]*>\s*#{Regexp.escape(secondary_label)}\s*</th>}m, body)
   end
 
   test 'ranking highlights selected primary and tie-break columns' do
