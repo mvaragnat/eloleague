@@ -20,16 +20,11 @@ module Avo
         field :creator, as: :belongs_to, resource: Avo::Resources::User
         field :game_system, as: :belongs_to, resource: Avo::Resources::GameSystem
 
-        field :format, as: :text
+        field :format, as: :select, options: ::Tournament::Tournament.formats.keys
         field :rounds_count, as: :number
         field :starts_at, as: :date_time
         field :ends_at, as: :date_time
-        field :state, as: :select, options: {
-          'draft' => I18n.t('tournaments.state.draft'),
-          'registration' => I18n.t('tournaments.state.registration'),
-          'running' => I18n.t('tournaments.state.running'),
-          'completed' => I18n.t('tournaments.state.completed')
-        }
+        field :state, as: :select, options: ::Tournament::Tournament.states.keys
         field :slug, as: :text
         field :require_army_list_for_check_in, as: :boolean
         field :online, as: :boolean
