@@ -292,3 +292,21 @@ fr:
     opponent: "Adversaire"
     games: "Matchs"
     mirrors: "Miroirs"
+  mailers:
+    user_notifications:
+      hello: "Bonjour %{username}"
+      problem_html: "Si quelque chose semble incorrect, contactez Marquis via le <a href=\"%{contact_url}\">formulaire de contact</a>."
+      view_game: "Voir la partie"
+      top3: "Top 3"
+      game_event_recorded:
+        subject: "Une partie a été enregistrée pour vous"
+        body_html: "%{by} a enregistré une partie qui vous concerne."
+      tournament_match_created:
+        subject: "Un match a été créé pour vous dans %{name}"
+        body_html: "Un nouveau match de tournoi a été créé pour vous dans <strong>%{name}</strong>."
+      tournament_match_result_recorded:
+        subject: "Un résultat de match a été enregistré pour %{name}"
+        body_html: "%{by} a enregistré le résultat de votre match dans <strong>%{name}</strong>."
+      tournament_completed:
+        subject: "%{name} est terminé"
+        body_html: "Le tournoi <strong>%{name}</strong> est maintenant terminé. Voici les meilleurs joueurs :"

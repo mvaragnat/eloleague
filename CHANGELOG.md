@@ -24,6 +24,18 @@
   - Non-competitive games excluded from all stats (tables and time series)
   - Added explanatory note on the Stats page with localized copy (EN/FR)
 
+## 2025-10-26
+
+- Feature — Email notifications for players (EN/FR):
+  - Notify when a casual Game event is recorded for a user by someone else (opponent-submitted game)
+  - Notify when a new Swiss round creates a Tournament match for a user
+  - Notify when a Tournament match result is recorded by someone else (avoids duplicate with Game event)
+  - Notify all participants when a Tournament is finalized, including Top 3 player names
+  - Links to the relevant Tournament or My Dashboard, plus a contact link
+  - Fully localized (English/French)
+  - Implementation: `UserNotificationMailer`, `UserNotifications::Notifier`, hooks in `Game::Event`, `Tournament::Match`, and finalize action
+  - Tests added for mailer and standings Top 3 extraction
+
 ## 2025-10-16
 - Add Player profile page (`/users/:id`) with:
   - Current ELO by game system

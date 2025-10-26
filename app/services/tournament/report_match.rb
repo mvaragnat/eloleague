@@ -101,6 +101,7 @@ module Tournament
       @match.result = ::Tournament::Match.deduce_result(@a_score.to_i, @b_score.to_i)
       @match.save!
       @match.propagate_winner_to_parent!
+      ::UserNotifications::Notifier.match_result_recorded(@match, event)
     end
   end
 end

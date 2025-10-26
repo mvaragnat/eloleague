@@ -27,6 +27,7 @@ module Game
 
     before_validation :apply_tournament_competitiveness, on: :create
     after_commit :enqueue_elo_update, on: :create
+    after_commit :notify_created, on: :create
 
     scope :competitive, -> { where(non_competitive: false) }
     scope :non_competitive, -> { where(non_competitive: true) }
@@ -99,6 +100,10 @@ module Game
 
     def enqueue_elo_update
       EloUpdateJob.perform_later(id)
+    end
+
+    def notify_created
+      ::UserNotifications::Notifier.game_event_created(self)
     end
   end
 end

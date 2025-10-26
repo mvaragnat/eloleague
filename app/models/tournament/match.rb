@@ -24,6 +24,7 @@ module Tournament
     scope :non_competitive, -> { where(non_competitive: true) }
 
     before_validation :copy_non_competitive_from_tournament, on: :create
+    after_commit :notify_on_create, on: :create
 
     def self.deduce_result(a_score, b_score)
       return 'draw' if a_score == b_score
@@ -65,6 +66,12 @@ module Tournament
       elsif child_slot == 'b'
         parent.update!(b_user_id: winner_user.id)
       end
+    end
+
+    private
+
+    def notify_on_create
+      ::UserNotifications::Notifier.match_created(self)
     end
   end
 end

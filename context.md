@@ -117,6 +117,15 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Admin actions for the tournament creator: lock registration, generate pairings, close round, finalize
 - Tournament games integrate with Elo the same way as casual games
 
+### Email Notifications
+- Players receive email notifications for key events (localized EN/FR):
+  - Casual Game recorded by someone else: opponent-reported game triggers a mail to the other participant.
+  - Swiss round pairings: when a new round is generated, both players in each created match are notified.
+  - Tournament match result recorded by someone else: both players are notified; duplicate email from the underlying game creation is avoided.
+  - Tournament finalized: all participants receive an email including the Top 3 players by final standings.
+- Mails include links to the Tournament or My Dashboard and a link to the contact form for issues.
+- Implemented via `UserNotificationMailer` and `UserNotifications::Notifier` with model/controller hooks.
+
 #### Competitive vs Non-competitive Tournaments
 - Organizers can mark a tournament as non-competitive. Default is competitive.
 - When non-competitive, reported tournament games do not affect ELO.
