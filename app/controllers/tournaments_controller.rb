@@ -207,6 +207,12 @@ class TournamentsController < ApplicationController
     end
 
     @tournament.update!(state: 'completed')
+    begin
+      top3 = ::Tournament::Standings.top3_usernames(@tournament)
+      ::UserNotifications::Notifier.tournament_completed(@tournament, top3)
+    rescue StandardError => e
+      Rails.logger.warn("Tournament finalize notifications failed: #{e.class}: #{e.message}")
+    end
     redirect_to tournament_path(@tournament), notice: t('tournaments.finalized', default: 'Tournament finalized')
   end
 

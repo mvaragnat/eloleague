@@ -1,0 +1,10 @@
+<p><%= t('mailers.user_notifications.hello', username: @user.username) %>,</p>
+
+<p><%= t('mailers.user_notifications.tournament_match_result_recorded.body_html', name: @tournament.name, by: @by_username) %></p>
+<p>
+  <a href="<%= @tournament_url %>"><%= t('tournaments.show.matches') %></a>
+  ·
+  <a href="<%= @dashboard_url %>"><%= t('home.link') %></a>
+</p>
+
+<p><%= t('mailers.user_notifications.problem_html', contact_url: @contact_url) %></p>

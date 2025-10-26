@@ -240,7 +240,9 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     # Lock triggers tree generation
     sign_out @user
     sign_in creator
-    post lock_registration_tournament_path(t, locale: I18n.locale)
+    perform_enqueued_jobs do
+      post lock_registration_tournament_path(t, locale: I18n.locale)
+    end
     assert_redirected_to tournament_path(t, locale: I18n.locale)
 
     t.reload

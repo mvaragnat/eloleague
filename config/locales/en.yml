@@ -325,3 +325,21 @@ en:
     opponent: "Opponent"
     games: "Games"
     mirrors: "Mirrors"
+  mailers:
+    user_notifications:
+      hello: "Hello %{username}"
+      problem_html: "If something looks wrong, contact Marquis via the <a href=\"%{contact_url}\">contact form</a>."
+      view_game: "View game"
+      top3: "Top 3"
+      game_event_recorded:
+        subject: "A game was recorded for you"
+        body_html: "%{by} recorded a game that includes you."
+      tournament_match_created:
+        subject: "A match was created for you in %{name}"
+        body_html: "A new tournament match has been created for you in <strong>%{name}</strong>."
+      tournament_match_result_recorded:
+        subject: "A match result was recorded for %{name}"
+        body_html: "%{by} recorded the result of your match in <strong>%{name}</strong>."
+      tournament_completed:
+        subject: "%{name} has finished"
+        body_html: "The tournament <strong>%{name}</strong> is now completed. Here are the top players:"
