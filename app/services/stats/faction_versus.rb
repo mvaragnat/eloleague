@@ -86,10 +86,10 @@ module Stats
     end
 
     def filter_rows_by_thresholds(rows)
-      min_players = Rails.application.config.x.stats.min_players
-      min_games = Rails.application.config.x.stats.min_games
+      min_matchup_players = Rails.application.config.x.stats.min_matchup_players
+      min_matchup_games = Rails.application.config.x.stats.min_matchup_games
       rows.select do |r|
-        r.opponent_faction_id != @faction.id && r.unique_players >= min_players && r.games >= min_games
+        r.opponent_faction_id != @faction.id && r.unique_players >= min_matchup_players && r.games >= min_matchup_games
       end
     end
 
