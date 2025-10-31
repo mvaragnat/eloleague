@@ -16,9 +16,11 @@ module Stats
       rows = @system.factions.map do |f|
         build_row_for_faction(f, parts, parts_by_event)
       end
-      rows.select do |row|
+      rows = rows.select do |row|
         row[:unique_players] >= thresholds.min_players && row[:total_games] >= thresholds.min_games
       end
+      # Default sort: highest win% first
+      rows.sort_by { |r| -r[:win_percent].to_f }
     end
 
     private

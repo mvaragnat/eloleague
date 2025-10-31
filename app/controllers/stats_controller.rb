@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class StatsController < ApplicationController
-  skip_before_action :authenticate_user!
-  before_action :authenticate_admin!
-
   def index
     @systems = Game::System.order(:name)
   end
@@ -27,11 +24,5 @@ class StatsController < ApplicationController
     faction = Game::Faction.find(params[:faction_id])
     series = Stats::FactionWinrateSeries.new(faction: faction).call
     render json: { ok: true, series: series }
-  end
-
-  private
-
-  def authenticate_admin!
-    redirect_to(new_admin_session_path) unless admin_signed_in?
   end
 end

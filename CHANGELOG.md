@@ -1,3 +1,8 @@
+## 2025-10-31
+
+- Stats panel is now available to all authenticated users (not admin-only).
+- Global faction winrates table defaults to sorting by Win% (descending).
+
 ## 2025-10-17
 
 - Add admin-only Stats page:

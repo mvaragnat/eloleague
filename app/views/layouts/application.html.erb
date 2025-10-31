@@ -28,7 +28,7 @@
         <%= link_to t('home.link'), dashboard_path, class: "brand" %>
       <% end %>
       <%= link_to "ELO", elo_path, class: "brand" %>
-      <% if admin_signed_in? %>
+      <% if user_signed_in? || admin_signed_in? %>
         <%= link_to t('stats.title', default: 'Stats'), stats_path, class: "brand" %>
       <% end %>
       <%= link_to t('tournaments.index_title'), tournaments_path, class: "brand" %>

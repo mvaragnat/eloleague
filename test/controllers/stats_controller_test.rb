@@ -3,29 +3,32 @@
 require 'test_helper'
 
 class StatsControllerTest < ActionDispatch::IntegrationTest
-  test 'redirects guests to admin login' do
+  test 'redirects guests to user login' do
     get stats_path
     assert_response :redirect
-    assert_includes @response.redirect_url, '/admins/sign_in'
+    assert_includes @response.redirect_url, '/users/sign_in'
   end
 
-  test 'admin can see index' do
-    admin = Admin.create!(email: 'admin@example.com', password: 'password123', password_confirmation: 'password123')
-    sign_in admin, scope: :admin
+  test 'user can see index' do
+    user = User.create!(username: 'jane', email: 'jane@example.com', password: 'password123',
+                        password_confirmation: 'password123')
+    sign_in user
     get stats_path
     assert_response :success
     assert_select 'h1', /Stats|Statistiques/
   end
 
-  test 'factions json requires admin' do
+  test 'factions json requires authentication' do
     system = Game::System.first || Game::System.create!(name: 'TestSys', description: 'desc')
     get stats_factions_path, params: { game_system_id: system.id }
     assert_response :redirect
+    assert_includes @response.redirect_url, '/users/sign_in'
   end
 
-  test 'factions json returns data for admin' do
-    admin = Admin.create!(email: 'admin2@example.com', password: 'password123', password_confirmation: 'password123')
-    sign_in admin, scope: :admin
+  test 'factions json returns data for authenticated user' do
+    user = User.create!(username: 'john', email: 'john@example.com', password: 'password123',
+                        password_confirmation: 'password123')
+    sign_in user
     system = Game::System.first || Game::System.create!(name: 'TestSys2', description: 'desc')
     get stats_factions_path, params: { game_system_id: system.id }, as: :json
     assert_response :success
