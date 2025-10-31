@@ -95,9 +95,9 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Factions sourced from the official Army Forge "Official books" for Grimdark Future. See [Army Forge Grimdark Future](https://army-forge.onepagerules.com/armyBookSelection?gameSystem=gf).
 - Factions are provided primarily in English; French mirrors English where specific translations are not provided.
 
-### Stats (Admin-only)
-- Admins can access a `Stats` page (`/stats`) to explore per-system and per-faction performance.
-- Selecting a game system reveals a sortable table of all factions with: total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%).
+### Stats
+- All authenticated users can access a `Stats` page (`/stats`) to explore per-system and per-faction performance.
+- Selecting a game system reveals a sortable table of all factions with: total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by Win% (descending) by default.
 - Selecting a faction shows:
   - A winrate-over-time graph with the same visual style as the ELO chart.
   - A sortable versus table against all factions in the system, with mirror games shown only as a count.

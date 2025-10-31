@@ -42,6 +42,15 @@ module Stats
       assert f2_row[:unique_players] >= Rails.application.config.x.stats.min_players
     end
 
+    test 'global winrates are sorted by win_percent desc by default' do
+      create_competitive_series(11)
+      rows = Stats::FactionWinRates.new(game_system: @system).call
+      assert rows.size >= 2, 'Expected at least two factions in results'
+      # F1 wins all games in setup, should be first
+      assert_equal @f1.id, rows.first[:faction_id]
+      assert rows.first[:win_percent] >= rows.second[:win_percent]
+    end
+
     private
 
     def create_competitive_series(num)
