@@ -181,6 +181,7 @@ fr:
         names:
           pairing:
             by_points_random_within_group: "Par points (aléatoire dans les égalités)"
+            by_standings_neighbors: "Par ordre du classement (éviter les re-matchs)"
           primary:
             points: "Points"
             score_sum: "Somme des scores"
@@ -195,6 +196,7 @@ fr:
         explanations:
           pairing:
             by_points_random_within_group: "Apparie par points; aléatoire en cas d'égalité; évite les re-matchs quand possible."
+            by_standings_neighbors: "Apparie 1v2, 3v4, ... selon le classement actuel (critère principal et départages) ; tente d'éviter les re-matchs en décalant les voisins."
             default: "Apparie selon les points; mélange les égalités; évite les re-matchs quand possible."
           primary:
             points: "Points victoire/défaite (1 victoire, 0,5 nul, 0 défaite)."

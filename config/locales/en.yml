@@ -210,6 +210,7 @@ en:
         names:
           pairing:
             by_points_random_within_group: "By Points (random within ties)"
+            by_standings_neighbors: "By ranking order (avoid repeats)"
           primary:
             points: "Points"
             score_sum: "Score sum"
@@ -224,6 +225,7 @@ en:
         explanations:
           pairing:
             by_points_random_within_group: "Pairs by points; random within ties; avoids repeats when possible."
+            by_standings_neighbors: "Pairs 1v2, 3v4, ... using current ranking (primary and tie-breakers); tries to avoid repeats by shifting neighbors."
             default: "Pairs by current points; shuffles within tied groups; avoids repeats when possible."
           primary:
             points: "Win/Lose points (1 win, 0.5 draw, 0 loss)."

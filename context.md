@@ -162,7 +162,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Elimination: changing the winner updates the assigned player on the parent match only if that parent match has not been played yet; if the parent has already been reported/played, the bracket remains unchanged.
 
 #### Swiss/Open Tournaments
-- Swiss/Open tournaments run in rounds. Closing a round validates all results and generates the next-round pairings from checked-in players (or all registrants if none are checked in). Pairings group players by current points and draw opponents within each group while avoiding repeats when possible. If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
+- Swiss/Open tournaments run in rounds. Closing a round validates all results and generates the next-round pairings from checked-in players (or all registrants if none are checked in).
+  - Default strategy: group players by current points and draw opponents within each group while avoiding repeats when possible.
+  - Alternative strategy: pair strictly by current ranking order (Primary and tie-breakers): 1v2, 3v4, ...; if a neighbor pair already played, the generator attempts a one-position shift (1v3 and 2v4) to avoid repeats.
+  - If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
 
 - Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by the selected primary strategy with tie-breakers applied. The Ranking tab shows Points, Score sum, Strength of Schedule (SoS), and conditionally Secondary score sum. The Secondary column appears only when 'Secondary score sum' is selected as the primary or a tie-break strategy. Columns selected as primary or tie-break are highlighted in pale yellow to make the applied rules explicit.
 

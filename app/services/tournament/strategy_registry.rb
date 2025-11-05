@@ -7,7 +7,8 @@ module Tournament
     # Pairing strategies map: key => [human_label, class]
     def pairing_strategies
       {
-        'by_points_random_within_group' => ['By Points (random within ties)', ::Tournament::Pairing::ByPointsRandomWithinGroup]
+        'by_points_random_within_group' => ['By Points (random within ties)', ::Tournament::Pairing::ByPointsRandomWithinGroup],
+        'by_standings_neighbors' => ['By ranking order (avoid repeats)', ::Tournament::Pairing::ByStandingsNeighbors]
       }
     end
 

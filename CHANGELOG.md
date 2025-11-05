@@ -1,3 +1,10 @@
+## 2025-11-05
+
+- Swiss/Open: Added pairing strategy "By ranking order (avoid repeats)".
+  - Pairs players strictly by current standings order (primary and tie-breakers): 1v2, 3v4, ...
+  - If a neighbor pair already played, the generator tries a one-position shift (1v3 and 2v4) to avoid repeats.
+  - Strategy selectable in the tournament Admin tab; fully localized (EN/FR).
+
 ## 2025-10-31
 
 - Stats panel is now available to all authenticated users (not admin-only).
