@@ -60,7 +60,10 @@ class ApplicationController < ActionController::Base
     available = I18n.available_locales.map(&:to_s)
     return unless available.include?(cookie_locale)
 
-    redirect_to url_for(locale: cookie_locale)
+    # Preserve query string (e.g., Devise reset_password_token) when redirecting to set locale
+    target = url_for(locale: cookie_locale)
+    target = "#{target}?#{request.query_string}" if request.query_string.present?
+    redirect_to target
   end
 
   def default_url_options
