@@ -22,6 +22,36 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "cancelled tournaments are hidden from all tabs except 'My tournaments'" do
+    sign_in @user
+    cancelled = ::Tournament::Tournament.create!(
+      name: 'Cancelled Cup',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'cancelled'
+    )
+
+    get tournaments_path(locale: I18n.locale)
+    assert_response :success
+    body = @response.body
+
+    # Split the 4 tab panels (Accepting, Ongoing, Closed, Mine) and check the content
+    panels = body.split('<div data-tabs-target="panel')
+    # Expect 5 segments: preamble + 4 panels
+    assert_operator panels.size, :>=, 5
+
+    # Accepting (index 1)
+    assert_not_includes panels[1], cancelled.name
+    # Ongoing (index 2)
+    assert_not_includes panels[2], cancelled.name
+    # Closed (index 3)
+    assert_not_includes panels[3], cancelled.name
+    # My tournaments (index 4)
+    assert_includes panels[4], cancelled.name
+  end
+
   test 'tournaments can be accessed by slug URL' do
     t = ::Tournament::Tournament.create!(
       name: 'Spring Championship 2025',

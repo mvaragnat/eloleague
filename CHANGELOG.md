@@ -1,3 +1,10 @@
+## 2025-11-09
+
+- Tournaments: Added new `cancelled` state.
+  - Cancelled tournaments are hidden from all index tabs (Accepting, Ongoing, Closed) and only visible under “My tournaments”.
+  - EN/FR translations added.
+  - Tests updated to cover visibility rules.
+
 ## 2025-11-05
 
 - Swiss/Open: Added pairing strategy "By ranking order (avoid repeats)".
