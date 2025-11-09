@@ -60,8 +60,8 @@ class ByStandingsNeighborsPairingTest < ActiveSupport::TestCase
     assert_equal 2, result.pairs.size
 
     # Expect shift: the two top-ranked neighbors should not be paired together
-    assert_not result.pairs.any? { |a, b| (a == @creator && b == u2) || (a == u2 && b == @creator) },
-               'Expected top neighbors not to be paired together after shift'
+    refute result.pairs.any? { |a, b| (a == @creator && b == u2) || (a == u2 && b == @creator) },
+           'Expected top neighbors not to be paired together after shift'
 
     # Each top neighbor should be paired with one of the remaining two
     bottom = [u3, u4]
