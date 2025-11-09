@@ -31,7 +31,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 ### Tournament Domain
 - `Tournament::Tournament`
-  - Root entity for a competition. Attributes: `name`, `description`, `creator_id`, `game_system_id`, `format` (open|swiss|elimination), `rounds_count` (for Swiss), `starts_at`, `ends_at`, `state` (draft|registration|running|completed), `settings`, `slug`.
+  - Root entity for a competition. Attributes: `name`, `description`, `creator_id`, `game_system_id`, `format` (open|swiss|elimination), `rounds_count` (for Swiss), `starts_at`, `ends_at`, `state` (draft|registration|running|completed|cancelled), `settings`, `slug`.
   - Associations: `has_many :registrations` (participants), `has_many :rounds`, `has_many :matches`.
   - New optional fields: `location` (string) and `online` (boolean, default false). If `online` is true, the address field is hidden and the Overview tab shows an "Online tournament" badge. When `location` is present and `online` is false, the Overview tab displays the address and a small Google Maps embed.
   - New optional `max_players` (integer). When set, registrations are blocked once the number of registrations reaches this cap; UI shows a "Tournament is full" message and the register button is hidden.
@@ -135,6 +135,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 #### Admin Check-in Toggle & Tab Persistence
 - The organizer can toggle any participant status between `pending` and `checked_in` from the `Participants` tab, bypassing participant requirements (faction selection or army list submission). This is intended for day-of check-in adjustments.
 - The tournaments page persists the selected tab in the URL using the `tab` query parameter and keeps the same tab active after updates and redirects.
+
+#### Cancelled tournaments
+- New `cancelled` state for tournaments.
+- Cancelled tournaments do not appear in the public index tabs (Accepting, Ongoing, Closed) and are only visible under the creator’s “My tournaments” tab.
 
 #### Overview Tab
 - All tournament formats include an Overview tab summarizing key details:

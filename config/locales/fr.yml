@@ -241,6 +241,7 @@ fr:
       registration: "Inscriptions"
       running: "En cours"
       completed: "Terminé"
+      cancelled: "Annulé"
     unauthorized: "Non autorisé"
     not_allowed_state: "Action non autorisée dans l'état actuel"
     draw_not_allowed: "Match nul interdit en élimination"
