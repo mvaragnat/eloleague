@@ -14,8 +14,8 @@ module Avo
         field :id, as: :id
         field :username, as: :text, sortable: true
         field :email, as: :text
-        field :password, as: :password, only_on: :create
-        field :password_confirmation, as: :password, only_on: :create
+        field :password, as: :password, only_on: :new
+        field :password_confirmation, as: :password, only_on: :new
         field :game_participations, as: :has_many
         field :game_events, as: :has_many, through: :game_participations
         field :game_systems, as: :has_many, through: :game_events
