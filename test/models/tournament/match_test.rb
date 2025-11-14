@@ -27,5 +27,20 @@ module Tournament
       assert_not m.valid?
       assert m.errors[:result].present?
     end
+
+    test 'allows child_slot to be nil even when parent_match is present' do
+      parent = ::Tournament::Match.create!(tournament: @t, a_user: @a, b_user: @b)
+      child = ::Tournament::Match.new(tournament: @t, a_user: @a, b_user: @b, parent_match: parent, child_slot: nil)
+      assert child.valid?
+      assert child.save
+      assert_nil child.reload.child_slot
+    end
+
+    test 'can update child_slot back to nil' do
+      parent = ::Tournament::Match.create!(tournament: @t, a_user: @a, b_user: @b)
+      child = ::Tournament::Match.create!(tournament: @t, a_user: @a, b_user: @b, parent_match: parent, child_slot: 'a')
+      assert child.update(child_slot: nil)
+      assert_nil child.reload.child_slot
+    end
   end
 end

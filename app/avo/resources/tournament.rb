@@ -42,6 +42,10 @@ module Avo
         field :rounds, as: :has_many, resource: Avo::Resources::TournamentRound
         field :matches, as: :has_many, resource: Avo::Resources::TournamentMatch
       end
+
+      def filters
+        filter Avo::Filters::GameSystemFilter
+      end
     end
   end
 end

@@ -232,6 +232,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Tournament index shows a Registrations count column.
 
 - Users resource: supports searching by `username` on the index page.
+- Users resource: shows related Tournament Registrations and Tournament Matches (as A/B). Editing username/email does not require changing the password; password fields appear only on create (admins creating a user can leave password blank and it will be generated).
 
 - Game Factions resource:
   - Index supports filtering by Game System.
@@ -242,6 +243,14 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Tournament resource:
   - The `find_record` class method is overridden to support slug-based lookups in addition to ID-based lookups.
   - This enables creating tournament registrations and accessing related resources via slug URLs (e.g., when clicking "Add Registration" from a tournament page).
+  - Tournament Matches admin edit allows leaving the child slot empty (no forced A/B selection required unless relevant).
+
+- Game Events resource:
+  - Shows the associated Tournament on index/show (via direct association or through the linked Tournament Match).
+
+- Elo Ratings resource:
+  - Avo sidebar now includes Elo Rankings (EloRating). Index is filterable by Game System.
+  - Game Events, Tournaments, Tournament Matches, and Tournament Registrations are also filterable by Game System in Avo. Matches and Registrations filter via the related Tournament’s Game System.
 
 ### Footer & Contact
 - A global footer appears on all pages: "Made by Marquis with ❤️. A bug, a suggestion, a new game to add? Write me"

@@ -1,3 +1,13 @@
+## 2025-11-14
+
+- Avo admin improvements:
+  - Users: show Tournament Registrations and Tournament Matches (as A/B) on the user page.
+  - Users: edit username/email without forcing a password change (password fields only on create; admin-created users auto-generate password if left blank).
+  - Game Events: display associated Tournament on index/show (direct or via linked Tournament Match).
+  - Tournament Matches: child slot can be left empty on edit (no forced A/B).
+  - Elo Ratings: added Avo resource for Elo Ranking.
+  - Added Game System filter to Elo Ratings, Game Events, Tournaments, Tournament Matches, and Tournament Registrations (matches/registrations filter via the related Tournament).
+
 ## 2025-11-09
 
 - Tournaments: Added new `cancelled` state.

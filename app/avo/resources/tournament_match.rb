@@ -20,8 +20,12 @@ module Avo
         field :metadata, as: :code, language: 'json'
 
         field :parent_match, as: :belongs_to, resource: Avo::Resources::TournamentMatch
-        field :child_slot, as: :select, options: %w[a b], include_blank: true
+        field :child_slot, as: :select, options: %w[a b], include_blank: true, nullable: true, required: false
         field :child_matches, as: :has_many, resource: Avo::Resources::TournamentMatch
+      end
+
+      def filters
+        filter Avo::Filters::TournamentGameSystemFilter
       end
     end
   end

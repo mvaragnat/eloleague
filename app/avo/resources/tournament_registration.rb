@@ -56,6 +56,10 @@ module Avo
             LIMIT 1"
         )
       end
+
+      def filters
+        filter Avo::Filters::TournamentGameSystemFilter
+      end
     end
   end
 end
