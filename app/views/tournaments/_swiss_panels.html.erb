@@ -24,7 +24,11 @@
         <div class="card">
           <div class="card-body">
             <% if round.matches.any? %>
-              <%= render 'matches_grid', tournament: tournament, matches: round.matches %>
+              <% ms = round.matches.to_a %>
+              <% if ms.any? { |m| m.table_number.present? } %>
+                <% ms = ms.sort_by { |m| [m.table_number ? 0 : 1, m.table_number || 0] } %>
+              <% end %>
+              <%= render 'matches_grid', tournament: tournament, matches: ms %>
             <% else %>
               <p class="card-date"><%= t('tournaments.show.no_matches', default: 'No matches yet') %></p>
             <% end %>

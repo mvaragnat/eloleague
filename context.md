@@ -158,6 +158,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - On lock, elimination tournaments generate a full bracket tree using `Tournament::BracketBuilder` (Elo-based seeding, power-of-two sizing, byes to top seeds).
 - Tree is modeled via `Tournament::Match` with `parent_match_id` and `child_slot`.
 - Bracket UI renders from the tree; "Open" link appears only when both players are assigned and the user is eligible.
+ - Leaf matches are assigned incremental table numbers at generation for operational/print purposes. The bracket UI does not rely on these numbers but they are available on each match.
 
 #### Post-report Match Edits
 - Organizers can edit a match after it has been reported.
@@ -170,6 +171,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Default strategy: group players by current points and draw opponents within each group while avoiding repeats when possible.
   - Alternative strategy: pair strictly by current ranking order (Primary and tie-breakers): 1v2, 3v4, ...; if a neighbor pair already played, the generator attempts a one-position shift (1v3 and 2v4) to avoid repeats.
   - If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
+  - Generated pairings receive incremental table numbers stored on each `Tournament::Match`. The Swiss pairings page displays the number next to each matchup and sorts matches by table number when present. Top-ranked pairs get the lowest table numbers.
 
 - Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by the selected primary strategy with tie-breakers applied. The Ranking tab shows Points, Score sum, Strength of Schedule (SoS), and conditionally Secondary score sum. The Secondary column appears only when 'Secondary score sum' is selected as the primary or a tie-break strategy. Columns selected as primary or tie-break are highlighted in pale yellow to make the applied rules explicit.
 

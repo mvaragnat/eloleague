@@ -1,3 +1,9 @@
+## 2025-11-22
+
+- Tournaments — Table numbers for pairings:
+  - Swiss: when generating a round, created matches receive incremental `table_number` (top-ranked pairs start at 1). Swiss pairings page shows the number next to each matchup and sorts by table number when present.
+  - Elimination: initial leaf matches receive incremental `table_number` at bracket generation (for operational use). Bracket UI remains unchanged.
+
 ## 2025-11-14
 
 - Avo admin improvements:

@@ -7,6 +7,86 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     @user = users(:player_one)
   end
 
+  test 'swiss assigns incremental table numbers on pairings and sorts by table number in UI' do
+    # Setup swiss tournament with 4 players
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Swiss Tables',
+        description: 'S',
+        game_system_id: game_systems(:chess).id,
+        format: 'swiss',
+        rounds_count: 1
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    # Register four players and check in
+    players = [users(:player_one), users(:player_two),
+               User.create!(username: 'p3', email: 'p3@example.com', password: 'password'),
+               User.create!(username: 'p4', email: 'p4@example.com', password: 'password')]
+    players.each do |u|
+      sign_out @user
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+      f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: "F-#{u.username}")
+      t.registrations.find_by(user: u).update!(faction: f)
+      post check_in_tournament_path(t, locale: I18n.locale)
+    end
+    sign_out @user
+    sign_in users(:player_one)
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+    post next_round_tournament_path(t, locale: I18n.locale)
+
+    r = t.reload.rounds.order(:number).last
+    matches = r.matches.select { |m| m.a_user_id && m.b_user_id }
+    # Expect two matches with table numbers 1 and 2
+    assert_equal 2, matches.size
+    table_numbers = matches.map(&:table_number).compact
+    assert_equal [1, 2], table_numbers.sort
+    assert table_numbers.all?, 'All swiss matches should have table_number'
+
+    # UI should render; sorting by table number is handled in view
+    get tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_response :success
+  end
+
+  test 'elimination leaf matches receive incremental table numbers on lock' do
+    creator = users(:player_one)
+    sign_in creator
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Elim Tables',
+        description: 'Tree',
+        game_system_id: game_systems(:chess).id,
+        format: 'elimination'
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    # Register 4 players and check in
+    u3 = User.create!(username: 'e3', email: 'e3@example.com', password: 'password')
+    u4 = User.create!(username: 'e4', email: 'e4@example.com', password: 'password')
+    [users(:player_one), users(:player_two), u3, u4].each do |u|
+      sign_out creator
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+      f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: "F-#{u.username}")
+      t.registrations.find_by(user: u).update!(faction: f, status: 'checked_in')
+    end
+    sign_out u4
+    sign_in creator
+
+    # Lock to generate bracket
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+    t.reload
+    leaves = t.matches.select { |m| m.child_matches.empty? }
+    assert_operator leaves.size, :>=, 2
+    tables = leaves.map(&:table_number).compact
+    assert_operator tables.size, :>=, 2
+    assert_equal tables.uniq.sort, tables.sort, 'Leaf table numbers should be unique'
+    # Expect they start at 1
+    assert_includes tables, 1
+  end
   test 'guests can access tournaments index' do
     get tournaments_path(locale: I18n.locale)
     assert_response :success

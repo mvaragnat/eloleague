@@ -185,8 +185,13 @@ class TournamentsController < ApplicationController
     pairing_cls = Tournament::StrategyRegistry.pairing_strategies[@tournament.pairing_key].last
     result = pairing_cls.new(@tournament).call
     pairs = result.pairs
-    pairs.each do |a_user, b_user|
-      @tournament.matches.create!(round: new_round, a_user: a_user, b_user: b_user)
+    pairs.each_with_index do |(a_user, b_user), idx|
+      @tournament.matches.create!(
+        round: new_round,
+        a_user: a_user,
+        b_user: b_user,
+        table_number: idx + 1
+      )
     end
 
     # If a bye is selected, record it as an immediate win for that player
