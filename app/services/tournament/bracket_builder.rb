@@ -73,7 +73,12 @@ module Tournament
       (0...(leaf_slots.size / 2)).each do |i|
         a = leaf_slots[i * 2]
         b = leaf_slots[(i * 2) + 1]
-        matches << tournament.matches.create!(a_user: a, b_user: b, non_competitive: tournament.non_competitive)
+        matches << tournament.matches.create!(
+          a_user: a,
+          b_user: b,
+          non_competitive: tournament.non_competitive,
+          table_number: i + 1
+        )
       end
       matches
     end

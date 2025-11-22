@@ -185,9 +185,16 @@ module ApplicationHelper
       link = allowed ? tournament_tournament_match_path(tournament, match) : nil
     end
 
+    table_text = match.respond_to?(:table_number) && match.table_number.present? ? match.table_number.to_s : nil
+
     parts = [
       content_tag(:rect, nil, x: pos_x, y: pos_y, width: cell_w, height: cell_h, rx: 10, ry: 10,
                               fill: '#ffffff', stroke: '#e5e7eb', 'stroke-width': 3),
+      # Table number (top-left), when available
+      (if table_text
+         content_tag(:text, table_text, x: pos_x + 14, y: pos_y + 18, 'text-anchor': 'start',
+                                        'font-size': 12, fill: '#6b7280')
+       end),
       # Score or Pending aligned to the top-right
       content_tag(:text, score_text, x: pos_x + cell_w - 14, y: pos_y + 22, 'text-anchor': 'end',
                                      'font-size': 14, fill: '#6b7280'),

@@ -18,6 +18,7 @@ module Avo
         field :result, as: :select, options: ::Tournament::Match::RESULTS
         field :reported_at, as: :date_time
         field :metadata, as: :code, language: 'json'
+        field :table_number, as: :number
 
         field :parent_match, as: :belongs_to, resource: Avo::Resources::TournamentMatch
         field :child_slot, as: :select, options: %w[a b], include_blank: true, nullable: true, required: false

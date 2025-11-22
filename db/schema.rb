@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_15_120000) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -118,6 +118,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_120000) do
     t.bigint "parent_match_id"
     t.string "child_slot"
     t.boolean "non_competitive", default: false, null: false
+    t.integer "table_number"
     t.index ["a_user_id"], name: "index_tournament_matches_on_a_user_id"
     t.index ["b_user_id"], name: "index_tournament_matches_on_b_user_id"
     t.index ["game_event_id"], name: "index_tournament_matches_on_game_event_id"
@@ -125,6 +126,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_15_120000) do
     t.index ["parent_match_id"], name: "index_tournament_matches_on_parent_match_id"
     t.index ["tournament_id", "tournament_round_id"], name: "idx_on_tournament_id_tournament_round_id_e9fc8dbd6c"
     t.index ["tournament_id"], name: "index_tournament_matches_on_tournament_id"
+    t.index ["tournament_round_id", "table_number"], name: "idx_round_table_number"
     t.index ["tournament_round_id"], name: "index_tournament_matches_on_tournament_round_id"
   end
 
