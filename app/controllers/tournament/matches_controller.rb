@@ -79,7 +79,8 @@ module Tournament
           end
           format.html do
             # After creating match, redirect to Matches tab (index 1 due to Overview at 0)
-            redirect_to tournament_path(@tournament, tab: 1),
+            round_index = @tournament.rounds.order(:number).pluck(:id).index(match.tournament_round_id) || 0
+            redirect_to tournament_path(@tournament, tab: 1, round_tab: round_index),
                         notice: t('tournaments.match_updated', default: 'Match updated')
           end
         end
@@ -124,7 +125,7 @@ module Tournament
         return render :show, status: :unprocessable_content
       end
 
-      redirect_to tournament_path(@tournament, tab: 1),
+      redirect_to tournament_path(@tournament, tab: 1, round_tab: @tournament.rounds.order(:number).pluck(:id).index(@match.tournament_round_id) || 0),
                   notice: t('tournaments.match_updated', default: 'Match updated')
     end
 

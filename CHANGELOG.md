@@ -1,3 +1,12 @@
+## 2025-11-23
+
+- Swiss tournaments: Round direct link parameter
+  - Added `round_tab` URL parameter to deep link to a specific round in Swiss view (e.g., `?round_tab=1` for Round 2).
+  - Entering a match result or creating a new match now redirects back to the same round tab.
+  - Using the "Next Round" action redirects to the newly created round tab.
+  - JS tab controller updates the URL parameter on click without reloading.
+  - Tests updated to verify redirects preserve round context.
+
 ## 2025-11-22
 
 - Tournaments — Table numbers for pairings:
