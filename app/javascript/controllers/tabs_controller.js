@@ -3,9 +3,13 @@ import { Controller } from "@hotwired/stimulus"
 // data-controller="tabs"
 // data-tabs-target="tab" for buttons and data-tabs-target="panel" for panels
 // Optional: data-tabs-active-index-value to set initial active tab (default 0)
+// Optional: data-tabs-param-name-value to set the URL param name (default "tab")
 export default class extends Controller {
   static targets = ["tab", "panel"]
-  static values = { activeIndex: { type: Number, default: 0 } }
+  static values = {
+    activeIndex: { type: Number, default: 0 },
+    paramName: { type: String, default: "tab" }
+  }
 
   connect() {
     this.show(this.activeIndexValue)
@@ -19,7 +23,7 @@ export default class extends Controller {
     // Persist tab in URL without reloading
     try {
       const url = new URL(window.location.href)
-      url.searchParams.set('tab', index)
+      url.searchParams.set(this.paramNameValue, index)
       window.history.replaceState({}, '', url)
     } catch (_) {
       // No-op if URL API not available
@@ -39,4 +43,4 @@ export default class extends Controller {
       el.style.display = i === index ? "block" : "none"
     })
   }
-} 
+}

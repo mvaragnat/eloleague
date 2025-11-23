@@ -5,7 +5,9 @@
 
 <!-- Rounds panel with inner round tabs -->
 <div data-tabs-target="panel" style="display:none;">
-  <div data-controller="tabs">
+  <div data-controller="tabs"
+       data-tabs-active-index-value="<%= @active_round_index %>"
+       data-tabs-param-name-value="round_tab">
     <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
       <% rounds.each_with_index do |round, idx| %>
         <a href="#"

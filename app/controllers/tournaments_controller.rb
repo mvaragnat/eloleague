@@ -27,6 +27,7 @@ class TournamentsController < ApplicationController
     # Load all matches for Open view; grid will auto-wrap to multiple rows
     @matches = @tournament.matches.includes(:a_user, :b_user, :game_event).order(created_at: :desc)
     @active_tab_index = (params[:tab].presence || 0).to_i
+    @active_round_index = (params[:round_tab].presence || 0).to_i
     @is_registered = Current.user && @tournament.registrations.exists?(user_id: Current.user.id)
     @my_registration = Current.user && @tournament.registrations.find_by(user_id: Current.user.id)
 
@@ -199,7 +200,7 @@ class TournamentsController < ApplicationController
       @tournament.matches.create!(round: new_round, a_user: result.bye_user, b_user: nil, result: 'a_win')
     end
 
-    redirect_to tournament_path(@tournament, tab: 1),
+    redirect_to tournament_path(@tournament, tab: 1, round_tab: @tournament.rounds.count - 1),
                 notice: t('tournaments.round_advanced', default: 'Moved to next round')
   end
 
