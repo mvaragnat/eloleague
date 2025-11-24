@@ -164,7 +164,7 @@ module ApplicationHelper
     if match.game_event_id
       pa = match.game_event.game_participations.find_by(user: match.a_user)
       pb = match.game_event.game_participations.find_by(user: match.b_user)
-      # Highlight strictly by recorded match.result to respect scoring rules (e.g., min diff for a win)
+      # Highlight by stored match.result to reflect scoring rules (win green, draw blue)
       case match.result
       when 'a_win'
         a_style = 'font-weight:700; fill:#16a34a;'
@@ -172,6 +172,9 @@ module ApplicationHelper
       when 'b_win'
         a_style = ''
         b_style = 'font-weight:700; fill:#16a34a;'
+      when 'draw'
+        a_style = 'font-weight:700; fill:#2563eb;'
+        b_style = 'font-weight:700; fill:#2563eb;'
       else
         a_style = ''
         b_style = ''

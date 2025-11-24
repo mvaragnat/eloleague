@@ -305,6 +305,7 @@ fr:
     wins: "Victoires"
     losses: "Défaites"
     draws: "Nuls"
+    draw_percent: "% de nuls"
     win_percent: "% de victoire"
     opponent: "Adversaire"
     games: "Matchs"

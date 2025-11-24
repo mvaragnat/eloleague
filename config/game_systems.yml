@@ -8,7 +8,7 @@ game_systems:
       fr: "Stratégie en 6mm – listes maintenues par la communauté française"
     scoring_systems:
       - name: 'Grand Tournoi'
-        description: "<p>Le total doit être 32. La victoire requiert une différence strictement supérieure à 5.</p><div>Victoire par une différence de :<ul><li>3 points ou plus : 32-0 au T3, 30-2 au T4</li></ul></div>"
+        description: "<table><thead><tr><th>Victoire par :</th><th>au T3</th><th>au T4</th></tr></thead><tbody><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr></tbody></table>"
         fix_total_score: 32
         min_difference_for_win: 5
         is_default: true

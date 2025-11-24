@@ -5,7 +5,7 @@ module Stats
   # Mirror row contains only mirror_count; other metrics remain nil as requested.
   class FactionVersus
     Row = Struct.new(:opponent_faction_id, :opponent_faction_name, :games, :unique_players,
-                     :wins, :losses, :draws, :win_percent, :mirror_count, keyword_init: true)
+                     :wins, :losses, :draws, :win_percent, :draw_percent, :mirror_count, keyword_init: true)
 
     def initialize(faction:)
       @faction = faction
@@ -25,14 +25,14 @@ module Stats
 
     def preload_parts
       event_ids = Game::Event.where(game_system: @system).competitive.pluck(:id)
-      parts = Game::Participation.where(game_event_id: event_ids).includes(:faction, :user)
+      parts = Game::Participation.where(game_event_id: event_ids).includes(:faction, :user, game_event: :scoring_system)
       [parts, parts.group_by(&:game_event_id)]
     end
 
     def build_rows_index
       rows = @system.factions.map do |opp|
         Row.new(opponent_faction_id: opp.id, opponent_faction_name: opp.localized_name,
-                games: 0, unique_players: 0, wins: 0, losses: 0, draws: 0, win_percent: nil,
+                games: 0, unique_players: 0, wins: 0, losses: 0, draws: 0, win_percent: nil, draw_percent: nil,
                 mirror_count: 0)
       end
       [rows, rows.index_by(&:opponent_faction_id)]
@@ -62,7 +62,7 @@ module Stats
     def finalize_rows(rows, my_parts, parts_by_event)
       rows.each do |row|
         populate_unique_players!(row, my_parts, parts_by_event)
-        compute_row_win_percent!(row)
+        compute_row_win_and_draw_percent!(row)
       end
 
       filter_rows_by_thresholds(rows).map do |r|
@@ -80,9 +80,10 @@ module Stats
       row.unique_players = user_ids.uniq.size
     end
 
-    def compute_row_win_percent!(row)
+    def compute_row_win_and_draw_percent!(row)
       denom = row.wins + row.losses + row.draws
       row.win_percent = denom.zero? ? 0.0 : (row.wins.to_f * 100.0 / denom).round(2)
+      row.draw_percent = denom.zero? ? 0.0 : (row.draws.to_f * 100.0 / denom).round(2)
     end
 
     def filter_rows_by_thresholds(rows)
@@ -103,6 +104,7 @@ module Stats
         losses: row.losses,
         draws: row.draws,
         win_percent: row.win_percent,
+        draw_percent: row.draw_percent,
         mirror_count: row.mirror_count
       }
     end
@@ -114,6 +116,13 @@ module Stats
     def compare_scores(part_a, part_b)
       return :none unless part_a.score && part_b.score
 
+      event = part_a.game_event
+      if event&.scoring_system
+        res = event.scoring_system.result_for(part_a.score, part_b.score)
+        return :win if res == 'a_win'
+        return :loss if res == 'b_win'
+        return :draw if res == 'draw'
+      end
       return :win if part_a.score > part_b.score
       return :loss if part_a.score < part_b.score
 

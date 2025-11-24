@@ -338,6 +338,7 @@ en:
     wins: "Wins"
     losses: "Losses"
     draws: "Draws"
+    draw_percent: "Draw%"
     win_percent: "Win%"
     opponent: "Opponent"
     games: "Games"
