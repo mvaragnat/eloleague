@@ -159,6 +159,11 @@ export default class extends Controller {
       wrapper.style.display = 'none'
       select.innerHTML = `<option value="${list[0].id}" selected="selected">${list[0].name}</option>`
       info.innerHTML = this.renderScoringInfo(list[0])
+      if (!list[0].description_html) {
+        this._loadScoringSystemDetails(list[0].id).then(item => {
+          if (item) info.innerHTML = this.renderScoringInfo(item)
+        }).catch(() => {})
+      }
       return
     }
 
@@ -182,6 +187,11 @@ export default class extends Controller {
       const id = select.value
       const chosen = list.find(s => String(s.id) === String(id)) || null
       info.innerHTML = chosen ? this.renderScoringInfo(chosen) : ''
+      if (chosen && !chosen.description_html) {
+        this._loadScoringSystemDetails(chosen.id).then(item => {
+          if (item) info.innerHTML = this.renderScoringInfo(item)
+        }).catch(() => {})
+      }
     })
   }
 
@@ -190,6 +200,19 @@ export default class extends Controller {
     const summary = item.summary ? `<div class="card-date" style="font-style:normal;">${item.summary}</div>` : ''
     const desc = item.description_html ? `<div class="card" style="padding:0.5rem; margin-top:0.25rem;">${item.description_html}</div>` : ''
     return `<div><strong>${item.name}</strong>${summary}${desc}</div>`
+  }
+
+  async _loadScoringSystemDetails(id) {
+    try {
+      const base = String(this.scoringSystemsUrlValue || '').replace(/\?.*$/, '')
+      if (!base) return null
+      const url = `${base}/${encodeURIComponent(id)}`
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+      if (!res.ok) return null
+      return await res.json()
+    } catch (_e) {
+      return null
+    }
   }
 
   showScores() {

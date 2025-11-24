@@ -23,5 +23,16 @@ module Game
           }
         end
     end
+
+    def show
+      s = Game::ScoringSystem.find(params[:id])
+      render json: {
+        id: s.id,
+        name: s.name,
+        is_default: s.is_default,
+        summary: s.summary,
+        description_html: s.description.to_s
+      }
+    end
   end
 end
