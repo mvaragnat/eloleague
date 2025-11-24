@@ -8,7 +8,7 @@ game_systems:
       fr: "Stratégie en 6mm – listes maintenues par la communauté française"
     scoring_systems:
       - name: 'Grand Tournoi'
-        description: "<table><thead><tr><th>Victoire par :</th><th>au T3</th><th>au T4</th></tr></thead><tbody><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr></tbody></table>"
+        description: "<table><thead><tr><th>Victoire par :</th><th>  - au T3 -  </th><th>  - au T4 -  </th></tr></thead><tbody><tr><td>3 objectifs ou plus</td><td>32 - 0</td><td>30 - 2</td></tr><tr><td>2 objectifs de différence</td><td>30 - 2</td><td>28 - 4</td></tr><tr><td>1 objectif de différence, et au moins 2 objectifs   </td><td>28 - 8</td><td>26 - 6</td></tr><tr><td>Egalité, ou aucun joueur n'a deux objectifs</td><td colspan=2></td></tr><tr><td>Plus de 250 pts d'écart au kill point</td><td></td><td>18- 14</td></tr><tr><td>Moins de 250 pts d'écart au kill point</td><td></td><td>16 - 16</td></tr></tbody></table>"
         fix_total_score: 32
         min_difference_for_win: 5
         is_default: true
