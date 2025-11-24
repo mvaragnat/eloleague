@@ -7,88 +7,104 @@
       <% tiebreak2_key = tournament.tiebreak2_key %>
 
       <% highlight_bg = 'background-color:#fff8c4;' %>
-      <table style="width:100%; border-collapse: collapse;">
-        <thead>
-          <tr>
-            <th style="text-align:left; padding:0.25rem 0;">#</th>
-            <th style="text-align:left; padding:0.25rem 0;"><%= t('elo.player') %></th>
-            <th style="text-align:right; padding:0.25rem 0;"><%= t('tournaments.show.standings.games_played', default: 'Games Played') %></th>
+      <div class="overflow-x-auto">
+        <table style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left; padding:0.25rem 0;">#</th>
+              <th style="text-align:left; padding:0.25rem 0;"><%= t('elo.player') %></th>
+              <th style="text-align:right; padding:0.25rem 0;"><%= t('tournaments.show.standings.games_played', default: 'Games Played') %></th>
 
-            <%# Points %>
-            <% th_style = 'text-align:right; padding:0.25rem 0;' %>
-            <% if primary_key == 'points' || tiebreak1_key == 'points' || tiebreak2_key == 'points' %>
-              <% th_style = th_style + highlight_bg %>
-            <% end %>
-            <th style="<%= th_style %>"><%= t('tournaments.show.standings.points', default: 'Points') %></th>
-
-            <%# Score sum %>
-            <% th_style = 'text-align:right; padding:0.25rem 0;' %>
-            <% if primary_key == 'score_sum' || tiebreak1_key == 'score_sum' || tiebreak2_key == 'score_sum' %>
-              <% th_style = th_style + highlight_bg %>
-            <% end %>
-            <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum') %></th>
-
-            <%# Strength of Schedule %>
-            <% th_style = 'text-align:right; padding:0.25rem 0;' %>
-            <% if primary_key == 'sos' || tiebreak1_key == 'sos' || tiebreak2_key == 'sos' %>
-              <% th_style = th_style + highlight_bg %>
-            <% end %>
-            <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule') %></th>
-
-            <%# Secondary score sum (only when selected as primary/tiebreak) %>
-            <% if [primary_key, tiebreak1_key, tiebreak2_key].include?('secondary_score_sum') %>
+              <%# Points %>
               <% th_style = 'text-align:right; padding:0.25rem 0;' %>
-              <% if primary_key == 'secondary_score_sum' || tiebreak1_key == 'secondary_score_sum' || tiebreak2_key == 'secondary_score_sum' %>
+              <% if primary_key == 'points' || tiebreak1_key == 'points' || tiebreak2_key == 'points' %>
                 <% th_style = th_style + highlight_bg %>
               <% end %>
-              <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.secondary_score_sum', default: 'Secondary score sum') %></th>
-            <% end %>
-          </tr>
-        </thead>
-        <tbody>
-          <% standings.each_with_index do |row, idx| %>
-            <tr>
-              <td style="padding:0.25rem 0;"><%= idx + 1 %></td>
-              <td style="padding:0.25rem 0;"><%= link_to row[:user].username, user_path(row[:user]) %></td>
-              <td style="padding:0.25rem 0; text-align:right;"><%= tournament.matches.where(a_user: row[:user]).or(tournament.matches.where(b_user: row[:user])).where.not(result: 'pending').count %></td>
+              <th style="<%= th_style %>"><%= t('tournaments.show.standings.points', default: 'Points') %></th>
 
-              <%# Points cell %>
-              <% td_style = 'padding:0.25rem 0; text-align:right;' %>
-              <% if primary_key == 'points' || tiebreak1_key == 'points' || tiebreak2_key == 'points' %>
-                <% td_style = td_style + highlight_bg %>
-              <% end %>
-              <td style="<%= td_style %>"><%= row[:points].to_f %></td>
-
-              <%# Score sum cell %>
-              <% td_style = 'padding:0.25rem 0; text-align:right;' %>
+              <%# Score sum %>
+              <% th_style = 'text-align:right; padding:0.25rem 0;' %>
               <% if primary_key == 'score_sum' || tiebreak1_key == 'score_sum' || tiebreak2_key == 'score_sum' %>
-                <% td_style = td_style + highlight_bg %>
+                <% th_style = th_style + highlight_bg %>
               <% end %>
-              <td style="<%= td_style %>"><%= row[:score_sum].to_f %></td>
+              <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum') %></th>
 
-              <%# SoS cell %>
-              <% td_style = 'padding:0.25rem 0; text-align:right;' %>
+              <%# Strength of Schedule %>
+              <% th_style = 'text-align:right; padding:0.25rem 0;' %>
               <% if primary_key == 'sos' || tiebreak1_key == 'sos' || tiebreak2_key == 'sos' %>
-                <% td_style = td_style + highlight_bg %>
+                <% th_style = th_style + highlight_bg %>
               <% end %>
-              <td style="<%= td_style %>"><%= row[:sos].to_f %></td>
+              <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule') %></th>
 
-              <%# Secondary score sum cell (conditionally shown) %>
+              <%# Secondary score sum (only when selected as primary/tiebreak) %>
               <% if [primary_key, tiebreak1_key, tiebreak2_key].include?('secondary_score_sum') %>
-                <% td_style = 'padding:0.25rem 0; text-align:right;' %>
+                <% th_style = 'text-align:right; padding:0.25rem 0;' %>
                 <% if primary_key == 'secondary_score_sum' || tiebreak1_key == 'secondary_score_sum' || tiebreak2_key == 'secondary_score_sum' %>
+                  <% th_style = th_style + highlight_bg %>
+                <% end %>
+                <th style="<%= th_style %>"><%= t('tournaments.show.strategies.names.primary.secondary_score_sum', default: 'Secondary score sum') %></th>
+              <% end %>
+
+              <th style="text-align:right; padding:0.25rem 0;"><%= t('tournaments.show.standings.army_list', default: 'List') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% standings.each_with_index do |row, idx| %>
+              <tr>
+                <td style="padding:0.25rem 0;"><%= idx + 1 %></td>
+                <td style="padding:0.25rem 0;">
+                  <%= link_to row[:user].username, user_path(row[:user]) %>
+                  <% if row[:registration]&.faction %>
+                    <small><em> (<%= row[:registration].faction.localized_name %>)</em></small>
+                  <% end %>
+                </td>
+                <td style="padding:0.25rem 0; text-align:right;"><%= tournament.matches.where(a_user: row[:user]).or(tournament.matches.where(b_user: row[:user])).where.not(result: 'pending').count %></td>
+
+                <%# Points cell %>
+                <% td_style = 'padding:0.25rem 0; text-align:right;' %>
+                <% if primary_key == 'points' || tiebreak1_key == 'points' || tiebreak2_key == 'points' %>
                   <% td_style = td_style + highlight_bg %>
                 <% end %>
-                <td style="<%= td_style %>"><%= row[:secondary_score_sum].to_f %></td>
-              <% end %>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+                <td style="<%= td_style %>"><%= row[:points].to_f %></td>
+
+                <%# Score sum cell %>
+                <% td_style = 'padding:0.25rem 0; text-align:right;' %>
+                <% if primary_key == 'score_sum' || tiebreak1_key == 'score_sum' || tiebreak2_key == 'score_sum' %>
+                  <% td_style = td_style + highlight_bg %>
+                <% end %>
+                <td style="<%= td_style %>"><%= row[:score_sum].to_f %></td>
+
+                <%# SoS cell %>
+                <% td_style = 'padding:0.25rem 0; text-align:right;' %>
+                <% if primary_key == 'sos' || tiebreak1_key == 'sos' || tiebreak2_key == 'sos' %>
+                  <% td_style = td_style + highlight_bg %>
+                <% end %>
+                <td style="<%= td_style %>"><%= row[:sos].to_f %></td>
+
+                <%# Secondary score sum cell (conditionally shown) %>
+                <% if [primary_key, tiebreak1_key, tiebreak2_key].include?('secondary_score_sum') %>
+                  <% td_style = 'padding:0.25rem 0; text-align:right;' %>
+                  <% if primary_key == 'secondary_score_sum' || tiebreak1_key == 'secondary_score_sum' || tiebreak2_key == 'secondary_score_sum' %>
+                    <% td_style = td_style + highlight_bg %>
+                  <% end %>
+                  <td style="<%= td_style %>"><%= row[:secondary_score_sum].to_f %></td>
+                <% end %>
+
+                <td style="padding:0.25rem 0; text-align:right;">
+                  <% if row[:registration]&.army_list.present? %>
+                    <%= link_to t('tournaments.show.standings.view_list', default: 'View'),
+                        tournament_tournament_registration_path(tournament, row[:registration]),
+                        data: { turbo_frame: "modal" },
+                        class: "text-indigo-600 hover:text-indigo-900" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% else %>
       <p class="card-date"><%= t('tournaments.show.no_standings', default: 'No results yet') %></p>
     <% end %>
   </div>
 </div>
-
-

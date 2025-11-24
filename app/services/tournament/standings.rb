@@ -2,7 +2,8 @@
 
 module Tournament
   class Standings
-    ResultRow = Struct.new(:user, :points, :score_sum, :secondary_score_sum, :sos, :primary, :tiebreak1, :tiebreak2)
+    ResultRow = Struct.new(:user, :registration, :points, :score_sum, :secondary_score_sum, :sos, :primary, :tiebreak1,
+                           :tiebreak2)
 
     def self.top3_usernames(tournament)
       rows = new(tournament).rows
@@ -14,16 +15,21 @@ module Tournament
     end
 
     def rows
-      users = registered_users
+      regs = registrations
+      users = regs.map(&:user)
       return [] if users.empty?
 
       points, score_sum, secondary_score_sum, opponents = initialize_aggregates(users)
       aggregate(points, score_sum, secondary_score_sum, opponents)
 
-      sort_rows(users, points, score_sum, secondary_score_sum, opponents)
+      sort_rows(regs, points, score_sum, secondary_score_sum, opponents)
     end
 
     private
+
+    def registrations
+      @tournament.registrations.includes(:user, :faction)
+    end
 
     def aggregate(points, score_sum, secondary_score_sum, opponents)
       @tournament.matches.includes(:a_user, :b_user, :game_event).find_each do |match|
@@ -98,7 +104,7 @@ module Tournament
     end
 
     def registered_users
-      @tournament.registrations.includes(:user).map(&:user)
+      registrations.map(&:user)
     end
 
     def initialize_aggregates(users)
@@ -117,7 +123,7 @@ module Tournament
       [points, score_sum, secondary_score_sum, opponents]
     end
 
-    def sort_rows(users, points, score_sum, secondary_score_sum, opponents)
+    def sort_rows(regs, points, score_sum, secondary_score_sum, opponents)
       context = build_context(
         points: points,
         score_sum: score_sum,
@@ -125,8 +131,8 @@ module Tournament
         opponents: opponents
       )
 
-      rows = users.map do |user|
-        build_row(user, context[:agg], context)
+      rows = regs.map do |reg|
+        build_row(reg, context[:agg], context)
       end
       rows.sort_by { |r| [-r.primary, -r.tiebreak1, -r.tiebreak2, r.user.username] }
     end
@@ -161,9 +167,11 @@ module Tournament
       }
     end
 
-    def build_row(user, agg, ctx)
+    def build_row(reg, agg, ctx)
+      user = reg.user
       ResultRow.new(
         user,
+        reg,
         ctx[:points][user.id],
         ctx[:score_sum][user.id],
         ctx[:secondary_score_sum][user.id],
