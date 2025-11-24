@@ -26,10 +26,11 @@ module Tournament
     before_validation :copy_non_competitive_from_tournament, on: :create
     after_commit :notify_on_create, on: :create
 
-    def self.deduce_result(a_score, b_score)
+    def self.deduce_result(a_score, b_score, scoring_system: nil)
+      return scoring_system.result_for(a_score, b_score) if scoring_system
       return 'draw' if a_score == b_score
 
-      a_score > b_score ? 'a_win' : 'b_win'
+      a_score.to_i > b_score.to_i ? 'a_win' : 'b_win'
     end
 
     def match_label

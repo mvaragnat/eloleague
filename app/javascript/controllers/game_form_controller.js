@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["error", "scores"]
-  static values = { factionsUrl: String, twoPlayers: Boolean }
+  static values = { factionsUrl: String, scoringSystemsUrl: String, twoPlayers: Boolean }
 
   connect() {
     const systemSelect = this.element.querySelector('select[name="game_event[game_system_id]"]')
@@ -80,6 +80,7 @@ export default class extends Controller {
     if (!systemId) {
       factionSelects.forEach(select => this.populateSelect(select, []))
       this.toggleScores()
+      this.populateScoringSystems([], null)
       return
     }
 
@@ -95,6 +96,19 @@ export default class extends Controller {
       this.toggleScores()
       // After factions options are populated, apply any preset faction ids
       this.applyPresetFactions()
+    }
+
+    // Also load scoring systems for this game system
+    try {
+      if (!this.hasScoringSystemsUrlValue) return
+      const url = `${this.scoringSystemsUrlValue}?game_system_id=${encodeURIComponent(systemId)}`
+      const response = await fetch(url, { headers: { Accept: "application/json" }, credentials: "same-origin" })
+      if (!response.ok) throw new Error("Network error")
+      const list = await response.json()
+      const defaultItem = list.find(s => s.is_default) || list[0] || null
+      this.populateScoringSystems(list, defaultItem)
+    } catch (_e) {
+      this.populateScoringSystems([], null)
     }
   }
 
@@ -124,6 +138,58 @@ export default class extends Controller {
 
     // Trigger change for dependent UI, if any
     select.dispatchEvent(new Event('change', { bubbles: true }))
+  }
+
+  populateScoringSystems(list, selected) {
+    const select = this.element.querySelector('select[name="game_event[scoring_system_id]"]')
+    const info = this.element.querySelector('[data-scoring-info]')
+    const wrapper = this.element.querySelector('[data-scoring-select-wrapper]')
+    if (!select || !info || !wrapper) return
+
+    // Reset
+    select.innerHTML = ''
+    if (!list || list.length === 0) {
+      wrapper.style.display = 'none'
+      info.innerHTML = ''
+      return
+    }
+
+    if (list.length === 1) {
+      // Single: set hidden value and show info
+      wrapper.style.display = 'none'
+      select.innerHTML = `<option value="${list[0].id}" selected="selected">${list[0].name}</option>`
+      info.innerHTML = this.renderScoringInfo(list[0])
+      return
+    }
+
+    // Multiple: show select and info
+    wrapper.style.display = 'block'
+    const placeholder = document.createElement('option')
+    placeholder.value = ''
+    placeholder.textContent = window.I18n?.t('games.scoring.select_prompt') || 'Select scoring system'
+    select.appendChild(placeholder)
+    list.forEach(s => {
+      const opt = document.createElement('option')
+      opt.value = String(s.id)
+      opt.textContent = s.name
+      if (selected && selected.id === s.id) opt.selected = true
+      select.appendChild(opt)
+    })
+    // Update info
+    info.innerHTML = this.renderScoringInfo(selected || list[0])
+    // Bind change
+    select.addEventListener('change', () => {
+      const id = select.value
+      const chosen = list.find(s => String(s.id) === String(id)) || null
+      info.innerHTML = chosen ? this.renderScoringInfo(chosen) : ''
+    })
+  }
+
+  renderScoringInfo(item) {
+    if (!item) return ''
+    const summary = item.summary ? `<div class="card-date" style="font-style:normal;">${item.summary}</div>` : ''
+    const desc = item.description_html ? `<div class="card" style="padding:0.5rem; margin-top:0.25rem;">${item.description_html}</div>` : ''
+    return `<div><strong>${item.name}</strong>${summary}${desc}</div>`
   }
 
   showScores() {

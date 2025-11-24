@@ -6,6 +6,17 @@ game_systems:
     description: 
       en: "6mm strategy – French community-maintained lists"
       fr: "Stratégie en 6mm – listes maintenues par la communauté française"
+    scoring_systems:
+      - name:
+          en: "Standard 100/32 with win by 6+"
+          fr: "Standard 100/32 avec victoire par 6+"
+        description:
+          en: "<p>Max 100 per player. Total must be 32. Win requires difference strictly greater than 5.</p>"
+          fr: "<p>Max 100 par joueur. Total doit être 32. La victoire requiert une différence strictement supérieure à 5.</p>"
+        max_score_per_player: 100
+        fix_total_score: 32
+        min_difference_for_win: 5
+        is_default: true
     factions:
       - "Adeptus Astartes"
       - "White Scars"

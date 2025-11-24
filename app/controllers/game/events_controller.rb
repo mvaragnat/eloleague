@@ -32,6 +32,7 @@ module Game
       key = params.key?(:event) ? :event : :game_event
       params.require(key).permit(
         :game_system_id,
+        :scoring_system_id,
         :non_competitive,
         game_participations_attributes: %i[user_id score secondary_score faction_id army_list]
       )

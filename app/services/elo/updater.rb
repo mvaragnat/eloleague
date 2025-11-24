@@ -68,10 +68,21 @@ module Elo
     end
 
     def scores_from_event(participation1, participation2)
-      return [1.0, 0.0] if participation1.score > participation2.score
-      return [0.0, 1.0] if participation2.score > participation1.score
-
-      [0.5, 0.5]
+      ev = participation1.game_event
+      scoring = ev.scoring_system
+      result =
+        if scoring
+          scoring.result_for(participation1.score, participation2.score)
+        elsif participation1.score.to_i == participation2.score.to_i
+          'draw'
+        else
+          (participation1.score.to_i > participation2.score.to_i ? 'a_win' : 'b_win')
+        end
+      case result
+      when 'a_win' then [1.0, 0.0]
+      when 'b_win' then [0.0, 1.0]
+      else [0.5, 0.5]
+      end
     end
 
     def apply_bundle(ctx, users:, ratings:, expecteds:, scores:)

@@ -6,6 +6,7 @@ module Stats
   class FactionStatsThresholdsTest < ActiveSupport::TestCase
     def setup
       @system = Game::System.create!(name: 'Sys', description: 'desc')
+      Game::ScoringSystem.create!(game_system: @system, name: 'Default', is_default: true)
       @f1 = Game::Faction.create!(game_system: @system, name: 'F1')
       @f2 = Game::Faction.create!(game_system: @system, name: 'F2')
       @users = 1.upto(6).map do |i|

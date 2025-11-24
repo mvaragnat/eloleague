@@ -4,8 +4,10 @@
       <h2 style="margin-right:2rem;"><%= t('games.new.title') %></h2>
       <%= link_to "×", "#", class: "modal-close", aria: { label: t('layouts.shared.close', default: 'Close') }, data: { action: 'click->modal#close' } %>
 
-      <%= form_with(model: @game, url: game_events_path, scope: :game_event, data: { controller: "game-form", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
-        <div data-game-form-target="error" class="hidden" style="color:#dc2626;font-size:0.875rem;margin-bottom:1rem;"></div>
+      <%= form_with(model: @game, url: game_events_path, scope: :game_event, data: { controller: "game-form", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_scoring_systems_url_value: game_scoring_systems_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
+        <div data-game-form-target="error" class="<%= @game.errors.any? ? '' : 'hidden' %>" style="color:#dc2626;font-size:0.875rem;margin-bottom:1rem;">
+          <%= @game.errors.full_messages.to_sentence %>
+        </div>
 
         <div class="form-group">
           <%= form.label :game_system_id, t('games.new.system'), class: "form-label" %>
@@ -13,6 +15,16 @@
               Game::System.all.sort_by(&:localized_name), :id, :localized_name,
               { prompt: t('games.new.select_system') },
               { class: "form-select", data: { action: 'change->game-form#loadFactions' } } %>
+        </div>
+
+        <div data-scoring-select-wrapper style="display:none;" class="form-group">
+          <%= form.label :scoring_system_id, t('games.scoring.select_label', default: 'Scoring system'), class: "form-label" %>
+          <select name="game_event[scoring_system_id]" class="form-select"></select>
+        </div>
+
+        <div class="form-group">
+          <div class="card-date" style="font-style:normal; font-weight:600;"><%= t('games.scoring.about', default: 'Scoring system') %></div>
+          <div data-scoring-info></div>
         </div>
 
         <%= render partial: 'shared/participations_fields', locals: { form: form, preselected_user: Current.user, preselected_removable: false, tournament_id: nil } %>

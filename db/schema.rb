@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_22_120000) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_24_090200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -63,10 +63,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_22_120000) do
     t.boolean "elo_applied", default: false, null: false
     t.bigint "tournament_id"
     t.boolean "non_competitive", default: false, null: false
+    t.bigint "scoring_system_id"
     t.index ["elo_applied"], name: "index_game_events_on_elo_applied"
     t.index ["game_system_id"], name: "index_game_events_on_game_system_id"
     t.index ["non_competitive"], name: "index_game_events_on_non_competitive"
     t.index ["played_at"], name: "index_game_events_on_played_at"
+    t.index ["scoring_system_id"], name: "index_game_events_on_scoring_system_id"
     t.index ["tournament_id"], name: "index_game_events_on_tournament_id"
   end
 
@@ -94,6 +96,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_22_120000) do
     t.index ["game_event_id", "user_id"], name: "index_game_participations_on_game_event_id_and_user_id", unique: true
     t.index ["game_event_id"], name: "index_game_participations_on_game_event_id"
     t.index ["user_id"], name: "index_game_participations_on_user_id"
+  end
+
+  create_table "game_scoring_systems", force: :cascade do |t|
+    t.bigint "game_system_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.integer "max_score_per_player"
+    t.integer "fix_total_score"
+    t.integer "min_difference_for_win"
+    t.boolean "is_default", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_system_id", "is_default"], name: "idx_game_scoring_systems_default"
+    t.index ["game_system_id"], name: "index_game_scoring_systems_on_game_system_id"
   end
 
   create_table "game_systems", force: :cascade do |t|
@@ -182,11 +198,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_22_120000) do
     t.string "primary_strategy_key", default: "points", null: false
     t.integer "score_for_bye", default: 0, null: false
     t.integer "tournament_registrations_count", default: 0, null: false
+    t.bigint "scoring_system_id"
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"
     t.index ["non_competitive"], name: "index_tournaments_on_non_competitive"
     t.index ["online"], name: "index_tournaments_on_online"
+    t.index ["scoring_system_id"], name: "index_tournaments_on_scoring_system_id"
     t.index ["slug"], name: "index_tournaments_on_slug", unique: true
   end
 
@@ -209,12 +227,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_22_120000) do
   add_foreign_key "elo_changes", "users"
   add_foreign_key "elo_ratings", "game_systems"
   add_foreign_key "elo_ratings", "users"
+  add_foreign_key "game_events", "game_scoring_systems", column: "scoring_system_id"
   add_foreign_key "game_events", "game_systems"
   add_foreign_key "game_events", "tournaments"
   add_foreign_key "game_factions", "game_systems"
   add_foreign_key "game_participations", "game_events"
   add_foreign_key "game_participations", "game_factions", column: "faction_id"
   add_foreign_key "game_participations", "users"
+  add_foreign_key "game_scoring_systems", "game_systems"
   add_foreign_key "tournament_matches", "game_events"
   add_foreign_key "tournament_matches", "tournament_matches", column: "parent_match_id"
   add_foreign_key "tournament_matches", "tournament_rounds"
@@ -225,6 +245,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_22_120000) do
   add_foreign_key "tournament_registrations", "tournaments"
   add_foreign_key "tournament_registrations", "users"
   add_foreign_key "tournament_rounds", "tournaments"
+  add_foreign_key "tournaments", "game_scoring_systems", column: "scoring_system_id"
   add_foreign_key "tournaments", "game_systems"
   add_foreign_key "tournaments", "users", column: "creator_id"
 end

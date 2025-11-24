@@ -270,6 +270,7 @@ class TournamentsController < ApplicationController
       :name,
       :description,
       :game_system_id,
+      :scoring_system_id,
       :format,
       :rounds_count,
       :starts_at,

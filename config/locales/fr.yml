@@ -98,8 +98,15 @@ fr:
       exactly_two_players: "Vous devez sélectionner exactement deux joueurs (vous et un adversaire)"
       both_scores_required: "Les deux scores sont requis"
       both_factions_required: "Les deux joueurs doivent sélectionner une faction"
+      scoring_system_wrong_system: "Le système de score sélectionné appartient à un autre système de jeu"
+      score_exceeds_max: "Chaque score doit être compris entre 0 et %{max}"
+      total_must_equal: "La somme des deux scores doit être égale à %{total}"
     secondary_score_short: "Points"
     tournament_label: "Tournoi"
+    scoring:
+      select_label: "Système de score"
+      select_prompt: "Sélectionnez un système de score"
+      about: "Système de score"
   avo:
     fields:
       participants_with_scores: "Participants & scores"
@@ -259,6 +266,11 @@ fr:
       registration_closed: "Les inscriptions sont fermées"
       cannot_unregister: "Impossible de se désinscrire de ce tournoi"
       status_invalid: "doit être pending ou checked_in"
+      scoring_system_wrong_system: "Le système de score sélectionné appartient à un autre système de jeu"
+    scoring:
+      select_label: "Système de score"
+      select_prompt: "Sélectionnez un système de score"
+      about: "Système de score"
   elo:
     title: "Classements ELO"
     game_systems: "Jeu"
@@ -298,6 +310,11 @@ fr:
     games: "Matchs"
     mirrors: "Miroirs"
   mailers:
+  scoring_system:
+    summary:
+      max_per_player: "Max par joueur: %{value}"
+      fixed_total: "Total fixe: %{value}"
+      min_diff: "Victoire si écart > %{value}"
     user_notifications:
       hello: "Bonjour %{username}"
       problem_html: "Si quelque chose semble incorrect, contactez Marquis via le <a href=\"%{contact_url}\">formulaire de contact</a>."

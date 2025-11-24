@@ -12,7 +12,7 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
   test 'user can see index' do
     user = User.create!(username: 'jane', email: 'jane@example.com', password: 'password123',
                         password_confirmation: 'password123')
-    sign_in user
+    sign_in user, scope: :user
     get stats_path
     assert_response :success
     assert_select 'h1', /Stats|Statistiques/
@@ -28,7 +28,7 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
   test 'factions json returns data for authenticated user' do
     user = User.create!(username: 'john', email: 'john@example.com', password: 'password123',
                         password_confirmation: 'password123')
-    sign_in user
+    sign_in user, scope: :user
     system = Game::System.first || Game::System.create!(name: 'TestSys2', description: 'desc')
     get stats_factions_path, params: { game_system_id: system.id }, as: :json
     assert_response :success

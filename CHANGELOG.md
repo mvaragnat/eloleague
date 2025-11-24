@@ -1,5 +1,13 @@
 ## 2025-11-24
 
+- Feature — Scoring Systems per Game System
+  - Added `Game::ScoringSystem` with options: `max_score_per_player`, `fix_total_score`, `min_difference_for_win`, `description` (HTML allowed). One default per game system.
+  - Games and Tournaments now belong to a Scoring System (validated to match the selected Game System). If only one scoring system exists for a Game System, it is auto-selected; otherwise, forms offer a selector.
+  - Tournament Overview and forms display the scoring system name, a short summary of options, and the description (rendered as HTML).
+  - Score validations provide localized error messages on both the non-tournament Game form and the Tournament Match report form.
+  - Elo and result computation honor `min_difference_for_win` (differences ≤ threshold are recorded as draws even if scores differ).
+  - Seeds: `config/game_systems.yml` can include `scoring_systems` per system; if omitted, a “Default” scoring system is created. Example entry added.
+
 - Tournaments: Standings improvements
   - Ranking table now shows the player's faction next to their username (italicized).
   - Added an "Army list" column to the standings table with a link to view the player's list (opens in a modal).

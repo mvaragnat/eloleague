@@ -14,6 +14,8 @@ class AvoBulkDeleteFactionsIntegrationTest < ActionDispatch::IntegrationTest
     faction = Game::Faction.create!(name: 'Ref Faction', game_system: system)
 
     user = User.create!(email: 'user@example.com', password: 'password123', username: 'u')
+    # Ensure a default scoring system exists for the system
+    Game::ScoringSystem.create!(game_system: system, name: 'Default', is_default: true)
     tournament = Tournament::Tournament.create!(name: 'T1', description: 'D', game_system: system, format: 'open',
                                                 creator: user)
     Tournament::Registration.create!(tournament:, user:, faction: faction, status: 'pending')

@@ -1,7 +1,7 @@
 <div class="games-container">
   <h1><%= t('tournaments.new.title') %></h1>
 
-  <%= form_with model: @tournament, scope: :tournament, url: tournaments_path, data: { controller: 'tournament-form' } do |f| %>
+  <%= form_with model: @tournament, scope: :tournament, url: tournaments_path, data: { controller: 'tournament-form', tournament_form_scoring_systems_url_value: game_scoring_systems_path(locale: I18n.locale) } do |f| %>
     <div class="card">
       <div class="card-body" style="display:grid; gap:0.75rem;">
         <div>
@@ -28,6 +28,14 @@
         <div>
           <%= f.label :game_system_id, t('tournaments.new.game_system') %>
           <%= f.collection_select :game_system_id, Game::System.all.sort_by(&:localized_name), :id, :localized_name, include_blank: t('games.new.select_system') %>
+        </div>
+        <div data-tournament-form-target="scoringWrapper" style="display:none;">
+          <%= f.label :scoring_system_id, t('tournaments.scoring.select_label', default: 'Scoring system') %>
+          <select name="tournament[scoring_system_id]" class="form-select"></select>
+        </div>
+        <div>
+          <div class="card-date" style="font-style:normal; font-weight:600;"><%= t('tournaments.scoring.about', default: 'Scoring system') %></div>
+          <div data-tournament-form-target="scoringInfo"></div>
         </div>
         <div>
           <%= f.label :format, t('tournaments.new.format') %>

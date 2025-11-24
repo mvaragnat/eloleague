@@ -3,6 +3,7 @@
 module Game
   class Event < ApplicationRecord
     belongs_to :game_system, class_name: 'Game::System'
+    belongs_to :scoring_system, class_name: 'Game::ScoringSystem', optional: true
     belongs_to :tournament, class_name: 'Tournament::Tournament', optional: true
     has_one :match, class_name: 'Tournament::Match', foreign_key: 'game_event_id', inverse_of: :game_event,
                     dependent: :destroy
@@ -20,11 +21,15 @@ module Game
              dependent: :destroy
 
     validates :played_at, presence: true
+    validates :scoring_system, presence: true
     validate :must_have_exactly_two_players
     validate :players_must_be_distinct
     validate :both_scores_present
     validate :both_factions_present
+    validate :scoring_system_matches_game_system
+    validate :scores_respect_scoring_rules
 
+    before_validation :assign_scoring_system_default, on: :create
     before_validation :apply_tournament_competitiveness, on: :create
     after_commit :enqueue_elo_update, on: :create
     after_commit :notify_created, on: :create
@@ -49,9 +54,12 @@ module Game
       return nil unless participations.size == 2
 
       a, b = participations
-      return nil if a.score == b.score
+      return nil unless scoring_system
 
-      a.score > b.score ? a.user : b.user
+      result = scoring_system.result_for(a.score.to_i, b.score.to_i)
+      return nil if result == 'draw'
+
+      result == 'a_win' ? a.user : b.user
     end
 
     private
@@ -96,6 +104,53 @@ module Game
       return unless participations.any? { |p| p.faction_id.blank? }
 
       errors.add(:players, I18n.t('games.errors.both_factions_required', default: 'Both players must select a faction'))
+    end
+
+    def scoring_system_matches_game_system
+      return unless scoring_system
+      return if scoring_system.game_system_id == game_system_id
+
+      errors.add(:scoring_system, I18n.t('games.errors.scoring_system_wrong_system',
+                                         default: 'Selected scoring system belongs to a different game system'))
+    end
+
+    def scores_respect_scoring_rules
+      return unless scoring_system
+
+      parts = game_participations.reject(&:marked_for_destruction?)
+      return unless parts.size == 2 && parts.all? { |p| p.score.present? }
+
+      a = parts[0].score.to_i
+      b = parts[1].score.to_i
+
+      if scoring_system.max_score_per_player.present?
+        max = scoring_system.max_score_per_player
+        if a.negative? || b.negative? || a > max || b > max
+          errors.add(:base, I18n.t('games.errors.score_exceeds_max',
+                                   max: max,
+                                   default: "Each score must be between 0 and #{max}"))
+        end
+      end
+
+      return if scoring_system.fix_total_score.blank?
+
+      total = scoring_system.fix_total_score
+      return unless (a + b) != total
+
+      errors.add(:base, I18n.t('games.errors.total_must_equal',
+                               total: total,
+                               default: "Total of both scores must equal #{total}"))
+    end
+
+    def assign_scoring_system_default
+      return if scoring_system_id.present?
+      return if game_system_id.blank?
+
+      self.scoring_system = if tournament&.scoring_system
+                              tournament.scoring_system
+                            else
+                              Game::ScoringSystem.default_for(game_system)
+                            end
     end
 
     def enqueue_elo_update
