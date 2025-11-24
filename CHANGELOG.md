@@ -1,5 +1,12 @@
 ## 2025-11-24
 
+- Maintenance — Backfill default scoring systems
+  - Added rake task `scoring:backfill_defaults` to retroactively set `scoring_system_id` on past tournaments and game events and to recalculate match results:
+    - Tournaments without a scoring system receive their game system’s default.
+    - Game events without a scoring system receive their tournament’s scoring system when present, otherwise the game system’s default.
+    - Tournament matches with recorded scores are updated to a result (`a_win`/`b_win`/`draw`) consistent with their scoring system (draws are skipped for elimination brackets).
+  - Idempotent and safe for legacy rows (bypasses validations).
+
 - Feature — Scoring Systems per Game System
   - Added `Game::ScoringSystem` with options: `max_score_per_player`, `fix_total_score`, `min_difference_for_win`, `description` (HTML allowed). One default per game system.
   - Games and Tournaments now belong to a Scoring System (validated to match the selected Game System). If only one scoring system exists for a Game System, it is auto-selected; otherwise, forms offer a selector.
