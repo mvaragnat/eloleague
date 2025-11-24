@@ -36,4 +36,18 @@ class TournamentStandingsServiceTest < ActiveSupport::TestCase
     assert_equal 3, top3.size
     assert_includes top3, creator.username
   end
+
+  test 'rows include registration and faction' do
+    creator = users(:player_one)
+    system = game_systems(:chess)
+    t = ::Tournament::Tournament.create!(name: 'S', description: 'D', game_system: system, format: 'open',
+                                         creator: creator)
+
+    f1 = Game::Faction.find_or_create_by!(game_system: system, name: 'White')
+    t.registrations.create!(user: creator, faction: f1)
+
+    rows = ::Tournament::Standings.new(t).rows
+    assert_equal 1, rows.size
+    assert_equal f1, rows.first.registration.faction
+  end
 end

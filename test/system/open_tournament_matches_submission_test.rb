@@ -296,7 +296,7 @@ class OpenTournamentMatchesSubmissionTest < ApplicationSystemTestCase # rubocop:
     register!(tournament, other2)
 
     login_as(@participant)
-    visit tournament_path(tournament)
+    visit tournament_path(tournament, locale: I18n.locale)
     click_on I18n.t('tournaments.show.tabs.matches', default: 'Matches')
     click_on I18n.t('games.add')
 

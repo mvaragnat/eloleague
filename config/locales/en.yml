@@ -201,6 +201,8 @@ en:
         score_sum: "Score sum"
         secondary_score_sum: "Secondary score sum"
         sos: "Strength of Schedule"
+        army_list: "List"
+        view_list: "View"
       strategies:
         primary: "Primary"
         explanation: "Ranking uses the following criteria:"

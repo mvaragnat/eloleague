@@ -298,7 +298,10 @@ class TournamentsController < ApplicationController
     secondary_score_sum = Hash.new(0.0)
     opponents = Hash.new { |h, k| h[k] = [] }
 
-    users = tournament.registrations.includes(:user).map(&:user)
+    regs = tournament.registrations.includes(:user, :faction)
+    users = regs.map(&:user)
+    reg_by_user = regs.index_by(&:user_id)
+
     users.each do |u|
       points[u.id] ||= 0.0
       score_sum[u.id] ||= 0.0
@@ -327,6 +330,7 @@ class TournamentsController < ApplicationController
     rows = users.map do |u|
       {
         user: u,
+        registration: reg_by_user[u.id],
         points: points[u.id],
         score_sum: score_sum[u.id],
         secondary_score_sum: secondary_score_sum[u.id],

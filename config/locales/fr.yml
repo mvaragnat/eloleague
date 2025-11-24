@@ -172,6 +172,8 @@ fr:
         score_sum: "Somme des scores"
         secondary_score_sum: "Somme des scores secondaires"
         sos: "Force de l'opposition"
+        army_list: "Liste"
+        view_list: "Voir"
       strategies:
         primary: "Critère principal"
         explanation: "Le classement utilise les critères suivants :"

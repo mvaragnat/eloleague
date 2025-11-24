@@ -1,3 +1,10 @@
+## 2025-11-24
+
+- Tournaments: Standings improvements
+  - Ranking table now shows the player's faction next to their username (italicized).
+  - Added an "Army list" column to the standings table with a link to view the player's list (opens in a modal).
+  - Made the ranking table responsive with horizontal scrolling on smaller screens.
+
 ## 2025-11-23
 
 - Swiss tournaments: Round direct link parameter
