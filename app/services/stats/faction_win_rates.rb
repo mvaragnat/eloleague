@@ -5,7 +5,7 @@ module Stats
   # Mirrors: include in total games count but exclude from W/L/D and Win%.
   class FactionWinRates
     ResultRow = Struct.new(:faction_id, :faction_name, :total_games, :unique_players,
-                           :wins, :losses, :draws, :win_percent, keyword_init: true)
+                           :wins, :losses, :draws, :win_percent, :draw_percent, keyword_init: true)
 
     def initialize(game_system:)
       @system = game_system
@@ -27,7 +27,7 @@ module Stats
 
     def preload_parts
       event_ids = Game::Event.where(game_system: @system).competitive.pluck(:id)
-      parts = Game::Participation.where(game_event_id: event_ids).includes(:faction, :user)
+      parts = Game::Participation.where(game_event_id: event_ids).includes(:faction, :user, game_event: :scoring_system)
       [parts, parts.group_by(&:game_event_id)]
     end
 
@@ -43,7 +43,8 @@ module Stats
         wins: totals[:wins],
         losses: totals[:losses],
         draws: totals[:draws],
-        win_percent: totals[:win_percent]
+        win_percent: totals[:win_percent],
+        draw_percent: totals[:draw_percent]
       ).to_h
     end
 
@@ -72,7 +73,8 @@ module Stats
         wins: wins,
         losses: losses,
         draws: draws,
-        win_percent: (denom.zero? ? 0.0 : (wins.to_f * 100.0 / denom).round(2))
+        win_percent: (denom.zero? ? 0.0 : (wins.to_f * 100.0 / denom).round(2)),
+        draw_percent: (denom.zero? ? 0.0 : (draws.to_f * 100.0 / denom).round(2))
       }
     end
 
@@ -86,6 +88,14 @@ module Stats
 
     def compare_scores(part_a, part_b)
       return :none unless part_a.score && part_b.score
+
+      event = part_a.game_event
+      if event&.scoring_system
+        res = event.scoring_system.result_for(part_a.score, part_b.score)
+        return :win if res == 'a_win'
+        return :loss if res == 'b_win'
+        return :draw if res == 'draw'
+      end
       return :win if part_a.score > part_b.score
       return :loss if part_a.score < part_b.score
 

@@ -54,7 +54,8 @@ module Tournament
           played_at: Time.current,
           game_system: @tournament.game_system,
           tournament: @tournament,
-          non_competitive: @tournament.non_competitive
+          non_competitive: @tournament.non_competitive,
+          scoring_system: @tournament.scoring_system
         )
       )
       if game.save
@@ -65,7 +66,8 @@ module Tournament
           non_competitive: @tournament.non_competitive,
           result: ::Tournament::Match.deduce_result(
             game.game_participations.first.score.to_i,
-            game.game_participations.second.score.to_i
+            game.game_participations.second.score.to_i,
+            scoring_system: @tournament.scoring_system
           )
         )
 
@@ -85,6 +87,7 @@ module Tournament
           end
         end
       else
+        @game = game
         respond_to do |format|
           format.turbo_stream { render :new, status: :unprocessable_content }
           format.html { render :new, status: :unprocessable_content }
@@ -125,7 +128,8 @@ module Tournament
         return render :show, status: :unprocessable_content
       end
 
-      redirect_to tournament_path(@tournament, tab: 1, round_tab: @tournament.rounds.order(:number).pluck(:id).index(@match.tournament_round_id) || 0),
+      round_index = @tournament.rounds.order(:number).pluck(:id).index(@match.tournament_round_id) || 0
+      redirect_to tournament_path(@tournament, tab: 1, round_tab: round_index),
                   notice: t('tournaments.match_updated', default: 'Match updated')
     end
 

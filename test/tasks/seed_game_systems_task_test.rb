@@ -11,6 +11,7 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     Game::Participation.delete_all
     Game::Event.delete_all
     Game::Faction.delete_all
+    Game::ScoringSystem.delete_all
     Game::System.delete_all
   end
 

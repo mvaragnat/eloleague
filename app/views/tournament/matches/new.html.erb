@@ -4,12 +4,32 @@
 			<h2><%= t('tournaments.show.matches', default: 'Matches') %> — <%= @tournament.name %></h2>
 
 			<%= form_with(model: @game, url: tournament_tournament_matches_path(@tournament), scope: :game_event, data: { controller: "game-form", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
-				<div data-game-form-target="error" class="hidden" style="color:#dc2626;font-size:0.875rem;"></div>
+				<div data-game-form-target="error" class="<%= @game&.errors&.any? ? '' : 'hidden' %>" style="color:#dc2626;font-size:0.875rem;">
+          <%= @game&.errors&.full_messages&.to_sentence %>
+        </div>
 
 				<!-- Hidden system select to trigger faction loading -->
 				<select name="game_event[game_system_id]" style="display:none;">
 					<option value="<%= @tournament.game_system_id %>" selected="selected"></option>
 				</select>
+
+        <div class="card" style="padding:0.75rem; margin-bottom:0.5rem;">
+          <div class="card-date" style="font-style:normal; font-weight:600;">
+            <%= t('tournaments.scoring.about', default: 'Scoring system') %>
+          </div>
+          <div>
+            <% s = @tournament.scoring_system %>
+            <% if s.present? %>
+              <div><strong><%= s.name %></strong></div>
+              <% if s.summary.present? %>
+                <div class="card-date" style="font-style:normal;"><%= s.summary %></div>
+              <% end %>
+              <% if s.description.present? %>
+                <div class="card" style="padding:0.5rem; margin-top:0.25rem;"><%= s.description.html_safe %></div>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
 
 				<% show_secondary = (@tournament.open? || @tournament.swiss?) && [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
 				<%= render partial: 'shared/participations_fields',

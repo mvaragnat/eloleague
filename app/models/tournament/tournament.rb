@@ -11,6 +11,7 @@ module Tournament
 
     belongs_to :creator, class_name: 'User'
     belongs_to :game_system, class_name: 'Game::System'
+    belongs_to :scoring_system, class_name: 'Game::ScoringSystem', optional: true
 
     has_many :registrations,
              class_name: 'Tournament::Registration',
@@ -34,10 +35,13 @@ module Tournament
     validates :max_players, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
     validates :score_for_bye, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: false
     validates :slug, presence: true, uniqueness: true
+    validates :scoring_system, presence: true
+    validate :scoring_system_matches_game_system
 
     validate :strategy_keys_are_known
 
     before_validation :generate_slug, on: :create
+    before_validation :assign_default_scoring_system, on: :create
 
     scope :competitive, -> { where(non_competitive: false) }
     scope :non_competitive, -> { where(non_competitive: true) }
@@ -91,6 +95,21 @@ module Tournament
                       .gsub(/^_|_$/, '') # Remove leading/trailing underscores
 
       self.slug = base_slug.presence || SecureRandom.hex(8)
+    end
+
+    def assign_default_scoring_system
+      return if scoring_system_id.present?
+      return unless game_system
+
+      self.scoring_system = Game::ScoringSystem.default_for(game_system)
+    end
+
+    def scoring_system_matches_game_system
+      return unless scoring_system
+      return if scoring_system.game_system_id == game_system_id
+
+      errors.add(:scoring_system, I18n.t('tournaments.errors.scoring_system_wrong_system',
+                                         default: 'Selected scoring system belongs to a different game system'))
     end
 
     def strategy_keys_are_known

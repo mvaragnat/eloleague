@@ -14,6 +14,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Has many game events
 - Has many players through game events
 - Has many factions
+- Has many scoring systems (see below)
 
 ### Game::Faction
 - Represents a faction/side within a game system (e.g., White/Black for Chess)
@@ -24,10 +25,22 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 ### Game::Event
 - Represents a single game played
 - Belongs to a game system
+- Belongs to a scoring system (defaults to the system default; uses the tournament’s scoring when in a tournament)
 - Has many players (through participations)
 - Tracks the outcome of the game
  - Each participation now supports a secondary score used for tie-breaks
  - Each participation can include an optional army list (text)
+
+### Game::ScoringSystem
+- Defines how scores are validated and how wins/draws are determined for a given `Game::System`
+- Attributes:
+  - `name` (required), `description` (HTML allowed)
+  - `max_score_per_player` (optional, integer)
+  - `fix_total_score` (optional, integer)
+  - `min_difference_for_win` (optional, integer; requires score difference to be strictly greater for a win; otherwise it’s a draw even if scores differ)
+  - `is_default` (boolean; at most one default per system)
+- Tournaments and casual games reference a scoring system; if a system has a single scoring system, it is selected automatically. If multiple exist, forms allow selection. Tournament match reporting uses the tournament’s scoring system.
+- Seeds: `config/game_systems.yml` optionally includes a `scoring_systems` array per system; if absent, a “Default” scoring system is created with no constraints. Example entries are provided in the YAML.
 
 ### Tournament Domain
 - `Tournament::Tournament`

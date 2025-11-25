@@ -127,8 +127,15 @@ en:
       exactly_two_players: "You must select exactly two players (you and one opponent)"
       both_scores_required: "Both scores are required"
       both_factions_required: "Both players must select a faction"
+      scoring_system_wrong_system: "Selected scoring system belongs to a different game system"
+      score_exceeds_max: "Each score must be between 0 and %{max}"
+      total_must_equal: "Total of both scores must equal %{total}"
     secondary_score_short: "Points"
     tournament_label: "Tournament"
+    scoring:
+      select_label: "Scoring system"
+      select_prompt: "Select a scoring system"
+      about: "Scoring system"
   avo:
     fields:
       participants_with_scores: "Participants & scores"
@@ -292,6 +299,11 @@ en:
       registration_closed: "Registration is closed"
       cannot_unregister: "Cannot unregister from this tournament"
       status_invalid: "must be pending or checked_in"
+      scoring_system_wrong_system: "Selected scoring system belongs to a different game system"
+    scoring:
+      select_label: "Scoring system"
+      select_prompt: "Select a scoring system"
+      about: "Scoring system"
   elo:
     title: "ELO Rankings"
     game_systems: "Game"
@@ -326,11 +338,17 @@ en:
     wins: "Wins"
     losses: "Losses"
     draws: "Draws"
+    draw_percent: "Draw%"
     win_percent: "Win%"
     opponent: "Opponent"
     games: "Games"
     mirrors: "Mirrors"
   mailers:
+  scoring_system:
+    summary:
+      max_per_player: "Max per player: %{value}"
+      fixed_total: "Fixed total: %{value}"
+      min_diff: "Win if diff > %{value}"
     user_notifications:
       hello: "Hello %{username}"
       problem_html: "If something looks wrong, contact Marquis via the <a href=\"%{contact_url}\">contact form</a>."

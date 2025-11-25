@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     namespace :game do
       resources :events, only: %i[new create show]
       resources :factions, only: %i[index]
+      resources :scoring_systems, only: %i[index show]
     end
 
     # Users search (used by player search UI) and public profile

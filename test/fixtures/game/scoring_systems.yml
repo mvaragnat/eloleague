@@ -1,0 +1,19 @@
+chess_default:
+  game_system: chess
+  name: Default
+  is_default: true
+
+chess_constrained:
+  game_system: chess
+  name: Constrained
+  max_score_per_player: 100
+  fix_total_score: 32
+  min_difference_for_win: 5
+  is_default: false
+
+go_default:
+  game_system: go
+  name: Default
+  is_default: true
+
+

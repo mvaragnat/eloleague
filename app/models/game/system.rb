@@ -8,6 +8,8 @@ module Game
     has_many :players, through: :participations, source: :user
     has_many :factions, class_name: 'Game::Faction', foreign_key: 'game_system_id',
                         inverse_of: :game_system, dependent: :destroy
+    has_many :scoring_systems, class_name: 'Game::ScoringSystem', foreign_key: 'game_system_id',
+                               inverse_of: :game_system, dependent: :destroy
 
     validates :name, presence: true, uniqueness: true
     validates :description, presence: true

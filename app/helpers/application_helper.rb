@@ -164,8 +164,21 @@ module ApplicationHelper
     if match.game_event_id
       pa = match.game_event.game_participations.find_by(user: match.a_user)
       pb = match.game_event.game_participations.find_by(user: match.b_user)
-      a_style = pa&.score.to_i > pb&.score.to_i ? 'font-weight:700; fill:#16a34a;' : ''
-      b_style = pb&.score.to_i > pa&.score.to_i ? 'font-weight:700; fill:#16a34a;' : ''
+      # Highlight by stored match.result to reflect scoring rules (win green, draw blue)
+      case match.result
+      when 'a_win'
+        a_style = 'font-weight:700; fill:#16a34a;'
+        b_style = ''
+      when 'b_win'
+        a_style = ''
+        b_style = 'font-weight:700; fill:#16a34a;'
+      when 'draw'
+        a_style = 'font-weight:700; fill:#2563eb;'
+        b_style = 'font-weight:700; fill:#2563eb;'
+      else
+        a_style = ''
+        b_style = ''
+      end
       score_text = "#{pa&.score} - #{pb&.score}"
       # For open format listing, we may show secondary below or omit to reduce clutter. Keep compact here.
       both_present = match.a_user_id.present? && match.b_user_id.present?

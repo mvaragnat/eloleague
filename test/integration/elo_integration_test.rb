@@ -69,7 +69,7 @@ class EloIntegrationTest < ActionDispatch::IntegrationTest
     sign_in @player2
     patch tournament_tournament_match_path(t, match, locale: I18n.locale),
           params: { tournament_match: { a_score: 1, b_score: 0 } }
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1, round_tab: 0)
 
     match.reload
     assert_equal 'a_win', match.result
@@ -87,7 +87,7 @@ class EloIntegrationTest < ActionDispatch::IntegrationTest
     sign_in @creator
     patch tournament_tournament_match_path(t, match, locale: I18n.locale),
           params: { tournament_match: { a_score: 0, b_score: 1 } }
-    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 1, round_tab: 0)
     match.reload
     assert_equal 'b_win', match.result
   end

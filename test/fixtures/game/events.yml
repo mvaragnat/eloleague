@@ -3,7 +3,9 @@
 chess_game:
   game_system: chess
   played_at: <%= 1.day.ago %>
+  scoring_system: chess_default
 
 go_game:
   game_system: go
   played_at: <%= Time.current %>
+  scoring_system: go_default

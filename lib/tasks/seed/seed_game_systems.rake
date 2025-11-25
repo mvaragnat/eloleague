@@ -65,6 +65,7 @@ module SeedGameSystemsHelper
     system_name = extract_name(system_data['name'])
     system_description = localized_value(system_data['description'])
     factions_data = system_data['factions'] || []
+    scoring_systems_data = system_data['scoring_systems'] || []
 
     return if system_name.blank?
 
@@ -89,6 +90,8 @@ module SeedGameSystemsHelper
 
     # Seed factions for this game system
     seed_factions(game_system, factions_data)
+    # Seed scoring systems for this game system
+    seed_scoring_systems(game_system, scoring_systems_data)
   end
 
   def self.seed_factions(game_system, factions_data)
@@ -105,6 +108,55 @@ module SeedGameSystemsHelper
         Rails.logger.info "  ✓ Created faction: #{faction_name}"
       else
         Rails.logger.info "  → Faction already exists: #{faction_name}"
+      end
+    end
+  end
+
+  def self.seed_scoring_systems(game_system, scoring_systems_data)
+    return ensure_default_scoring_system(game_system) if scoring_systems_data.blank?
+
+    upsert_scoring_systems(game_system, scoring_systems_data)
+  end
+
+  def self.ensure_default_scoring_system(game_system)
+    existing_default = game_system.scoring_systems.find_by(is_default: true)
+    if existing_default.blank?
+      game_system.scoring_systems.create!(
+        name: 'Default',
+        description: nil,
+        max_score_per_player: nil,
+        fix_total_score: nil,
+        min_difference_for_win: nil,
+        is_default: true
+      )
+      Rails.logger.info "  ✓ Created default scoring system for #{game_system.name}"
+    else
+      Rails.logger.info "  → Default scoring system already exists for #{game_system.name}"
+    end
+  end
+
+  def self.upsert_scoring_systems(game_system, scoring_systems_data)
+    scoring_systems_data.each_with_index do |entry, idx|
+      name = extract_name(entry['name'])
+      next if name.blank?
+
+      is_default = (!entry['is_default'].nil? && entry['is_default']) ||
+                   (idx.zero? && game_system.scoring_systems.defaults.blank?)
+      attrs = {
+        description: localized_value(entry['description']),
+        max_score_per_player: entry['max_score_per_player'],
+        fix_total_score: entry['fix_total_score'],
+        min_difference_for_win: entry['min_difference_for_win'],
+        is_default: is_default
+      }
+      row = game_system.scoring_systems.find_or_initialize_by(name: name)
+      if row.new_record?
+        row.assign_attributes(attrs)
+        row.save!
+        Rails.logger.info "  ✓ Created scoring system: #{name}"
+      else
+        row.update!(attrs)
+        Rails.logger.info "  → Updated scoring system: #{name}"
       end
     end
   end

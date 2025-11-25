@@ -64,7 +64,8 @@ module Tournament
         game_system: @tournament.game_system,
         played_at: Time.current,
         tournament: @tournament,
-        non_competitive: @tournament.non_competitive
+        non_competitive: @tournament.non_competitive,
+        scoring_system: @tournament.scoring_system
       )
       add_participations(event)
       [event.save, event]
@@ -98,7 +99,8 @@ module Tournament
     def finalize_match_update(event)
       @match.game_event ||= event
       @match.non_competitive = @tournament.non_competitive
-      @match.result = ::Tournament::Match.deduce_result(@a_score.to_i, @b_score.to_i)
+      @match.result = ::Tournament::Match.deduce_result(@a_score.to_i, @b_score.to_i,
+                                                        scoring_system: @tournament.scoring_system)
       @match.save!
       @match.propagate_winner_to_parent!
       ::UserNotifications::Notifier.match_result_recorded(@match, event)

@@ -50,8 +50,11 @@
       <% if @match.game_event.present? %>
         <% a = @match.game_event.game_participations.find_by(user: @match.a_user) %>
         <% b = @match.game_event.game_participations.find_by(user: @match.b_user) %>
+        <% a_win = (@match.result == 'a_win') %>
+        <% b_win = (@match.result == 'b_win') %>
+        <% is_draw = (@match.result == 'draw') %>
         <div class="card-row">
-          <div class="player" style="<%= a.score > b.score ? 'color: var(--green-500); font-weight:700;' : '' %>"><%= @match.a_user.username %></div>
+          <div class="player" style="<%= is_draw ? 'color:#2563eb; font-weight:700;' : (a_win ? 'color: var(--green-500); font-weight:700;' : '') %>"><%= @match.a_user.username %></div>
           <div class="score">
             <%= a.score %> - <%= b.score %>
             <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') && (a.secondary_score.present? || b.secondary_score.present?) %>
@@ -60,7 +63,7 @@
               </div>
             <% end %>
           </div>
-          <div class="player" style="text-align:right; <%= b.score > a.score ? 'color: var(--green-500); font-weight:700;' : '' %>"><%= @match.b_user.username %></div>
+          <div class="player" style="text-align:right; <%= is_draw ? 'color:#2563eb; font-weight:700;' : (b_win ? 'color: var(--green-500); font-weight:700;' : '' ) %>"><%= @match.b_user.username %></div>
         </div>
         <% if Current.user && @tournament.creator_id == Current.user.id %>
           <div style="margin-top:1rem; border-top:1px solid var(--gray-200); padding-top:1rem;">

@@ -28,6 +28,23 @@
       </div>
     </div>
 
+    <% if tournament.scoring_system.present? %>
+      <div>
+        <div class="card-date" style="font-style:normal; font-weight:600;">
+          <%= t('tournaments.scoring.about', default: 'Scoring system') %>
+        </div>
+        <div>
+          <div><strong><%= tournament.scoring_system.name %></strong></div>
+          <% if tournament.scoring_system.summary.present? %>
+            <div class="card-date" style="font-style:normal;"><%= tournament.scoring_system.summary %></div>
+          <% end %>
+          <% if tournament.scoring_system.description.present? %>
+            <div class="card" style="padding:0.5rem; margin-top:0.25rem;"><%= tournament.scoring_system.description.html_safe %></div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <% if tournament.online %>
       <div>
         <div class="card-date" style="font-style:normal; font-weight:600;">
