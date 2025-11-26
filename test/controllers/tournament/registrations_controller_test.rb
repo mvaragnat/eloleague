@@ -86,5 +86,19 @@ module Tournament
       get tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale)
       assert_response :success
     end
+
+    test 'after completed: guest can view any list' do
+      # Move to running then finalize
+      sign_in @creator
+      post lock_registration_tournament_path(@t, locale: I18n.locale)
+      post finalize_tournament_path(@t, locale: I18n.locale)
+
+      # As guest
+      sign_out @creator
+      get tournament_tournament_registration_path(@t, @reg_creator, locale: I18n.locale)
+      assert_response :success
+      get tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale)
+      assert_response :success
+    end
   end
 end

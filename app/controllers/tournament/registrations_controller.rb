@@ -50,7 +50,7 @@ module Tournament
     end
 
     def can_view?(registration)
-      return true if @tournament.running?
+      return true if @tournament.running? || @tournament.completed?
       return true if @tournament.creator_id == Current.user&.id
       return true if Current.user && registration.user_id == Current.user.id
 
