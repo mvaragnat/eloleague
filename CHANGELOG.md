@@ -1,3 +1,10 @@
+## 2025-11-26
+
+- Bugfix — Tournament army list visibility
+  - Participants tab: show "Army list" links when the tournament is running or completed (was only running).
+  - Rankings tab: "View" list links are now accessible to everyone (including guests) once the tournament is running or completed.
+  - Updated docs in `context.md`. Added controller and view tests.
+
 ## 2025-11-24
 
 - Maintenance — Backfill default scoring systems

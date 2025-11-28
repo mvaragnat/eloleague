@@ -1122,6 +1122,44 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_operator body.scan(I18n.t('tournaments.show.view_army_list', default: 'Army list')).size, :<, 2
   end
 
+  test "completed tournament shows 'Army list' link on Participants tab for all" do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Army View Completed',
+        description: 'X',
+        game_system_id: game_systems(:chess).id,
+        format: 'open'
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    # Register two users
+    post register_tournament_path(t, locale: I18n.locale)
+    f1 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
+    t.registrations.find_by(user: @user).update!(faction: f1)
+
+    sign_out @user
+    sign_in users(:player_two)
+    post register_tournament_path(t, locale: I18n.locale)
+    f2 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'Black')
+    reg2 = t.registrations.find_by(user: users(:player_two))
+    reg2.update!(faction: f2, army_list: 'XYZ')
+
+    # Move to running then finalize to completed
+    sign_out users(:player_two)
+    sign_in @user
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+    post finalize_tournament_path(t, locale: I18n.locale)
+
+    # As guest, participants tab should display the "Army list" link at least once
+    sign_out @user
+    get tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_response :success
+    body = @response.body
+    assert_includes body, I18n.t('tournaments.show.view_army_list', default: 'Army list')
+  end
+
   test 'ranking can use score_sum as primary' do
     sign_in @user
     post tournaments_path(locale: I18n.locale), params: {
