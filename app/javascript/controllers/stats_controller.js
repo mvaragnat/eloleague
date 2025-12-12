@@ -61,8 +61,8 @@ export default class extends Controller {
         <td>${row.wins}</td>
         <td>${row.losses}</td>
         <td>${row.draws}</td>
-        <td>${row.draw_percent?.toFixed(2)}%</td>
         <td>${row.win_percent?.toFixed(2)}%</td>
+        <td>${row.draw_percent?.toFixed(2)}%</td>
       </tr>
     `)
     // Show both wrapper and table
