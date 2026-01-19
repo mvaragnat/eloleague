@@ -83,25 +83,23 @@ class TournamentStandingsServiceTest < ActiveSupport::TestCase
 
     players = create_sos_test_players
     players.each { |user| tournament.registrations.create!(user: user) }
-
-    white = Game::Faction.find_or_create_by!(game_system: game_system, name: 'White')
-    black = Game::Faction.find_or_create_by!(game_system: game_system, name: 'Black')
     player_a, player_b, player_c, player_d = players
 
-    setup_round1_matches(
-      tournament: tournament, game_system: game_system, white: white, black: black,
-      player_a: player_a, player_b: player_b, player_c: player_c, player_d: player_d
-    )
-    setup_round2_matches(
-      tournament: tournament, game_system: game_system, white: white, black: black,
-      player_a: player_a, player_b: player_b, player_c: player_c, player_d: player_d
-    )
-    setup_round3_pending_matches(
-      tournament: tournament, player_a: player_a, player_b: player_b,
-      player_c: player_c, player_d: player_d
-    )
+    ctx = build_match_context(tournament: tournament, game_system: game_system)
+    setup_round1_matches(ctx: ctx, player_a: player_a, player_b: player_b, player_c: player_c, player_d: player_d)
+    setup_round2_matches(ctx: ctx, player_a: player_a, player_b: player_b, player_c: player_c, player_d: player_d)
+    setup_round3_pending(ctx: ctx, player_a: player_a, player_b: player_b, player_c: player_c, player_d: player_d)
 
     [tournament, players]
+  end
+
+  def build_match_context(tournament:, game_system:)
+    {
+      tournament: tournament,
+      game_system: game_system,
+      white: Game::Faction.find_or_create_by!(game_system: game_system, name: 'White'),
+      black: Game::Faction.find_or_create_by!(game_system: game_system, name: 'Black')
+    }
   end
 
   def create_sos_test_players
@@ -110,45 +108,29 @@ class TournamentStandingsServiceTest < ActiveSupport::TestCase
     end
   end
 
-  def setup_round1_matches(tournament:, game_system:, white:, black:, player_a:, player_b:, player_c:, player_d:)
-    round = tournament.rounds.create!(number: 1, state: 'closed')
-    # A beats C
-    create_match_with_event(
-      tournament: tournament, game_system: game_system, round: round,
-      winner: player_a, loser: player_c, winner_faction: white, loser_faction: black
-    )
-    # B beats D
-    create_match_with_event(
-      tournament: tournament, game_system: game_system, round: round,
-      winner: player_b, loser: player_d, winner_faction: white, loser_faction: black
-    )
+  def setup_round1_matches(ctx:, player_a:, player_b:, player_c:, player_d:)
+    round = ctx[:tournament].rounds.create!(number: 1, state: 'closed')
+    create_match_with_event(ctx: ctx, round: round, winner: player_a, loser: player_c)
+    create_match_with_event(ctx: ctx, round: round, winner: player_b, loser: player_d)
   end
 
-  def setup_round2_matches(tournament:, game_system:, white:, black:, player_a:, player_b:, player_c:, player_d:)
-    round = tournament.rounds.create!(number: 2, state: 'closed')
-    # C beats B
-    create_match_with_event(
-      tournament: tournament, game_system: game_system, round: round,
-      winner: player_c, loser: player_b, winner_faction: white, loser_faction: black
-    )
-    # A beats D
-    create_match_with_event(
-      tournament: tournament, game_system: game_system, round: round,
-      winner: player_a, loser: player_d, winner_faction: white, loser_faction: black
-    )
+  def setup_round2_matches(ctx:, player_a:, player_b:, player_c:, player_d:)
+    round = ctx[:tournament].rounds.create!(number: 2, state: 'closed')
+    create_match_with_event(ctx: ctx, round: round, winner: player_c, loser: player_b)
+    create_match_with_event(ctx: ctx, round: round, winner: player_a, loser: player_d)
   end
 
-  def setup_round3_pending_matches(tournament:, player_a:, player_b:, player_c:, player_d:)
-    round = tournament.rounds.create!(number: 3, state: 'open')
-    tournament.matches.create!(a_user: player_a, b_user: player_b, result: 'pending', round: round)
-    tournament.matches.create!(a_user: player_c, b_user: player_d, result: 'pending', round: round)
+  def setup_round3_pending(ctx:, player_a:, player_b:, player_c:, player_d:)
+    round = ctx[:tournament].rounds.create!(number: 3, state: 'open')
+    ctx[:tournament].matches.create!(a_user: player_a, b_user: player_b, result: 'pending', round: round)
+    ctx[:tournament].matches.create!(a_user: player_c, b_user: player_d, result: 'pending', round: round)
   end
 
-  def create_match_with_event(tournament:, game_system:, round:, winner:, loser:, winner_faction:, loser_faction:)
-    event = Game::Event.new(game_system: game_system, played_at: Time.current, tournament: tournament)
-    event.game_participations.build(user: winner, score: 1, faction: winner_faction)
-    event.game_participations.build(user: loser, score: 0, faction: loser_faction)
+  def create_match_with_event(ctx:, round:, winner:, loser:)
+    event = Game::Event.new(game_system: ctx[:game_system], played_at: Time.current, tournament: ctx[:tournament])
+    event.game_participations.build(user: winner, score: 1, faction: ctx[:white])
+    event.game_participations.build(user: loser, score: 0, faction: ctx[:black])
     event.save!
-    tournament.matches.create!(a_user: winner, b_user: loser, game_event: event, result: 'a_win', round: round)
+    ctx[:tournament].matches.create!(a_user: winner, b_user: loser, game_event: event, result: 'a_win', round: round)
   end
 end

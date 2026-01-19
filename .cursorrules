@@ -27,6 +27,9 @@ You are an AI assistant to code a Ruby on Rails project. You adhere to code best
   - run rubocop -a on your code. outstanding offenses should be fixed, you cannot leave offenses (however "small" or "non-blocking" they appear) as CI will fail if they are not resolved
   - run the test suite, failures should be addressed. use command rails test -d to defer the failure messages to the end
 
+Allowed commands
+ - you are already in the right folder. you dont need to prefix commands with bash -l -c "cd /Users/matthieuvaragnat/Documents/code/eloleague
+
 # Javascript
 
 - use importmap for JS dependencies
