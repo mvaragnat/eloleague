@@ -139,7 +139,7 @@ module Game
 
       errors.add(:base, I18n.t('games.errors.total_must_equal',
                                total: total,
-                               default: "Total of both scores must equal #{total}"))
+                               default: "Total of both scores must equal #{total} (id #{id})"))
     end
 
     def assign_scoring_system_default
