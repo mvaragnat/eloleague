@@ -22,7 +22,17 @@ module Tournament
           agg[:secondary_score_sum_by_user_id][uid] || 0.0
         }],
         'sos' => ['Strength of Schedule', lambda { |uid, agg|
-          (agg[:opponents_by_user_id][uid] || []).sum { |oid| agg[:points_by_user_id][oid] || 0.0 }
+          # SoS = average of opponents' win rates (points / games played)
+          # Only finalized matches are included in opponents_by_user_id
+          opponents = agg[:opponents_by_user_id][uid] || []
+          return 0.0 if opponents.empty?
+
+          win_rates = opponents.map do |oid|
+            points = agg[:points_by_user_id][oid] || 0.0
+            games = agg[:games_played_by_user_id][oid] || 0
+            games.positive? ? points / games : 0.0
+          end
+          win_rates.sum / opponents.size
         }]
       }
     end

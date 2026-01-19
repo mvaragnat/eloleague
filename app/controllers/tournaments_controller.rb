@@ -294,87 +294,125 @@ class TournamentsController < ApplicationController
 
   # Returns rows with primary, points and tiebreak columns and labels
   def compute_standings_with_tiebreaks(tournament)
-    points = Hash.new(0.0)
-    score_sum = Hash.new(0.0)
-    secondary_score_sum = Hash.new(0.0)
-    opponents = Hash.new { |h, k| h[k] = [] }
-
     regs = tournament.registrations.includes(:user, :faction)
     users = regs.map(&:user)
     reg_by_user = regs.index_by(&:user_id)
 
-    users.each do |u|
-      points[u.id] ||= 0.0
-      score_sum[u.id] ||= 0.0
-      opponents[u.id] ||= []
-    end
+    agg_data = initialize_aggregates_for_users(users)
+    aggregate_points_and_scores(tournament: tournament, agg_data: agg_data)
 
-    aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents)
-
-    agg = {
-      score_sum_by_user_id: score_sum,
-      secondary_score_sum_by_user_id: secondary_score_sum,
-      points_by_user_id: points,
-      opponents_by_user_id: opponents
-    }
-
-    tiebreaks = Tournament::StrategyRegistry.tiebreak_strategies
-    primaries = Tournament::StrategyRegistry.primary_strategies
-    # Be tolerant to legacy/invalid keys by falling back to defaults
-    t1 = tiebreaks[tournament.tiebreak1_key] || tiebreaks[Tournament::StrategyRegistry.default_tiebreak1_key]
-    t2 = tiebreaks[tournament.tiebreak2_key] || tiebreaks[Tournament::StrategyRegistry.default_tiebreak2_key]
-    p1 = primaries[tournament.primary_key] || primaries[Tournament::StrategyRegistry.default_primary_key]
-
-    # Helper lambdas for fixed displayed metrics
-    sos_lambda = tiebreaks['sos'].last
-
-    rows = users.map do |u|
-      {
-        user: u,
-        registration: reg_by_user[u.id],
-        points: points[u.id],
-        score_sum: score_sum[u.id],
-        secondary_score_sum: secondary_score_sum[u.id],
-        sos: sos_lambda.call(u.id, agg),
-        primary: p1.last.call(u.id, agg),
-        tiebreak1: t1.last.call(u.id, agg),
-        tiebreak2: t2.last.call(u.id, agg)
-      }
-    end
+    agg = build_agg_hash(agg_data: agg_data)
+    strategies = load_strategies(tournament: tournament)
+    rows = build_standings_rows(users: users, reg_by_user: reg_by_user, agg_data: agg_data, agg: agg,
+                                strategies: strategies)
 
     rows.sort_by! { |h| [-h[:primary], -h[:tiebreak1], -h[:tiebreak2], h[:user].username] }
-
-    primary_label = t("tournaments.show.strategies.names.primary.#{tournament.primary_key}", default: p1.first)
-    t1_label = t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}", default: t1.first)
-    t2_label = t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: t2.first)
-    { rows: rows, primary_label: primary_label, tiebreak1_label: t1_label, tiebreak2_label: t2_label }
+    build_standings_result(rows: rows, tournament: tournament, strategies: strategies)
   end
 
-  def aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents)
-    tournament.matches.includes(:a_user, :b_user, :game_event).find_each do |m|
-      if bye_win_for_single_participant?(m)
-        apply_bye_points(points, m)
-        apply_bye_score(score_sum, m, tournament)
-        next
-      end
+  def initialize_aggregates_for_users(users)
+    agg_data = {
+      points: Hash.new(0.0),
+      score_sum: Hash.new(0.0),
+      secondary_score_sum: Hash.new(0.0),
+      opponents: Hash.new { |h, k| h[k] = [] },
+      games_played: Hash.new(0)
+    }
 
-      next unless m.a_user && m.b_user
-
-      # Track opponents for SoS
-      opponents[m.a_user.id] << m.b_user.id
-      opponents[m.b_user.id] << m.a_user.id
-
-      apply_normal_result_points(points, m)
-
-      a_score, b_score, a_secondary, b_secondary = extract_scores(m)
-      next unless a_score && b_score
-
-      score_sum[m.a_user.id] += a_score
-      score_sum[m.b_user.id] += b_score
-
-      secondary_score_sum[m.a_user.id] += a_secondary || 0.0
-      secondary_score_sum[m.b_user.id] += b_secondary || 0.0
+    users.each do |user|
+      agg_data[:points][user.id] ||= 0.0
+      agg_data[:score_sum][user.id] ||= 0.0
+      agg_data[:opponents][user.id] ||= []
+      agg_data[:games_played][user.id] ||= 0
     end
+
+    agg_data
+  end
+
+  def aggregate_points_and_scores(tournament:, agg_data:)
+    tournament.matches.includes(:a_user, :b_user, :game_event).find_each do |match|
+      aggregate_single_match(tournament: tournament, agg_data: agg_data, match: match)
+    end
+  end
+
+  def aggregate_single_match(tournament:, agg_data:, match:)
+    if bye_win_for_single_participant?(match)
+      apply_bye(agg_data: agg_data, match: match, tournament: tournament)
+      return
+    end
+
+    return unless match.a_user && match.b_user
+
+    aggregate_finalized_match(agg_data: agg_data, match: match) if match.result != 'pending'
+    aggregate_scores(agg_data: agg_data, match: match)
+  end
+
+  def aggregate_finalized_match(agg_data:, match:)
+    agg_data[:opponents][match.a_user.id] << match.b_user.id
+    agg_data[:opponents][match.b_user.id] << match.a_user.id
+    apply_normal_result_points(agg_data[:points], match)
+    agg_data[:games_played][match.a_user.id] += 1
+    agg_data[:games_played][match.b_user.id] += 1
+  end
+
+  def aggregate_scores(agg_data:, match:)
+    a_score, b_score, a_secondary, b_secondary = extract_scores(match)
+    return unless a_score && b_score
+
+    agg_data[:score_sum][match.a_user.id] += a_score
+    agg_data[:score_sum][match.b_user.id] += b_score
+    agg_data[:secondary_score_sum][match.a_user.id] += a_secondary || 0.0
+    agg_data[:secondary_score_sum][match.b_user.id] += b_secondary || 0.0
+  end
+
+  def build_agg_hash(agg_data:)
+    {
+      score_sum_by_user_id: agg_data[:score_sum],
+      secondary_score_sum_by_user_id: agg_data[:secondary_score_sum],
+      points_by_user_id: agg_data[:points],
+      opponents_by_user_id: agg_data[:opponents],
+      games_played_by_user_id: agg_data[:games_played]
+    }
+  end
+
+  def load_strategies(tournament:)
+    tiebreaks = Tournament::StrategyRegistry.tiebreak_strategies
+    primaries = Tournament::StrategyRegistry.primary_strategies
+    {
+      tiebreaks: tiebreaks,
+      t1: tiebreaks[tournament.tiebreak1_key] || tiebreaks[Tournament::StrategyRegistry.default_tiebreak1_key],
+      t2: tiebreaks[tournament.tiebreak2_key] || tiebreaks[Tournament::StrategyRegistry.default_tiebreak2_key],
+      p1: primaries[tournament.primary_key] || primaries[Tournament::StrategyRegistry.default_primary_key]
+    }
+  end
+
+  def build_standings_rows(users:, reg_by_user:, agg_data:, agg:, strategies:)
+    sos_lambda = strategies[:tiebreaks]['sos'].last
+    users.map do |user|
+      {
+        user: user,
+        registration: reg_by_user[user.id],
+        points: agg_data[:points][user.id],
+        score_sum: agg_data[:score_sum][user.id],
+        secondary_score_sum: agg_data[:secondary_score_sum][user.id],
+        sos: sos_lambda.call(user.id, agg),
+        primary: strategies[:p1].last.call(user.id, agg),
+        tiebreak1: strategies[:t1].last.call(user.id, agg),
+        tiebreak2: strategies[:t2].last.call(user.id, agg)
+      }
+    end
+  end
+
+  def build_standings_result(rows:, tournament:, strategies:)
+    {
+      rows: rows,
+      primary_label: t("tournaments.show.strategies.names.primary.#{tournament.primary_key}",
+                       default: strategies[:p1].first),
+      tiebreak1_label: t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak1_key}",
+                         default: strategies[:t1].first),
+      tiebreak2_label: t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}",
+                         default: strategies[:t2].first)
+    }
   end
 
   def bye_win_for_single_participant?(match)
@@ -382,20 +420,16 @@ class TournamentsController < ApplicationController
       (match.result == 'b_win' && match.b_user && match.a_user.nil?)
   end
 
-  def apply_bye_points(points, match)
-    if match.result == 'a_win' && match.a_user && match.b_user.nil?
-      points[match.a_user.id] += 1.0
-    elsif match.result == 'b_win' && match.b_user && match.a_user.nil?
-      points[match.b_user.id] += 1.0
-    end
-  end
-
-  def apply_bye_score(score_sum, match, tournament)
+  def apply_bye(agg_data:, match:, tournament:)
     bye_score = tournament.score_for_bye || 0
     if match.result == 'a_win' && match.a_user && match.b_user.nil?
-      score_sum[match.a_user.id] += bye_score
+      agg_data[:points][match.a_user.id] += 1.0
+      agg_data[:games_played][match.a_user.id] += 1
+      agg_data[:score_sum][match.a_user.id] += bye_score
     elsif match.result == 'b_win' && match.b_user && match.a_user.nil?
-      score_sum[match.b_user.id] += bye_score
+      agg_data[:points][match.b_user.id] += 1.0
+      agg_data[:games_played][match.b_user.id] += 1
+      agg_data[:score_sum][match.b_user.id] += bye_score
     end
   end
 
