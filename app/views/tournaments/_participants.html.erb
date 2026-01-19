@@ -35,7 +35,7 @@
             <% end %>
           <% end %>
           <%# Army list button/modal visibility %>
-          <% can_view_list = tournament.running? && r.army_list.present? %>
+          <% can_view_list = (tournament.running? || tournament.completed?) && r.army_list.present? %>
           <% if can_view_list %>
             <%= link_to t('tournaments.show.view_army_list', default: 'Army list').html_safe,
                         tournament_tournament_registration_path(tournament, r),

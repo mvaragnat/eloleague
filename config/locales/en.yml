@@ -344,11 +344,6 @@ en:
     games: "Games"
     mirrors: "Mirrors"
   mailers:
-  scoring_system:
-    summary:
-      max_per_player: "Max per player: %{value}"
-      fixed_total: "Fixed total: %{value}"
-      min_diff: "Win if diff > %{value}"
     user_notifications:
       hello: "Hello %{username}"
       problem_html: "If something looks wrong, contact Marquis via the <a href=\"%{contact_url}\">contact form</a>."
@@ -366,3 +361,8 @@ en:
       tournament_completed:
         subject: "%{name} has finished"
         body_html: "The tournament <strong>%{name}</strong> is now completed. Here are the top players:"
+  scoring_system:
+    summary:
+      max_per_player: "Max per player: %{value}"
+      fixed_total: "Fixed total: %{value}"
+      min_diff: "Win if diff > %{value}"
