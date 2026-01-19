@@ -311,11 +311,6 @@ fr:
     games: "Matchs"
     mirrors: "Miroirs"
   mailers:
-  scoring_system:
-    summary:
-      max_per_player: "Max par joueur: %{value}"
-      fixed_total: "Total fixe: %{value}"
-      min_diff: "Victoire si écart > %{value}"
     user_notifications:
       hello: "Bonjour %{username}"
       problem_html: "Si quelque chose semble incorrect, contactez Marquis via le <a href=\"%{contact_url}\">formulaire de contact</a>."
@@ -333,3 +328,8 @@ fr:
       tournament_completed:
         subject: "%{name} est terminé"
         body_html: "Le tournoi <strong>%{name}</strong> est maintenant terminé. Voici les meilleurs joueurs :"
+  scoring_system:
+    summary:
+      max_per_player: "Max par joueur: %{value}"
+      fixed_total: "Total fixe: %{value}"
+      min_diff: "Victoire si écart > %{value}"
