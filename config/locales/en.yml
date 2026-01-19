@@ -240,13 +240,13 @@ en:
             points: "Win/Lose points (1 win, 0.5 draw, 0 loss)."
             score_sum: "Higher total score across reported games ranks first."
             secondary_score_sum: "Higher total secondary score across reported games ranks first."
-            sos: "Higher sum of your opponents' final tournament points ranks first."
+            sos: "Average of your opponents' win rates (points/games). Higher is better (range 0-1)."
             default: "Main ranking criterion."
           tiebreak:
             none: "No tie-break applied."
             score_sum: "Higher total score across reported games ranks higher when points are equal."
             secondary_score_sum: "Sum of secondary scores across reported games."
-            sos: "Sum of your opponents' final tournament points across all your matches."
+            sos: "Average of your opponents' win rates (points/games). Only finalized matches count."
             default: "Tie-break rule applied when points are equal."
         saved: "Settings saved"
       pairing:

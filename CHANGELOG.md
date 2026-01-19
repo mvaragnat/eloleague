@@ -1,3 +1,10 @@
+## 2026-01-19
+
+- Feature — Improved Strength of Schedule (SoS) calculation for tournament standings:
+  - SoS is now calculated as the **average** of opponents' win rates (points / games played), resulting in a value between 0 and 1.
+  - Only **finalized matches** are considered (pending matches from newly generated rounds are excluded).
+  - This provides a more accurate measure of opponent strength and prevents unplayed pairings from affecting rankings.
+
 ## 2025-11-26
 
 - Bugfix — Tournament army list visibility

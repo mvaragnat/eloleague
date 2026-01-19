@@ -206,7 +206,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Tie-break strategies in standings:
   - Score sum: sums your reported game scores.
   - Secondary score sum: sums secondary scores across reported games.
-  - Strength of Schedule (SoS): sums the final tournament points of your opponents across all your matches. Higher is better.
+  - Strength of Schedule (SoS): average of your opponents' win rates (points / games played). Only finalized matches are counted (pending matches are excluded). Value ranges between 0 and 1. Higher is better.
 
 - Primary ranking strategy for standings is customizable (default: Points). Supported options mirror tie-breakers:
   - Points: win=1, draw=0.5, loss=0

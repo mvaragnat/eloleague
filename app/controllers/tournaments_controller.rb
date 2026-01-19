@@ -298,6 +298,7 @@ class TournamentsController < ApplicationController
     score_sum = Hash.new(0.0)
     secondary_score_sum = Hash.new(0.0)
     opponents = Hash.new { |h, k| h[k] = [] }
+    games_played = Hash.new(0)
 
     regs = tournament.registrations.includes(:user, :faction)
     users = regs.map(&:user)
@@ -307,15 +308,17 @@ class TournamentsController < ApplicationController
       points[u.id] ||= 0.0
       score_sum[u.id] ||= 0.0
       opponents[u.id] ||= []
+      games_played[u.id] ||= 0
     end
 
-    aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents)
+    aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents, games_played)
 
     agg = {
       score_sum_by_user_id: score_sum,
       secondary_score_sum_by_user_id: secondary_score_sum,
       points_by_user_id: points,
-      opponents_by_user_id: opponents
+      opponents_by_user_id: opponents,
+      games_played_by_user_id: games_played
     }
 
     tiebreaks = Tournament::StrategyRegistry.tiebreak_strategies
@@ -350,21 +353,24 @@ class TournamentsController < ApplicationController
     { rows: rows, primary_label: primary_label, tiebreak1_label: t1_label, tiebreak2_label: t2_label }
   end
 
-  def aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents)
+  def aggregate_points_and_scores(tournament, points, score_sum, secondary_score_sum, opponents, games_played)
     tournament.matches.includes(:a_user, :b_user, :game_event).find_each do |m|
       if bye_win_for_single_participant?(m)
-        apply_bye_points(points, m)
+        apply_bye_points(points, games_played, m)
         apply_bye_score(score_sum, m, tournament)
         next
       end
 
       next unless m.a_user && m.b_user
 
-      # Track opponents for SoS
-      opponents[m.a_user.id] << m.b_user.id
-      opponents[m.b_user.id] << m.a_user.id
-
-      apply_normal_result_points(points, m)
+      # Only track opponents, points, and games for finalized matches (not pending)
+      if m.result != 'pending'
+        opponents[m.a_user.id] << m.b_user.id
+        opponents[m.b_user.id] << m.a_user.id
+        apply_normal_result_points(points, m)
+        games_played[m.a_user.id] += 1
+        games_played[m.b_user.id] += 1
+      end
 
       a_score, b_score, a_secondary, b_secondary = extract_scores(m)
       next unless a_score && b_score
@@ -382,11 +388,13 @@ class TournamentsController < ApplicationController
       (match.result == 'b_win' && match.b_user && match.a_user.nil?)
   end
 
-  def apply_bye_points(points, match)
+  def apply_bye_points(points, games_played, match)
     if match.result == 'a_win' && match.a_user && match.b_user.nil?
       points[match.a_user.id] += 1.0
+      games_played[match.a_user.id] += 1
     elsif match.result == 'b_win' && match.b_user && match.a_user.nil?
       points[match.b_user.id] += 1.0
+      games_played[match.b_user.id] += 1
     end
   end
 
