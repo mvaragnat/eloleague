@@ -5,50 +5,52 @@ require 'test_helper'
 class TournamentStandingsServiceTest < ActiveSupport::TestCase
   test 'top3_usernames returns usernames of top players' do
     creator = users(:player_one)
-    system = game_systems(:chess)
-    t = ::Tournament::Tournament.create!(name: 'S', description: 'D', game_system: system, format: 'open',
-                                         creator: creator)
-    p2 = users(:player_two)
-    p3 = User.create!(username: 'p3', email: 'p3@example.com', password: 'password')
+    game_system = game_systems(:chess)
+    tournament = ::Tournament::Tournament.create!(
+      name: 'S', description: 'D', game_system: game_system, format: 'open', creator: creator
+    )
+    player2 = users(:player_two)
+    player3 = User.create!(username: 'p3', email: 'p3@example.com', password: 'password')
 
     # Register participants
-    [creator, p2, p3].each { |u| t.registrations.create!(user: u) }
+    [creator, player2, player3].each { |user| tournament.registrations.create!(user: user) }
 
     # Build two events with scores
-    f1 = Game::Faction.find_or_create_by!(game_system: system, name: 'White')
-    f2 = Game::Faction.find_or_create_by!(game_system: system, name: 'Black')
+    white_faction = Game::Faction.find_or_create_by!(game_system: game_system, name: 'White')
+    black_faction = Game::Faction.find_or_create_by!(game_system: game_system, name: 'Black')
 
-    e1 = Game::Event.new(game_system: system, played_at: Time.current, tournament: t)
-    e1.game_participations.build(user: creator, score: 1, faction: f1)
-    e1.game_participations.build(user: p2, score: 0, faction: f2)
-    assert e1.save!, e1.errors.full_messages.to_sentence
+    event1 = Game::Event.new(game_system: game_system, played_at: Time.current, tournament: tournament)
+    event1.game_participations.build(user: creator, score: 1, faction: white_faction)
+    event1.game_participations.build(user: player2, score: 0, faction: black_faction)
+    assert event1.save!, event1.errors.full_messages.to_sentence
 
-    e2 = Game::Event.new(game_system: system, played_at: 1.minute.from_now, tournament: t)
-    e2.game_participations.build(user: creator, score: 0, faction: f1)
-    e2.game_participations.build(user: p3, score: 1, faction: f2)
-    assert e2.save!, e2.errors.full_messages.to_sentence
+    event2 = Game::Event.new(game_system: game_system, played_at: 1.minute.from_now, tournament: tournament)
+    event2.game_participations.build(user: creator, score: 0, faction: white_faction)
+    event2.game_participations.build(user: player3, score: 1, faction: black_faction)
+    assert event2.save!, event2.errors.full_messages.to_sentence
 
     # Create matches linking events so standings include points
-    t.matches.create!(a_user: creator, b_user: p2, game_event: e1, result: 'a_win')
-    t.matches.create!(a_user: creator, b_user: p3, game_event: e2, result: 'b_win')
+    tournament.matches.create!(a_user: creator, b_user: player2, game_event: event1, result: 'a_win')
+    tournament.matches.create!(a_user: creator, b_user: player3, game_event: event2, result: 'b_win')
 
-    top3 = ::Tournament::Standings.top3_usernames(t)
+    top3 = ::Tournament::Standings.top3_usernames(tournament)
     assert_equal 3, top3.size
     assert_includes top3, creator.username
   end
 
   test 'rows include registration and faction' do
     creator = users(:player_one)
-    system = game_systems(:chess)
-    t = ::Tournament::Tournament.create!(name: 'S', description: 'D', game_system: system, format: 'open',
-                                         creator: creator)
+    game_system = game_systems(:chess)
+    tournament = ::Tournament::Tournament.create!(
+      name: 'S', description: 'D', game_system: game_system, format: 'open', creator: creator
+    )
 
-    f1 = Game::Faction.find_or_create_by!(game_system: system, name: 'White')
-    t.registrations.create!(user: creator, faction: f1)
+    white_faction = Game::Faction.find_or_create_by!(game_system: game_system, name: 'White')
+    tournament.registrations.create!(user: creator, faction: white_faction)
 
-    rows = ::Tournament::Standings.new(t).rows
+    rows = ::Tournament::Standings.new(tournament).rows
     assert_equal 1, rows.size
-    assert_equal f1, rows.first.registration.faction
+    assert_equal white_faction, rows.first.registration.faction
   end
 
   # SoS = average of opponents' win rates (points / games played)
@@ -58,39 +60,48 @@ class TournamentStandingsServiceTest < ActiveSupport::TestCase
   # A SoS: avg(C=0.5, D=0.0) = 0.25 | B SoS: avg(D=0.0, C=0.5) = 0.25
   # C SoS: avg(A=1.0, B=0.5) = 0.75 | D SoS: avg(B=0.5, A=1.0) = 0.75
   test 'sos is average of opponents points for finalized matches only' do
-    t, players = create_swiss_tournament_with_sos_scenario
-    a, b, c, d = players
+    tournament, players = create_swiss_tournament_with_sos_scenario
+    player_a, player_b, player_c, player_d = players
 
-    rows = ::Tournament::Standings.new(t).rows
-    sos_by_user = rows.index_by { |r| r.user.id }.transform_values(&:sos)
+    rows = ::Tournament::Standings.new(tournament).rows
+    sos_by_user = rows.index_by { |row| row.user.id }.transform_values(&:sos)
 
-    assert_in_delta 0.25, sos_by_user[a.id], 0.001, 'Player A SoS should be 0.25'
-    assert_in_delta 0.25, sos_by_user[b.id], 0.001, 'Player B SoS should be 0.25'
-    assert_in_delta 0.75, sos_by_user[c.id], 0.001, 'Player C SoS should be 0.75'
-    assert_in_delta 0.75, sos_by_user[d.id], 0.001, 'Player D SoS should be 0.75'
+    assert_in_delta 0.25, sos_by_user[player_a.id], 0.001, 'Player A SoS should be 0.25'
+    assert_in_delta 0.25, sos_by_user[player_b.id], 0.001, 'Player B SoS should be 0.25'
+    assert_in_delta 0.75, sos_by_user[player_c.id], 0.001, 'Player C SoS should be 0.75'
+    assert_in_delta 0.75, sos_by_user[player_d.id], 0.001, 'Player D SoS should be 0.75'
   end
 
   private
 
   def create_swiss_tournament_with_sos_scenario
-    system = game_systems(:chess)
-    t = ::Tournament::Tournament.create!(
-      name: 'Swiss SoS Test', description: 'Test', game_system: system,
+    game_system = game_systems(:chess)
+    tournament = ::Tournament::Tournament.create!(
+      name: 'Swiss SoS Test', description: 'Test', game_system: game_system,
       format: 'swiss', rounds_count: 3, creator: users(:player_one)
     )
 
     players = create_sos_test_players
-    players.each { |u| t.registrations.create!(user: u) }
+    players.each { |user| tournament.registrations.create!(user: user) }
 
-    f1 = Game::Faction.find_or_create_by!(game_system: system, name: 'White')
-    f2 = Game::Faction.find_or_create_by!(game_system: system, name: 'Black')
-    a, b, c, d = players
+    white = Game::Faction.find_or_create_by!(game_system: game_system, name: 'White')
+    black = Game::Faction.find_or_create_by!(game_system: game_system, name: 'Black')
+    player_a, player_b, player_c, player_d = players
 
-    create_sos_round1_matches(t, system, f1, f2, a, b, c, d)
-    create_sos_round2_matches(t, system, f1, f2, a, b, c, d)
-    create_sos_round3_pending_matches(t, a, b, c, d)
+    setup_round1_matches(
+      tournament: tournament, game_system: game_system, white: white, black: black,
+      player_a: player_a, player_b: player_b, player_c: player_c, player_d: player_d
+    )
+    setup_round2_matches(
+      tournament: tournament, game_system: game_system, white: white, black: black,
+      player_a: player_a, player_b: player_b, player_c: player_c, player_d: player_d
+    )
+    setup_round3_pending_matches(
+      tournament: tournament, player_a: player_a, player_b: player_b,
+      player_c: player_c, player_d: player_d
+    )
 
-    [t, players]
+    [tournament, players]
   end
 
   def create_sos_test_players
@@ -99,29 +110,45 @@ class TournamentStandingsServiceTest < ActiveSupport::TestCase
     end
   end
 
-  def create_sos_round1_matches(tournament, system, f1, f2, a, b, c, d)
+  def setup_round1_matches(tournament:, game_system:, white:, black:, player_a:, player_b:, player_c:, player_d:)
     round = tournament.rounds.create!(number: 1, state: 'closed')
-    create_match_with_event(tournament, system, round, f1, f2, a, c, 'a_win')
-    create_match_with_event(tournament, system, round, f1, f2, b, d, 'a_win')
+    # A beats C
+    create_match_with_event(
+      tournament: tournament, game_system: game_system, round: round,
+      winner: player_a, loser: player_c, winner_faction: white, loser_faction: black
+    )
+    # B beats D
+    create_match_with_event(
+      tournament: tournament, game_system: game_system, round: round,
+      winner: player_b, loser: player_d, winner_faction: white, loser_faction: black
+    )
   end
 
-  def create_sos_round2_matches(tournament, system, f1, f2, a, b, c, d)
+  def setup_round2_matches(tournament:, game_system:, white:, black:, player_a:, player_b:, player_c:, player_d:)
     round = tournament.rounds.create!(number: 2, state: 'closed')
-    create_match_with_event(tournament, system, round, f1, f2, c, b, 'a_win')
-    create_match_with_event(tournament, system, round, f1, f2, a, d, 'a_win')
+    # C beats B
+    create_match_with_event(
+      tournament: tournament, game_system: game_system, round: round,
+      winner: player_c, loser: player_b, winner_faction: white, loser_faction: black
+    )
+    # A beats D
+    create_match_with_event(
+      tournament: tournament, game_system: game_system, round: round,
+      winner: player_a, loser: player_d, winner_faction: white, loser_faction: black
+    )
   end
 
-  def create_sos_round3_pending_matches(tournament, a, b, c, d)
+  def setup_round3_pending_matches(tournament:, player_a:, player_b:, player_c:, player_d:)
     round = tournament.rounds.create!(number: 3, state: 'open')
-    tournament.matches.create!(a_user: a, b_user: b, result: 'pending', round: round)
-    tournament.matches.create!(a_user: c, b_user: d, result: 'pending', round: round)
+    tournament.matches.create!(a_user: player_a, b_user: player_b, result: 'pending', round: round)
+    tournament.matches.create!(a_user: player_c, b_user: player_d, result: 'pending', round: round)
   end
 
-  def create_match_with_event(tournament, system, round, f1, f2, winner, loser, result)
-    event = Game::Event.new(game_system: system, played_at: Time.current, tournament: tournament)
-    event.game_participations.build(user: winner, score: 1, faction: f1)
-    event.game_participations.build(user: loser, score: 0, faction: f2)
+  def create_match_with_event(tournament:, game_system:, round:, winner:, loser:, winner_faction:, loser_faction:)
+    event = Game::Event.new(game_system: game_system, played_at: Time.current, tournament: tournament)
+    event.game_participations.build(user: winner, score: 1, faction: winner_faction)
+    event.game_participations.build(user: loser, score: 0, faction: loser_faction)
     event.save!
-    tournament.matches.create!(a_user: winner, b_user: loser, game_event: event, result: result, round: round)
+    tournament.matches.create!(a_user: winner, b_user: loser, game_event: event, result: 'a_win', round: round)
   end
 end
