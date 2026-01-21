@@ -43,7 +43,8 @@ class UserNotificationMailerTest < ActionMailer::TestCase
       assert I18n.exists?('mailers.user_notifications.tournament_match_created.subject')
 
       mail = UserNotificationMailer.with(match: match, user: user).tournament_match_created
-      assert_equal I18n.t('mailers.user_notifications.tournament_match_created.subject', name: tournament.name), mail.subject
+      assert_equal I18n.t('mailers.user_notifications.tournament_match_created.subject', name: tournament.name),
+                   mail.subject
       assert_not_includes mail.subject, 'Translation missing'
       assert_equal [user.email], mail.to
     end

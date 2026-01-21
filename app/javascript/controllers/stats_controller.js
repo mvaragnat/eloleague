@@ -62,6 +62,7 @@ export default class extends Controller {
         <td>${row.losses}</td>
         <td>${row.draws}</td>
         <td>${row.win_percent?.toFixed(2)}%</td>
+        <td>${row.loss_percent?.toFixed(2)}%</td>
         <td>${row.draw_percent?.toFixed(2)}%</td>
       </tr>
     `)
@@ -117,6 +118,7 @@ export default class extends Controller {
         <td>${row.losses}</td>
         <td>${row.draws}</td>
         <td>${row.win_percent == null ? '' : (row.win_percent.toFixed(2) + '%')}</td>
+        <td>${row.loss_percent == null ? '' : (row.loss_percent.toFixed(2) + '%')}</td>
         <td>${row.draw_percent == null ? '' : (row.draw_percent.toFixed(2) + '%')}</td>
         <td>${row.mirror_count}</td>
       </tr>
@@ -166,6 +168,7 @@ export default class extends Controller {
             <td>${row.losses}</td>
             <td>${row.draws}</td>
             <td>${row.win_percent?.toFixed(2)}%</td>
+            <td>${row.loss_percent?.toFixed(2)}%</td>
             <td>${row.draw_percent?.toFixed(2)}%</td>
           </tr>
         `
@@ -179,6 +182,7 @@ export default class extends Controller {
           <td>${row.losses}</td>
           <td>${row.draws}</td>
           <td>${row.win_percent == null ? '' : (row.win_percent.toFixed(2) + '%')}</td>
+          <td>${row.loss_percent == null ? '' : (row.loss_percent.toFixed(2) + '%')}</td>
           <td>${row.draw_percent == null ? '' : (row.draw_percent.toFixed(2) + '%')}</td>
           <td>${row.mirror_count}</td>
         </tr>
