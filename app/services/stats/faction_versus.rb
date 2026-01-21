@@ -5,7 +5,8 @@ module Stats
   # Mirror row contains only mirror_count; other metrics remain nil as requested.
   class FactionVersus
     Row = Struct.new(:opponent_faction_id, :opponent_faction_name, :games, :unique_players,
-                     :wins, :losses, :draws, :win_percent, :draw_percent, :mirror_count, keyword_init: true)
+                     :wins, :losses, :draws, :win_percent, :loss_percent, :draw_percent, :mirror_count,
+                     keyword_init: true)
 
     def initialize(faction:)
       @faction = faction
@@ -32,8 +33,8 @@ module Stats
     def build_rows_index
       rows = @system.factions.map do |opp|
         Row.new(opponent_faction_id: opp.id, opponent_faction_name: opp.localized_name,
-                games: 0, unique_players: 0, wins: 0, losses: 0, draws: 0, win_percent: nil, draw_percent: nil,
-                mirror_count: 0)
+                games: 0, unique_players: 0, wins: 0, losses: 0, draws: 0, win_percent: nil, loss_percent: nil,
+                draw_percent: nil, mirror_count: 0)
       end
       [rows, rows.index_by(&:opponent_faction_id)]
     end
@@ -83,6 +84,7 @@ module Stats
     def compute_row_win_and_draw_percent!(row)
       denom = row.wins + row.losses + row.draws
       row.win_percent = denom.zero? ? 0.0 : (row.wins.to_f * 100.0 / denom).round(2)
+      row.loss_percent = denom.zero? ? 0.0 : (row.losses.to_f * 100.0 / denom).round(2)
       row.draw_percent = denom.zero? ? 0.0 : (row.draws.to_f * 100.0 / denom).round(2)
     end
 
@@ -104,6 +106,7 @@ module Stats
         losses: row.losses,
         draws: row.draws,
         win_percent: row.win_percent,
+        loss_percent: row.loss_percent,
         draw_percent: row.draw_percent,
         mirror_count: row.mirror_count
       }

@@ -5,7 +5,7 @@ module Stats
   # Mirrors: include in total games count but exclude from W/L/D and Win%.
   class FactionWinRates
     ResultRow = Struct.new(:faction_id, :faction_name, :total_games, :unique_players,
-                           :wins, :losses, :draws, :win_percent, :draw_percent, keyword_init: true)
+                           :wins, :losses, :draws, :win_percent, :loss_percent, :draw_percent, keyword_init: true)
 
     def initialize(game_system:)
       @system = game_system
@@ -44,6 +44,7 @@ module Stats
         losses: totals[:losses],
         draws: totals[:draws],
         win_percent: totals[:win_percent],
+        loss_percent: totals[:loss_percent],
         draw_percent: totals[:draw_percent]
       ).to_h
     end
@@ -74,6 +75,7 @@ module Stats
         losses: losses,
         draws: draws,
         win_percent: (denom.zero? ? 0.0 : (wins.to_f * 100.0 / denom).round(2)),
+        loss_percent: (denom.zero? ? 0.0 : (losses.to_f * 100.0 / denom).round(2)),
         draw_percent: (denom.zero? ? 0.0 : (draws.to_f * 100.0 / denom).round(2))
       }
     end
