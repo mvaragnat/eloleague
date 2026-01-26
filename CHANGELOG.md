@@ -1,3 +1,12 @@
+## 2026-01-22
+
+- Bugfix — Swiss pairing duplicate match prevention:
+  - Fixed an issue where Swiss round pairings could generate duplicate matches (rematches of previously played games), particularly at the bottom of the standings when limited combinations were available.
+  - The pairing algorithm now uses an extended swap mechanism: when a duplicate is detected, it attempts swaps with progressively further pairs until a valid (non-duplicate) combination is found.
+  - A maximum iteration limit (50) prevents infinite loops in edge cases.
+  - If no valid swap exists (all possible combinations have been played), the duplicate is accepted as a fallback.
+  - Both pairing strategies (`ByStandingsNeighbors` and `ByPointsRandomWithinGroup`) now include this improved logic.
+
 ## 2026-01-19
 
 - Feature — Improved Strength of Schedule (SoS) calculation for tournament standings:

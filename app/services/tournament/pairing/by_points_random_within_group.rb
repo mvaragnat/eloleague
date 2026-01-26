@@ -4,6 +4,7 @@ module Tournament
   module Pairing
     class ByPointsRandomWithinGroup
       Result = Struct.new(:pairs, :bye_user) # pairs: array of [user_a, user_b]
+      MAX_SWAP_ITERATIONS = 50
 
       def initialize(tournament)
         @tournament = tournament
@@ -134,7 +135,94 @@ module Tournament
             pairs.concat(grp_pairs)
           end
         end
+
+        # After initial pairing, resolve any remaining duplicates via swapping
+        resolve_duplicate_pairings(pairs)
+
         pairs
+      end
+
+      def resolve_duplicate_pairings(pairs)
+        iterations = 0
+
+        loop do
+          break if iterations >= MAX_SWAP_ITERATIONS
+
+          duplicate_idx = find_duplicate_pair_index(pairs)
+          break unless duplicate_idx
+
+          resolved = swap_performed?(pairs, duplicate_idx)
+
+          # If no swap resolved the issue, we must accept the duplicate (no valid alternative)
+          break unless resolved
+
+          iterations += 1
+        end
+      end
+
+      def find_duplicate_pair_index(pairs)
+        pairs.each_with_index do |pair, idx|
+          next unless pair.size == 2
+
+          return idx if already_played?(pair[0], pair[1])
+        end
+        nil
+      end
+
+      def swap_performed?(pairs, dup_idx)
+        dup_pair = pairs[dup_idx]
+        player_a, player_b = dup_pair
+
+        # Try swapping with other pairs, starting from the nearest
+        swap_distances(pairs.size, dup_idx).each do |target_idx|
+          target_pair = pairs[target_idx]
+          next unless target_pair.size == 2
+
+          target_x, target_y = target_pair
+
+          # Try swapping player_b with target_x: new pairs would be [a, x] and [b, y]
+          if valid_swap?(player_a, target_x, player_b, target_y)
+            pairs[dup_idx] = [player_a, target_x]
+            pairs[target_idx] = [player_b, target_y]
+            return true
+          end
+
+          # Try swapping player_b with target_y: new pairs would be [a, y] and [x, b]
+          if valid_swap?(player_a, target_y, target_x, player_b)
+            pairs[dup_idx] = [player_a, target_y]
+            pairs[target_idx] = [target_x, player_b]
+            return true
+          end
+
+          # Try swapping player_a with target_x: new pairs would be [x, b] and [a, y]
+          if valid_swap?(target_x, player_b, player_a, target_y)
+            pairs[dup_idx] = [target_x, player_b]
+            pairs[target_idx] = [player_a, target_y]
+            return true
+          end
+
+          # Try swapping player_a with target_y: new pairs would be [y, b] and [x, a]
+          next unless valid_swap?(target_y, player_b, target_x, player_a)
+
+          pairs[dup_idx] = [target_y, player_b]
+          pairs[target_idx] = [target_x, player_a]
+          return true
+        end
+
+        false
+      end
+
+      # Returns indices to try swapping with, ordered by proximity (nearest first)
+      def swap_distances(total_pairs, dup_idx)
+        (0...total_pairs).reject { |i| i == dup_idx }.sort_by { |i| (i - dup_idx).abs }
+      end
+
+      # Check if the swap creates two valid (non-duplicate) pairs
+      def valid_swap?(new_a1, new_a2, new_b1, new_b2)
+        return false if already_played?(new_a1, new_a2)
+        return false if already_played?(new_b1, new_b2)
+
+        true
       end
 
       def find_partner_for_floater(floater, grouped, scores_desc, current_idx)

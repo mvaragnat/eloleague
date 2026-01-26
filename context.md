@@ -183,6 +183,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Swiss/Open tournaments run in rounds. Closing a round validates all results and generates the next-round pairings from checked-in players (or all registrants if none are checked in).
   - Default strategy: group players by current points and draw opponents within each group while avoiding repeats when possible.
   - Alternative strategy: pair strictly by current ranking order (Primary and tie-breakers): 1v2, 3v4, ...; if a neighbor pair already played, the generator attempts a one-position shift (1v3 and 2v4) to avoid repeats.
+  - **Extended duplicate prevention**: Both strategies now detect duplicate matches after initial pairing and attempt swaps with progressively further pairs to resolve them. A maximum of 50 swap iterations prevents infinite loops. If no valid swap exists (all combinations exhausted), the duplicate is accepted as a fallback.
   - If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
   - Generated pairings receive incremental table numbers stored on each `Tournament::Match`. The Swiss pairings page displays the number next to each matchup and sorts matches by table number when present. Top-ranked pairs get the lowest table numbers.
 

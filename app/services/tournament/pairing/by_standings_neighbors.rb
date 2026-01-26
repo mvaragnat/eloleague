@@ -7,6 +7,7 @@ module Tournament
     # Example: pair (1,2), (3,4), ... unless (1,2) already played; then try (1,3) and (2,4).
     class ByStandingsNeighbors
       Result = Struct.new(:pairs, :bye_user)
+      MAX_SWAP_ITERATIONS = 50
 
       def initialize(tournament)
         @tournament = tournament
@@ -74,45 +75,100 @@ module Tournament
         ).exists?
       end
 
-      # Pairs neighbors (0-1, 2-3, ...) but if a neighbor pair already played,
-      # tries a single-position shift within the local block of four:
-      # (0,2) and (1,3) when available and beneficial.
+      # Pairs neighbors (0-1, 2-3, ...) while avoiding repeats through swapping.
+      # Algorithm:
+      # 1. Generate initial neighbor pairs
+      # 2. Detect duplicate matches
+      # 3. For each duplicate, attempt swaps with progressively further pairs
+      # 4. Use a max iteration limit to avoid infinite loops
       def build_neighbor_pairs_with_shift(users)
-        pairs = []
-        i = 0
-        while i < users.length
-          # Safety: even count expected here
-          break if i >= users.length - 1
+        # Step 1: Generate initial neighbor pairs (0-1, 2-3, ...)
+        pairs = users.each_slice(2).to_a
 
-          a = users[i]
-          b = users[i + 1]
-
-          unless already_played?(a, b)
-            pairs << [a, b]
-            i += 2
-            next
-          end
-
-          # Try shift-by-one if we have a block of four
-          if i + 3 < users.length
-            c = users[i + 2]
-            d = users[i + 3]
-
-            # Prefer avoiding repeats for both pairs after shift
-            if !already_played?(a, c) && !already_played?(b, d)
-              pairs << [a, c]
-              pairs << [b, d]
-              i += 4
-              next
-            end
-          end
-
-          # Fallback: keep neighbors even if repeat
-          pairs << [a, b]
-          i += 2
-        end
+        # Step 2: Iteratively resolve duplicates by swapping
+        resolve_duplicate_pairings(pairs)
 
         pairs
+      end
+
+      def resolve_duplicate_pairings(pairs)
+        iterations = 0
+
+        loop do
+          break if iterations >= MAX_SWAP_ITERATIONS
+
+          duplicate_idx = find_duplicate_pair_index(pairs)
+          break unless duplicate_idx
+
+          resolved = swap_performed?(pairs, duplicate_idx)
+
+          # If no swap resolved the issue, we must accept the duplicate (no valid alternative)
+          break unless resolved
+
+          iterations += 1
+        end
+      end
+
+      def find_duplicate_pair_index(pairs)
+        pairs.each_with_index do |pair, idx|
+          next unless pair.size == 2
+
+          return idx if already_played?(pair[0], pair[1])
+        end
+        nil
+      end
+
+      def swap_performed?(pairs, dup_idx)
+        dup_pair = pairs[dup_idx]
+        player_a, player_b = dup_pair
+
+        # Try swapping with other pairs, starting from the nearest
+        swap_distances(pairs.size, dup_idx).each do |target_idx|
+          target_pair = pairs[target_idx]
+          next unless target_pair.size == 2
+
+          target_x, target_y = target_pair
+
+          # Try swapping player_b with target_x: new pairs would be [a, x] and [b, y]
+          if valid_swap?(player_a, target_x, player_b, target_y)
+            pairs[dup_idx] = [player_a, target_x]
+            pairs[target_idx] = [player_b, target_y]
+            return true
+          end
+
+          # Try swapping player_b with target_y: new pairs would be [a, y] and [x, b]
+          if valid_swap?(player_a, target_y, target_x, player_b)
+            pairs[dup_idx] = [player_a, target_y]
+            pairs[target_idx] = [target_x, player_b]
+            return true
+          end
+
+          # Try swapping player_a with target_x: new pairs would be [x, b] and [a, y]
+          if valid_swap?(target_x, player_b, player_a, target_y)
+            pairs[dup_idx] = [target_x, player_b]
+            pairs[target_idx] = [player_a, target_y]
+            return true
+          end
+
+          # Try swapping player_a with target_y: new pairs would be [y, b] and [x, a]
+          next unless valid_swap?(target_y, player_b, target_x, player_a)
+
+          pairs[dup_idx] = [target_y, player_b]
+          pairs[target_idx] = [target_x, player_a]
+          return true
+        end
+
+        false
+      end
+
+      # Returns indices to try swapping with, ordered by proximity (nearest first)
+      def swap_distances(total_pairs, dup_idx)
+        (0...total_pairs).reject { |i| i == dup_idx }.sort_by { |i| (i - dup_idx).abs }
+      end
+
+      # Check if the swap creates two valid (non-duplicate) pairs
+      def valid_swap?(new_a1, new_a2, new_b1, new_b2)
+        !already_played?(new_a1, new_a2) && !already_played?(new_b1, new_b2)
       end
     end
   end
