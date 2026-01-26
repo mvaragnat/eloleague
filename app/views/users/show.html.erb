@@ -49,6 +49,89 @@
     </div>
   </div>
 
+  <% if @player_stats.any? %>
+    <div class="card">
+      <div class="card-header">
+        <h3><%= t('players.stats_by_system') %></h3>
+      </div>
+      <div class="card-body">
+        <% @player_stats.each do |system_stats| %>
+          <div class="mb-6">
+            <h4 class="text-lg font-semibold mb-2"><%= system_stats[:system_name] %></h4>
+
+            <%# Overall stats for this system %>
+            <div class="mb-4">
+              <h5 class="text-sm font-medium text-gray-600 mb-1"><%= t('players.stats_total') %></h5>
+              <div class="overflow-x-auto">
+                <table class="table w-full">
+                  <thead>
+                    <tr>
+                      <th><%= t('stats.total_games') %></th>
+                      <th><%= t('stats.wins') %></th>
+                      <th><%= t('stats.losses') %></th>
+                      <th><%= t('stats.draws') %></th>
+                      <th><%= t('stats.win_percent') %></th>
+                      <th><%= t('stats.loss_percent') %></th>
+                      <th><%= t('stats.draw_percent') %></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><%= system_stats[:total_games] %></td>
+                      <td><%= system_stats[:wins] %></td>
+                      <td><%= system_stats[:losses] %></td>
+                      <td><%= system_stats[:draws] %></td>
+                      <td><%= number_with_precision(system_stats[:win_percent], precision: 1) %>%</td>
+                      <td><%= number_with_precision(system_stats[:loss_percent], precision: 1) %>%</td>
+                      <td><%= number_with_precision(system_stats[:draw_percent], precision: 1) %>%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <%# Per-faction stats %>
+            <% if system_stats[:faction_rows].any? %>
+              <div>
+                <h5 class="text-sm font-medium text-gray-600 mb-1"><%= t('players.stats_by_faction') %></h5>
+                <div class="overflow-x-auto">
+                  <table class="table w-full">
+                    <thead>
+                      <tr>
+                        <th><%= t('stats.faction') %></th>
+                        <th><%= t('stats.total_games') %></th>
+                        <th><%= t('stats.wins') %></th>
+                        <th><%= t('stats.losses') %></th>
+                        <th><%= t('stats.draws') %></th>
+                        <th><%= t('stats.win_percent') %></th>
+                        <th><%= t('stats.loss_percent') %></th>
+                        <th><%= t('stats.draw_percent') %></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% system_stats[:faction_rows].each do |row| %>
+                        <tr>
+                          <td><%= row[:faction_name] %></td>
+                          <td><%= row[:total_games] %></td>
+                          <td><%= row[:wins] %></td>
+                          <td><%= row[:losses] %></td>
+                          <td><%= row[:draws] %></td>
+                          <td><%= number_with_precision(row[:win_percent], precision: 1) %>%</td>
+                          <td><%= number_with_precision(row[:loss_percent], precision: 1) %>%</td>
+                          <td><%= number_with_precision(row[:draw_percent], precision: 1) %>%</td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <div id="games-list">
     <% @events.each do |event| %>
       <%= render(GameEventComponent.new(event: event, current_user: @user)) %>

@@ -84,6 +84,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Sections:
   - Current ELO by game system (rating and games played)
   - ELO over time chart (one color per game system)
+  - Statistics by game system: shows per-system totals (games, wins, losses, draws, percentages) and per-faction breakdown with the same stats. Uses the same table styling as the Stats page.
   - All games played by the user across systems (same card component used elsewhere)
 - Profile links are available from Elo standings, tournament participants, and tournament ranking tables.
 

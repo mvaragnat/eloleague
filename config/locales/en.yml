@@ -320,6 +320,9 @@ en:
     system: "Game"
     no_ratings: "No ELO ratings yet"
     no_history: "No ELO history yet"
+    stats_by_system: "Statistics by game system"
+    stats_total: "Total"
+    stats_by_faction: "By faction"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"

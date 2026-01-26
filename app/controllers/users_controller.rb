@@ -44,6 +44,9 @@ class UsersController < ApplicationController
     # Recent games (all systems)
     @events = @user.game_events.includes(:game_system, :game_participations, :players,
                                          :tournament).order(played_at: :desc)
+
+    # Player stats per system and faction
+    @player_stats = Stats::PlayerWinRates.new(user: @user).call
   end
 
   private
