@@ -287,6 +287,9 @@ fr:
     system: "Jeu"
     no_ratings: "Aucun classement ELO pour le moment"
     no_history: "Aucun historique ELO pour le moment"
+    stats_by_system: "Statistiques par système de jeu"
+    stats_total: "Total"
+    stats_by_faction: "Par faction"
   time:
     formats:
       long: "Le %d/%m/%Y à %Hh%M"

@@ -1,3 +1,13 @@
+## 2026-01-26
+
+- Feature — Player profile stats by game system and faction:
+  - Added statistics section on player profile page (`/users/:id`)
+  - Shows per-system totals: games played, wins, losses, draws, and percentages
+  - Shows per-faction breakdown within each system with the same stats
+  - Reuses the same table styling as the Stats page for consistency
+  - Implemented via `Stats::PlayerWinRates` service
+  - Fully localized (EN/FR)
+
 ## 2026-01-22
 
 - Bugfix — Swiss pairing duplicate match prevention:
