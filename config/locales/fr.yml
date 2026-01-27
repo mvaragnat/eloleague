@@ -275,6 +275,7 @@ fr:
     title: "Classements ELO"
     game_systems: "Jeu"
     my_current_rankings: "Mes classements ELO actuels"
+    view_all_my_stats: "Voir toutes mes statistiques"
     standings: "Classement"
     player: "Joueur"
     rating: "Classement"
