@@ -58,6 +58,8 @@ game_systems:
       - "Hérésie d'Horus 30k"
       - en: "Chaos Daemons"
         fr: "Démons du Chaos"
+      - en: "Genestealer Cults"
+        fr: "Cultes Genestealer"
 
   - name: "Warhammer 40k"
     description: "The best known Games Workshop game"
