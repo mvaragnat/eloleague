@@ -1,3 +1,10 @@
+## 2026-02-04
+
+- Feature — Added Trench Crusade game system:
+  - Dark fantasy skirmish game set in an alternate World War I
+  - 23 factions including Court of the Seven-Headed Serpent, Cult of the Black Grail, Heretic Legion, Iron Sultanate, Papal States Intervention Force, Trench Pilgrims, and more
+  - Localized descriptions (EN/FR)
+
 ## 2026-01-26
 
 - Feature — Player profile stats by game system and faction:
