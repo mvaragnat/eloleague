@@ -109,6 +109,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Factions sourced from the official Army Forge "Official books" for Grimdark Future. See [Army Forge Grimdark Future](https://army-forge.onepagerules.com/armyBookSelection?gameSystem=gf).
 - Factions are provided primarily in English; French mirrors English where specific translations are not provided.
 
+#### Trench Crusade Game System
+- Added `Trench Crusade` as a supported game system.
+- Dark fantasy skirmish game set in an alternate World War I where Hell has invaded Earth.
+- 23 factions including Heretic, Crusader, and neutral warbands.
+- Factions are provided primarily in English; French translations provided where relevant (e.g., Stoßtruppen).
+
 ### Stats
 - All authenticated users can access a `Stats` page (`/stats`) to explore per-system and per-faction performance.
 - Selecting a game system reveals a sortable table of all factions with: total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by Win% (descending) by default.
