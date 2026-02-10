@@ -74,6 +74,8 @@ en:
       subject: "Subject"
       content: "Message"
       submit: "Send"
+    mailer:
+      from_label: "From"
     create:
       success: "Thanks! Your message has been sent."
       failure: "Please fix the errors below."

@@ -45,6 +45,8 @@ fr:
       subject: "Objet"
       content: "Message"
       submit: "Envoyer"
+    mailer:
+      from_label: "De"
     create:
       success: "Merci ! Votre message a été envoyé."
       failure: "Veuillez corriger les erreurs."

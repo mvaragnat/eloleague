@@ -14,14 +14,25 @@ class ContactsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should post create and redirect with notice' do
-    mail = Minitest::Mock.new
-    mail.expect(:deliver_now, true)
+    received_notify_args = nil
+    mail = Struct.new(:delivered) do
+      def deliver_now
+        self.delivered = true
+      end
+    end.new(false)
 
-    ContactMailer.stub :notify, mail do
+    ContactMailer.stub :notify, lambda { |**kwargs|
+      received_notify_args = kwargs
+      mail
+    } do
       post contacts_path(locale: I18n.default_locale), params: { contact: { subject: 'Hello', content: 'World' } }
     end
 
-    mail.verify
+    assert mail.delivered
+    assert_equal 'Hello', received_notify_args[:subject]
+    assert_equal 'World', received_notify_args[:content]
+    assert_equal @user.username, received_notify_args[:from]
+    assert_equal @user.email, received_notify_args[:from_email]
     assert_redirected_to root_path(locale: I18n.default_locale)
     assert_not_nil flash[:notice]
   end
