@@ -79,7 +79,7 @@
                 <% if primary_key == 'sos' || tiebreak1_key == 'sos' || tiebreak2_key == 'sos' %>
                   <% td_style = td_style + highlight_bg %>
                 <% end %>
-                <td style="<%= td_style %>"><%= row[:sos].to_f %></td>
+                <td style="<%= td_style %>"><%= row[:sos].to_f.round(2) %></td>
 
                 <%# Secondary score sum cell (conditionally shown) %>
                 <% if [primary_key, tiebreak1_key, tiebreak2_key].include?('secondary_score_sum') %>
