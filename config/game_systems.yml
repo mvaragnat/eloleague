@@ -61,6 +61,10 @@ game_systems:
         fr: "Démons du Chaos"
       - en: "Genestealer Cults"
         fr: "Cultes Genestealer"
+      - en: "Tagmatah Omnissia 30k - Loyalists"
+        fr: "Tagmatah Omnissia 30k - Loyalistes"
+      - en: "Tagmatah Omnissia 30k - Renegades"
+        fr: "Tagmatah Omnissia 30k - Rénégats"
 
   - name: "Warhammer 40k"
     description: "The best known Games Workshop game"
