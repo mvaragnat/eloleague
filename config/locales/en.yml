@@ -338,6 +338,10 @@ en:
     select_faction: "Select a faction"
     mirror_hint: "Mirror games are counted in total but excluded from W/L/D and Win%."
     threshold_hint: "Tables only display rows with enough data: at least %{players} unique players and %{games} games. Non-competitive games are excluded."
+    warning_hint: "All rows are displayed. Warnings flag rows with low confidence data. Non-competitive games are excluded."
+    versus_warning_hint: "Warnings use at least %{players} unique players and %{games} games for matchup confidence."
+    hide_non_representative: "Hide non-representative rows"
+    tournament_only: "Use tournament games only"
     faction: "Faction"
     total_games: "Games"
     unique_players: "Players"
@@ -350,6 +354,11 @@ en:
     opponent: "Opponent"
     games: "Games"
     mirrors: "Mirrors"
+    warning: "Warning"
+    warnings:
+      insufficient_players: "Number of players is insufficient"
+      insufficient_games: "Number of games is insufficient"
+      player_match_share: "One player represents more than %{percent}% of games"
   mailers:
     user_notifications:
       hello: "Hello %{username}"

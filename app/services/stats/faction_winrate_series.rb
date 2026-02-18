@@ -4,9 +4,10 @@ module Stats
   # Builds a simple time series of winrate over time for a faction.
   # Uses cumulative win/loss/draw excluding mirrors; x = played_at in ms.
   class FactionWinrateSeries
-    def initialize(faction:)
+    def initialize(faction:, tournament_only: false)
       @faction = faction
       @system = faction.game_system
+      @tournament_only = tournament_only
     end
 
     def call
@@ -40,7 +41,9 @@ module Stats
     private
 
     def ordered_events
-      Game::Event.where(game_system: @system).competitive.includes(:game_participations).order(:played_at)
+      events = Game::Event.where(game_system: @system).competitive
+      events = events.where.not(tournament_id: nil) if @tournament_only
+      events.includes(:game_participations).order(:played_at)
     end
 
     def two_participants_for(event)

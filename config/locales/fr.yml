@@ -305,6 +305,10 @@ fr:
     select_faction: "Sélectionnez une faction"
     mirror_hint: "Les miroirs sont comptés dans le total mais exclus des V/D/N et du % de victoire."
     threshold_hint: "Les tableaux affichent uniquement les lignes avec suffisamment de données : au moins %{players} joueurs uniques et %{games} matchs. Les parties non-compétitives sont exclues."
+    warning_hint: "Toutes les lignes sont affichées. Les warnings signalent les lignes peu représentatives. Les parties non-compétitives sont exclues."
+    versus_warning_hint: "Les warnings utilisent au moins %{players} joueurs uniques et %{games} matchs pour la confiance des matchups."
+    hide_non_representative: "Masquer les lignes non représentatives"
+    tournament_only: "N'utiliser que les matchs de tournois"
     faction: "Faction"
     total_games: "Matchs"
     unique_players: "Joueurs"
@@ -317,6 +321,11 @@ fr:
     opponent: "Adversaire"
     games: "Matchs"
     mirrors: "Miroirs"
+    warning: "Warning"
+    warnings:
+      insufficient_players: "Nombre de joueurs insuffisant"
+      insufficient_games: "Nombre de matchs insuffisant"
+      player_match_share: "Un joueur représente plus de %{percent}% des matchs"
   mailers:
     user_notifications:
       hello: "Bonjour %{username}"
