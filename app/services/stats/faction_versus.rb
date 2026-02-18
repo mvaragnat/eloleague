@@ -112,7 +112,7 @@ module Stats
       return warnings unless max_share > max_share_percent
 
       warnings << I18n.t('stats.warnings.player_match_share',
-                         default: 'One player represents more than %{percent}% of games',
+                         default: 'One player represents more than %<percent>s% of games',
                          percent: max_share_percent)
       warnings
     end

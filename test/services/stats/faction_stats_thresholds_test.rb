@@ -5,31 +5,13 @@ require 'test_helper'
 module Stats
   class FactionStatsThresholdsTest < ActiveSupport::TestCase
     def setup
-      @system = Game::System.create!(name: 'Sys', description: 'desc')
-      Game::ScoringSystem.create!(game_system: @system, name: 'Default', is_default: true)
-      @f1 = Game::Faction.create!(game_system: @system, name: 'F1')
-      @f2 = Game::Faction.create!(game_system: @system, name: 'F2')
-      @users = 1.upto(6).map do |i|
-        User.create!(username: "u#{i}", email: "u#{i}@e.com", password: 'password', password_confirmation: 'password')
-      end
-      @orig_players = Rails.application.config.x.stats.min_players
-      @orig_games = Rails.application.config.x.stats.min_games
-      @orig_matchup_players = Rails.application.config.x.stats.min_matchup_players
-      @orig_matchup_games = Rails.application.config.x.stats.min_matchup_games
-      @orig_max_share = Rails.application.config.x.stats.max_player_match_share_percent
-      Rails.application.config.x.stats.min_players = 4
-      Rails.application.config.x.stats.min_games = 10
-      Rails.application.config.x.stats.min_matchup_players = 4
-      Rails.application.config.x.stats.min_matchup_games = 10
-      Rails.application.config.x.stats.max_player_match_share_percent = 60
+      create_system_and_factions
+      @users = create_users
+      override_stats_thresholds
     end
 
     def teardown
-      Rails.application.config.x.stats.min_players = @orig_players
-      Rails.application.config.x.stats.min_games = @orig_games
-      Rails.application.config.x.stats.min_matchup_players = @orig_matchup_players
-      Rails.application.config.x.stats.min_matchup_games = @orig_matchup_games
-      Rails.application.config.x.stats.max_player_match_share_percent = @orig_max_share
+      restore_stats_thresholds
     end
 
     test 'global winrates keeps all rows and excludes non-competitive games' do
@@ -90,6 +72,52 @@ module Stats
     end
 
     private
+
+    def create_system_and_factions
+      @system = Game::System.create!(name: 'Sys', description: 'desc')
+      Game::ScoringSystem.create!(game_system: @system, name: 'Default', is_default: true)
+      @f1 = Game::Faction.create!(game_system: @system, name: 'F1')
+      @f2 = Game::Faction.create!(game_system: @system, name: 'F2')
+    end
+
+    def create_users
+      1.upto(6).map do |i|
+        User.create!(
+          username: "u#{i}",
+          email: "u#{i}@e.com",
+          password: 'password',
+          password_confirmation: 'password'
+        )
+      end
+    end
+
+    def stats_config
+      Rails.application.config.x.stats
+    end
+
+    def override_stats_thresholds
+      @orig_thresholds = {
+        min_players: stats_config.min_players,
+        min_games: stats_config.min_games,
+        min_matchup_players: stats_config.min_matchup_players,
+        min_matchup_games: stats_config.min_matchup_games,
+        max_player_match_share_percent: stats_config.max_player_match_share_percent
+      }
+
+      stats_config.min_players = 4
+      stats_config.min_games = 10
+      stats_config.min_matchup_players = 4
+      stats_config.min_matchup_games = 10
+      stats_config.max_player_match_share_percent = 60
+    end
+
+    def restore_stats_thresholds
+      stats_config.min_players = @orig_thresholds[:min_players]
+      stats_config.min_games = @orig_thresholds[:min_games]
+      stats_config.min_matchup_players = @orig_thresholds[:min_matchup_players]
+      stats_config.min_matchup_games = @orig_thresholds[:min_matchup_games]
+      stats_config.max_player_match_share_percent = @orig_thresholds[:max_player_match_share_percent]
+    end
 
     def create_competitive_series(num)
       num.times do |i|
