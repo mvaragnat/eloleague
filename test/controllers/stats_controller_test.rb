@@ -36,4 +36,54 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     assert json['ok']
     assert json['rows'].is_a?(Array)
   end
+
+  test 'factions json supports tournament_only filter' do
+    user = User.create!(username: 'jules', email: 'jules@example.com', password: 'password123',
+                        password_confirmation: 'password123')
+    sign_in user, scope: :user
+
+    system = Game::System.create!(name: 'FilteredSys', description: 'desc')
+    scoring = Game::ScoringSystem.create!(game_system: system, name: 'Default', is_default: true)
+    f1 = Game::Faction.create!(game_system: system, name: 'F1')
+    f2 = Game::Faction.create!(game_system: system, name: 'F2')
+    opponent = User.create!(username: 'oppo', email: 'oppo@example.com', password: 'password123',
+                            password_confirmation: 'password123')
+
+    tournament = Tournament::Tournament.create!(
+      name: 'Cup',
+      creator: user,
+      game_system: system,
+      scoring_system: scoring,
+      format: :open,
+      state: :registration
+    )
+
+    Game::Event.create!(
+      game_system: system,
+      tournament: tournament,
+      played_at: Time.current,
+      game_participations_attributes: [
+        { user_id: user.id, faction_id: f1.id, score: 10 },
+        { user_id: opponent.id, faction_id: f2.id, score: 0 }
+      ]
+    )
+    Game::Event.create!(
+      game_system: system,
+      played_at: 1.minute.from_now,
+      game_participations_attributes: [
+        { user_id: user.id, faction_id: f1.id, score: 10 },
+        { user_id: opponent.id, faction_id: f2.id, score: 0 }
+      ]
+    )
+
+    get stats_factions_path, params: { game_system_id: system.id }, as: :json
+    all_rows = JSON.parse(@response.body)['rows']
+    all_f1 = all_rows.find { |row| row['faction_id'] == f1.id }
+    assert_equal 2, all_f1['total_games']
+
+    get stats_factions_path, params: { game_system_id: system.id, tournament_only: true }, as: :json
+    tournament_rows = JSON.parse(@response.body)['rows']
+    tournament_f1 = tournament_rows.find { |row| row['faction_id'] == f1.id }
+    assert_equal 1, tournament_f1['total_games']
+  end
 end

@@ -6,13 +6,16 @@ export default class extends Controller {
     "faction",
     "factionsTable",
     "versusTable",
-    "chart"
+    "chart",
+    "hideWarnings",
+    "tournamentOnly"
   ]
 
   connect() {
     this._factionsSort = { key: "win_percent", dir: "desc" }
     this._vsSort = { key: "games", dir: "desc" }
     this._factionOptions = []
+    this._lastTournamentOnly = this._tournamentOnlyEnabled()
   }
 
   async onSystemChange() {
@@ -45,16 +48,38 @@ export default class extends Controller {
     ])
   }
 
+  async onFiltersChange() {
+    this._applyHideWarningsToAllTables()
+
+    const tournamentOnly = this._tournamentOnlyEnabled()
+    const tournamentOnlyChanged = tournamentOnly !== this._lastTournamentOnly
+    this._lastTournamentOnly = tournamentOnly
+    if (!tournamentOnlyChanged) return
+
+    const systemId = this.systemTarget.value
+    if (!systemId) return
+
+    await this._loadFactionsTable(systemId)
+
+    const factionId = this.factionTarget.value
+    if (!factionId) return
+
+    await Promise.all([
+      this._loadFactionSeries(factionId),
+      this._loadVersusTable(factionId)
+    ])
+  }
+
   sort(ev) { this._sortTable(ev, this.factionsTableTarget, '_factionsData', this._factionsSort) }
   sortVs(ev) { this._sortTable(ev, this.versusTableTarget, '_vsData', this._vsSort) }
 
   async _loadFactionsTable(systemId) {
-    const url = this._url(`/stats/factions?game_system_id=${encodeURIComponent(systemId)}`)
+    const url = this._url(this._withStatsFilters(`/stats/factions?game_system_id=${encodeURIComponent(systemId)}`))
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
-    this._factionsData = data.rows || []
+    this._factionsData = this._normalizeRows(data.rows || [])
     this._renderRows(this.factionsTableTarget, this._factionsData, row => `
-      <tr data-faction-id="${row.faction_id}">
+      <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
         <td>${this._e(row.faction_name)}</td>
         <td>${row.total_games}</td>
         <td>${row.unique_players}</td>
@@ -64,6 +89,7 @@ export default class extends Controller {
         <td>${row.win_percent?.toFixed(2)}%</td>
         <td>${row.loss_percent?.toFixed(2)}%</td>
         <td>${row.draw_percent?.toFixed(2)}%</td>
+        <td>${this._e(row.warning_text)}</td>
       </tr>
     `)
     // Show both wrapper and table
@@ -86,7 +112,7 @@ export default class extends Controller {
   }
 
   async _loadFactionSeries(factionId) {
-    const url = this._url(`/stats/faction_winrate_series?faction_id=${encodeURIComponent(factionId)}`)
+    const url = this._url(this._withStatsFilters(`/stats/faction_winrate_series?faction_id=${encodeURIComponent(factionId)}`))
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
     const series = data.series || []
@@ -105,12 +131,12 @@ export default class extends Controller {
   }
 
   async _loadVersusTable(factionId) {
-    const url = this._url(`/stats/faction_vs?faction_id=${encodeURIComponent(factionId)}`)
+    const url = this._url(this._withStatsFilters(`/stats/faction_vs?faction_id=${encodeURIComponent(factionId)}`))
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
-    this._vsData = data.rows || []
+    this._vsData = this._normalizeRows(data.rows || [])
     this._renderRows(this.versusTableTarget, this._vsData, row => `
-      <tr>
+      <tr data-has-warning="${row.has_warning}">
         <td>${this._e(row.opponent_faction_name)}</td>
         <td>${row.games}</td>
         <td>${row.unique_players}</td>
@@ -121,6 +147,7 @@ export default class extends Controller {
         <td>${row.loss_percent == null ? '' : (row.loss_percent.toFixed(2) + '%')}</td>
         <td>${row.draw_percent == null ? '' : (row.draw_percent.toFixed(2) + '%')}</td>
         <td>${row.mirror_count}</td>
+        <td>${this._e(row.warning_text)}</td>
       </tr>
     `)
     this._setHidden(this.versusTableTarget.closest('#versus-table'), false)
@@ -129,6 +156,7 @@ export default class extends Controller {
   _renderRows(tableEl, rows, templateFn) {
     const tbody = tableEl.querySelector('tbody')
     tbody.innerHTML = rows.map(templateFn).join('')
+    this._applyHideWarnings(tableEl)
   }
 
   _sortTable(ev, tableEl, dataKey, state) {
@@ -160,7 +188,7 @@ export default class extends Controller {
     this._renderRows(tableEl, data, row => {
       if (dataKey === '_factionsData') {
         return `
-          <tr data-faction-id="${row.faction_id}">
+          <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
             <td>${this._e(row.faction_name)}</td>
             <td>${row.total_games}</td>
             <td>${row.unique_players}</td>
@@ -170,11 +198,12 @@ export default class extends Controller {
             <td>${row.win_percent?.toFixed(2)}%</td>
             <td>${row.loss_percent?.toFixed(2)}%</td>
             <td>${row.draw_percent?.toFixed(2)}%</td>
+            <td>${this._e(row.warning_text)}</td>
           </tr>
         `
       }
       return `
-        <tr>
+        <tr data-has-warning="${row.has_warning}">
           <td>${this._e(row.opponent_faction_name)}</td>
           <td>${row.games}</td>
           <td>${row.unique_players}</td>
@@ -185,9 +214,49 @@ export default class extends Controller {
           <td>${row.loss_percent == null ? '' : (row.loss_percent.toFixed(2) + '%')}</td>
           <td>${row.draw_percent == null ? '' : (row.draw_percent.toFixed(2) + '%')}</td>
           <td>${row.mirror_count}</td>
+          <td>${this._e(row.warning_text)}</td>
         </tr>
       `
     })
+  }
+
+  _normalizeRows(rows) {
+    return rows.map(row => {
+      const warnings = Array.isArray(row.warnings) ? row.warnings : []
+      return {
+        ...row,
+        warnings,
+        has_warning: warnings.length > 0,
+        warning_text: warnings.join(" | ")
+      }
+    })
+  }
+
+  _applyHideWarnings(tableEl) {
+    const hide = this.hideWarningsTarget ? this.hideWarningsTarget.checked : true
+    tableEl.querySelectorAll('tbody tr').forEach(row => {
+      const hasWarning = row.dataset.hasWarning === 'true'
+      row.hidden = hide && hasWarning
+    })
+  }
+
+  _applyHideWarningsToAllTables() {
+    this._applyHideWarnings(this.factionsTableTarget)
+    this._applyHideWarnings(this.versusTableTarget)
+  }
+
+  _tournamentOnlyEnabled() {
+    return this.tournamentOnlyTarget ? this.tournamentOnlyTarget.checked : false
+  }
+
+  _withStatsFilters(path) {
+    const url = new URL(path, window.location.origin)
+    if (this._tournamentOnlyEnabled()) {
+      url.searchParams.set('tournament_only', '1')
+    } else {
+      url.searchParams.delete('tournament_only')
+    }
+    return `${url.pathname}${url.search}`
   }
 
   _setHidden(el, hidden) { if (el) el.hidden = hidden }

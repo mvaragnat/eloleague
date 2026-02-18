@@ -1,3 +1,13 @@
+## 2026-02-18
+
+- Feature — Stats page now shows all rows with reliability warnings and filters:
+  - Removed hard filtering by minimum players/games in global and versus stats; all rows are displayed.
+  - Added a `Warning` column with three warning types: insufficient players, insufficient games, and over-represented player share.
+  - Added `STATS_MAX_PLAYER_MATCH_SHARE_PERCENT` ENV config (default `60`) to control player-share warning threshold.
+  - Added a default-ON toggle to hide non-representative rows (rows with warnings), handled client-side.
+  - Added a tournament-only toggle that recalculates global stats, versus stats, and winrate series using only tournament games.
+  - Updated tests and localized strings (EN/FR) for the new behavior.
+
 ## 2026-02-04
 
 - Feature — Added Trench Crusade game system:

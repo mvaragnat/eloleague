@@ -6,8 +6,18 @@
   </div>
 
   <div class="card">
+    <div class="flex flex-col gap-2 mb-3 sm:flex-row sm:items-center sm:gap-6">
+      <label class="inline-flex items-center gap-2">
+        <input type="checkbox" class="h-4 w-4" checked data-stats-target="hideWarnings" data-action="change->stats#onFiltersChange">
+        <span><%= t('stats.hide_non_representative', default: 'Hide non-representative rows') %></span>
+      </label>
+      <label class="inline-flex items-center gap-2">
+        <input type="checkbox" class="h-4 w-4" data-stats-target="tournamentOnly" data-action="change->stats#onFiltersChange">
+        <span><%= t('stats.tournament_only', default: 'Use tournament games only') %></span>
+      </label>
+    </div>
     <div class="hint text-sm text-gray-600 mb-3">
-      <%= t('stats.threshold_hint', default: 'Tables only display rows with enough data: at least %{players} unique players and %{games} games. Non-competitive games are excluded. ', players: Rails.application.config.x.stats.min_players, games: Rails.application.config.x.stats.min_games) %>
+      <%= t('stats.warning_hint', default: 'All rows are displayed. Warnings flag rows with low confidence data. Non-competitive games are excluded.') %>
     </div>
     <label for="system-select"><%= t('stats.system_label', default: 'Game system') %></label>
     <select id="system-select" class="input" data-stats-target="system" data-action="change->stats#onSystemChange">
@@ -33,6 +43,7 @@
             <th class="sortable" data-action="click->stats#sort" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
             <th class="sortable" data-action="click->stats#sort" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
             <th class="sortable" data-action="click->stats#sort" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>
+            <th class="sortable" data-action="click->stats#sort" data-key="warning_text"><%= t('stats.warning', default: 'Warning') %></th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -43,7 +54,7 @@
   <div class="card mt-6">
     <label for="faction-select"><%= t('stats.faction_label', default: 'Faction') %></label>
     <div class="hint text-sm text-gray-600 mb-3">
-      <%= t('stats.threshold_hint', default: 'Tables only display rows with enough data: at least %{players} unique players and %{games} games. Non-competitive games are excluded. ', players: Rails.application.config.x.stats.min_matchup_players, games: Rails.application.config.x.stats.min_matchup_games) %>
+      <%= t('stats.versus_warning_hint', default: 'Warnings use at least %{players} unique players and %{games} games for matchup confidence.', players: Rails.application.config.x.stats.min_matchup_players, games: Rails.application.config.x.stats.min_matchup_games) %>
     </div>
     <select id="faction-select" class="input" data-stats-target="faction" data-action="change->stats#onFactionChange" disabled>
       <option value=""><%= t('stats.select_faction', default: 'Select a faction') %></option>
@@ -69,6 +80,7 @@
             <th class="sortable" data-action="click->stats#sortVs" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
             <th class="sortable" data-action="click->stats#sortVs" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>
             <th><%= t('stats.mirrors', default: 'Mirrors') %></th>
+            <th class="sortable" data-action="click->stats#sortVs" data-key="warning_text"><%= t('stats.warning', default: 'Warning') %></th>
           </tr>
         </thead>
         <tbody></tbody>
