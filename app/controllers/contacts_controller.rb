@@ -13,7 +13,8 @@ class ContactsController < ApplicationController
       ContactMailer.notify(
         subject: @contact.subject,
         content: @contact.content,
-        from: @contact.username
+        from: @contact.username,
+        from_email: current_user.email
       ).deliver_now
       redirect_to root_path, notice: t('contact.create.success')
     else

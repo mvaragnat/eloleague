@@ -1,4 +1,8 @@
 <div>
+  <p>
+    <strong><%= t('contact.mailer.from_label') %>:</strong>
+    <%= @from %> (&lt;<%= @from_email %>&gt;)
+  </p>
   <p><%= simple_format(@content) %></p>
 </div>
 
