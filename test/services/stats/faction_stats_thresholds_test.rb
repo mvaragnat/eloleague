@@ -150,8 +150,9 @@ module Stats
     end
 
     def create_dominated_series(num)
+      opponents = @users.drop(1)
       num.times do |i|
-        b_user = @users[(i + 1) % @users.size]
+        b_user = opponents[i % opponents.size]
         Game::Event.create!(
           game_system: @system,
           played_at: 2.hours.from_now + i.minutes,
