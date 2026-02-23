@@ -20,6 +20,7 @@ export default class extends Controller {
 
   validate(event) {
     const form = this.element
+    this.clearFieldErrors()
 
     // Two independent player selectors (one per participation block)
     const blocks = Array.from(form.querySelectorAll('.participation-block'))
@@ -29,14 +30,20 @@ export default class extends Controller {
       const allHaveOne = selectionsPerBlock.length === 2 && selectionsPerBlock.every(n => n === 1)
       if (!allHaveOne) {
         event.preventDefault()
-        this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players')
+        this.showError(
+          window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players',
+          '.participation-block [data-player-search-target="input"]'
+        )
         return
       }
     } else {
       // Fallback: at least one selected in the first block
       if (selectionsPerBlock[0] !== 1) {
         event.preventDefault()
-        this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players')
+        this.showError(
+          window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players',
+          '.participation-block [data-player-search-target="input"]'
+        )
         return
       }
     }
@@ -46,7 +53,10 @@ export default class extends Controller {
     const allScoresPresent = Array.from(scoreInputs).every(i => (i.value || '').trim() !== '')
     if (!allScoresPresent) {
       event.preventDefault()
-      this.showError(window.I18n?.t('games.errors.both_scores_required') || 'Both scores are required')
+      this.showError(
+        window.I18n?.t('games.errors.both_scores_required') || 'Both scores are required',
+        'input[name^="game_event[game_participations_attributes]"][name$="[score]"]'
+      )
       return
     }
 
@@ -55,7 +65,10 @@ export default class extends Controller {
     const allUsersPresent = userInputs.length >= 2 && userInputs.every(i => (i.value || '').trim() !== '')
     if (!allUsersPresent) {
       event.preventDefault()
-      this.showError(window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players')
+      this.showError(
+        window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players',
+        '.participation-block [data-player-search-target="input"]'
+      )
       return
     }
 
@@ -64,7 +77,10 @@ export default class extends Controller {
     const allFactionsPresent = Array.from(factionSelects).every(s => (s.value || '').trim() !== '')
     if (!allFactionsPresent) {
       event.preventDefault()
-      this.showError(window.I18n?.t('games.errors.both_factions_required') || 'Both players must select a faction')
+      this.showError(
+        window.I18n?.t('games.errors.both_factions_required') || 'Both players must select a faction',
+        'select[name^="game_event[game_participations_attributes]"][name$="[faction_id]"]'
+      )
       return
     }
 
@@ -225,16 +241,51 @@ export default class extends Controller {
     // No-op in two-selector layout; retain for backward compatibility
   }
 
-  showError(message) {
+  showError(message, selector = null) {
     if (!this.hasErrorTarget) return
     this.errorTarget.textContent = message
     this.errorTarget.classList.remove('hidden')
+    if (selector) {
+      const fields = Array.from(this.element.querySelectorAll(selector))
+      fields.forEach(field => this.markFieldError(field))
+      this.focusFirstField(fields)
+    }
   }
 
   hideError() {
     if (!this.hasErrorTarget) return
     this.errorTarget.textContent = ''
     this.errorTarget.classList.add('hidden')
+    this.clearFieldErrors()
+  }
+
+  markFieldError(field) {
+    field.classList.add('input-error')
+    field.setAttribute('aria-invalid', 'true')
+  }
+
+  clearFieldErrors() {
+    const flagged = this.element.querySelectorAll('.input-error[data-client-error="true"]')
+    flagged.forEach(field => {
+      field.classList.remove('input-error')
+      field.removeAttribute('aria-invalid')
+      field.removeAttribute('data-client-error')
+    })
+  }
+
+  focusFirstField(fields) {
+    const first = fields.find(field => {
+      if (!field || typeof field.focus !== 'function') return false
+      const style = window.getComputedStyle(field)
+      return style.display !== 'none' && style.visibility !== 'hidden'
+    })
+    if (!first) return
+    first.dataset.clientError = 'true'
+    first.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    first.focus({ preventScroll: true })
+    fields.forEach(field => {
+      field.dataset.clientError = 'true'
+    })
   }
 
   // Update player name headings based on selected players

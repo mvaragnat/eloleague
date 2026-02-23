@@ -26,6 +26,8 @@
             <label><%= t('games.new.select_player', default: 'Select player') %></label>
             <div data-player-search-target="container">
               <input type="text"
+                     class="<%= 'input-error' if local_assigns[:error_flags].present? && local_assigns[:error_flags][:players] %>"
+                     aria-invalid="<%= local_assigns[:error_flags].present? && local_assigns[:error_flags][:players] %>"
                      data-player-search-target="input"
                      data-action="input->player-search#search"
                      placeholder="<%= t('games.new.search_placeholder') %>">
@@ -36,11 +38,11 @@
       </div>
       <div>
         <%= p_form.label :score, t('games.new.score', default: 'Score') %>
-        <%= p_form.number_field :score, min: 0 %>
+        <%= p_form.number_field :score, min: 0, class: "#{'input-error' if local_assigns[:error_flags].present? && local_assigns[:error_flags][:scores]}", aria: { invalid: local_assigns[:error_flags].present? && local_assigns[:error_flags][:scores] } %>
         <%# Show secondary only when explicitly requested by caller (tournament + selected criterion) %>
         <% if local_assigns[:show_secondary] %>
           <%= p_form.label :secondary_score, t('games.new.secondary_score', default: 'Secondary score'), style: 'display:block; margin-top:0.25rem;' %>
-          <%= p_form.number_field :secondary_score, min: 0 %>
+          <%= p_form.number_field :secondary_score, min: 0, class: "#{'input-error' if local_assigns[:error_flags].present? && local_assigns[:error_flags][:scores]}", aria: { invalid: local_assigns[:error_flags].present? && local_assigns[:error_flags][:scores] } %>
         <% end %>
         <%= p_form.label :faction_id, t('games.new.faction', default: 'Faction'), style: 'display:block; margin-top:0.5rem;' %>
         <% options = (defined?(initial_factions) && initial_factions.present?) ? initial_factions.map { |fa| [fa.localized_name(I18n.locale), fa.id] } : [] %>
@@ -52,7 +54,7 @@
         <%= p_form.select :faction_id,
                           options,
                           { prompt: t('games.new.select_faction', default: 'Select faction'), selected: default_faction_id },
-                          { data: { faction_select: true } } %>
+                          { data: { faction_select: true }, class: "#{'input-error' if local_assigns[:error_flags].present? && local_assigns[:error_flags][:factions]}", aria: { invalid: local_assigns[:error_flags].present? && local_assigns[:error_flags][:factions] } } %>
         <%= p_form.hidden_field :user_id %>
       </div>
       <div>

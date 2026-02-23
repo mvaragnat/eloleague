@@ -1,8 +1,15 @@
-<div class="games-container">
+<div class="games-container" data-controller="form-errors">
   <h1>Match — <%= @tournament.name %></h1>
   <div style="margin: 0.5rem 0; display:flex; gap:0.5rem;">
     <%= link_to 'Tournament', tournament_path(@tournament, tab: 0), class: 'btn' %>
   </div>
+
+  <% score_error = @match_error_flags.present? && @match_error_flags[:scores] %>
+  <% if @match_error_message.present? %>
+    <p data-form-errors-target="summary" class="form-error-summary" role="alert" style="color:#b91c1c; margin-bottom: 0.75rem;">
+      <%= @match_error_message %>
+    </p>
+  <% end %>
 
   <% if alert = flash[:alert] %>
     <p id="alert" style="color:#b91c1c;"><%= alert %></p>
@@ -71,22 +78,22 @@
               <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0.75rem; align-items:center;">
             <div>
                   <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.a_user.username %></label>
-                  <%= number_field_tag 'tournament_match[a_score]', a.score, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
+                  <%= number_field_tag 'tournament_match[a_score]', a.score, min: 0, step: 1, required: true, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
               <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
                 <div style="margin-top:0.25rem;">
                   <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
-                  <%= number_field_tag 'tournament_match[a_secondary_score]', a.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                  <%= number_field_tag 'tournament_match[a_secondary_score]', a.secondary_score, min: 0, step: 1, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
                 </div>
               <% end %>
                 </div>
                 <div style="text-align:center; font-weight:700; font-size:1.25rem;">vs</div>
             <div>
                   <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.b_user.username %></label>
-                  <%= number_field_tag 'tournament_match[b_score]', b.score, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
+                  <%= number_field_tag 'tournament_match[b_score]', b.score, min: 0, step: 1, required: true, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
               <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
                 <div style="margin-top:0.25rem;">
                   <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
-                  <%= number_field_tag 'tournament_match[b_secondary_score]', b.secondary_score, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                  <%= number_field_tag 'tournament_match[b_secondary_score]', b.secondary_score, min: 0, step: 1, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
                 </div>
               <% end %>
                 </div>
@@ -102,22 +109,22 @@
           <div style="display:grid; grid-template-columns: 1fr 60px 1fr; gap:0.75rem; align-items:center;">
             <div>
               <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.a_user.username %></label>
-              <%= number_field_tag 'tournament_match[a_score]', nil, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
+              <%= number_field_tag 'tournament_match[a_score]', nil, min: 0, step: 1, required: true, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
               <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
                 <div style="margin-top:0.25rem;">
                   <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
-                  <%= number_field_tag 'tournament_match[a_secondary_score]', nil, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                  <%= number_field_tag 'tournament_match[a_secondary_score]', nil, min: 0, step: 1, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
                 </div>
               <% end %>
             </div>
             <div style="text-align:center; font-weight:700; font-size:1.25rem;">vs</div>
             <div>
               <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= @match.b_user.username %></label>
-              <%= number_field_tag 'tournament_match[b_score]', nil, min: 0, step: 1, required: true, class: 'input', style: 'width:100%;' %>
+              <%= number_field_tag 'tournament_match[b_score]', nil, min: 0, step: 1, required: true, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
               <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
                 <div style="margin-top:0.25rem;">
                   <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
-                  <%= number_field_tag 'tournament_match[b_secondary_score]', nil, min: 0, step: 1, class: 'input', style: 'width:100%;' %>
+                  <%= number_field_tag 'tournament_match[b_secondary_score]', nil, min: 0, step: 1, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
                 </div>
               <% end %>
             </div>

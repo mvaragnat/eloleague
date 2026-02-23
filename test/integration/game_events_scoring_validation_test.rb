@@ -22,5 +22,8 @@ class GameEventsScoringValidationTest < ActionDispatch::IntegrationTest
     }
     assert_response :unprocessable_content
     assert_includes @response.body, I18n.t('games.errors.total_must_equal', total: 32)
+    assert_includes @response.body, 'form-error-summary'
+    assert_includes @response.body, 'input-error'
+    assert_includes @response.body, 'data-controller="game-form form-errors"'
   end
 end

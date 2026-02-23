@@ -1,6 +1,22 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  def game_event_error_flags(event)
+    return {} unless event&.errors&.any?
+
+    attrs = event.errors.attribute_names.map(&:to_sym)
+    base_error = attrs.include?(:base)
+    players_error = attrs.include?(:players)
+
+    {
+      system: attrs.include?(:game_system_id),
+      scoring_system: attrs.include?(:scoring_system) || attrs.include?(:scoring_system_id),
+      players: players_error || attrs.any? { |attr| attr.to_s.include?('user') },
+      scores: players_error || base_error || attrs.any? { |attr| attr.to_s.include?('score') },
+      factions: players_error || attrs.any? { |attr| attr.to_s.include?('faction') }
+    }
+  end
+
   # Renders an SVG bracket for elimination tournaments.
   # Uses parent/child relations; no fallback to rounds.
   def render_svg_bracket(tournament, _rounds)

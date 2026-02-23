@@ -31,5 +31,42 @@ class TournamentMatchesScoringValidationTest < ActionDispatch::IntegrationTest
     # This is valid by fixed total only if 20+20=40, invalid for fixed total 32
     assert_response :unprocessable_content
     assert_includes @response.body, I18n.t('games.errors.total_must_equal', total: 32)
+    assert_includes @response.body, 'form-error-summary'
+    assert_includes @response.body, 'input-error'
+    assert_includes @response.body, 'data-controller="game-form form-errors"'
+  end
+
+  test 'tournament match report keeps score form visible with highlighted fields on invalid scoring' do
+    sign_in users(:player_one)
+    chess = game_systems(:chess)
+    scoring = game_scoring_systems(:chess_constrained)
+    white = game_factions(:chess_white)
+    black = game_factions(:chess_black)
+
+    tournament = Tournament::Tournament.create!(
+      name: 'Swiss T',
+      creator: users(:player_one),
+      game_system: chess,
+      format: :swiss,
+      rounds_count: 1,
+      state: 'running',
+      score_for_bye: 0,
+      scoring_system: scoring
+    )
+    Tournament::Registration.create!(tournament: tournament, user: users(:player_one), status: :checked_in, faction: white)
+    Tournament::Registration.create!(tournament: tournament, user: users(:player_two), status: :checked_in, faction: black)
+    round = Tournament::Round.create!(tournament: tournament, number: 1, state: :pending)
+    match = Tournament::Match.create!(tournament: tournament, tournament_round: round, a_user: users(:player_one),
+                                      b_user: users(:player_two), result: :pending)
+
+    patch tournament_tournament_match_path(locale: 'en', tournament_id: tournament.to_param, id: match.id), params: {
+      tournament_match: { a_score: 20, b_score: 20 }
+    }
+
+    assert_response :unprocessable_content
+    assert_includes @response.body, I18n.t('games.errors.total_must_equal', total: 32)
+    assert_includes @response.body, 'data-controller="form-errors"'
+    assert_includes @response.body, 'form-error-summary'
+    assert_includes @response.body, 'input-error'
   end
 end
