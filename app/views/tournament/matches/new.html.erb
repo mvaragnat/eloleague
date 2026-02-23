@@ -3,8 +3,9 @@
 		<div class="modal-card" style="max-height:90vh; overflow-y:auto; width:90vw; max-width:800px;">
 			<h2><%= t('tournaments.show.matches', default: 'Matches') %> — <%= @tournament.name %></h2>
 
-			<%= form_with(model: @game, url: tournament_tournament_matches_path(@tournament), scope: :game_event, data: { controller: "game-form", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
-				<div data-game-form-target="error" class="<%= @game&.errors&.any? ? '' : 'hidden' %>" style="color:#dc2626;font-size:0.875rem;">
+      <% error_flags = game_event_error_flags(@game) %>
+			<%= form_with(model: @game, url: tournament_tournament_matches_path(@tournament), scope: :game_event, data: { controller: "game-form form-errors", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
+				<div data-game-form-target="error" data-form-errors-target="summary" role="alert" class="<%= @game&.errors&.any? ? 'form-error-summary' : 'form-error-summary hidden' %>" style="color:#dc2626;font-size:0.875rem;">
           <%= @game&.errors&.full_messages&.to_sentence %>
         </div>
 
@@ -38,7 +39,8 @@
 									 preselected_removable: @preselected_removable,
 									 tournament_id: @tournament.id,
 									 show_secondary: show_secondary,
-									 initial_factions: Game::Faction.where(game_system_id: @tournament.game_system_id).order(:name).to_a } %>
+									 initial_factions: Game::Faction.where(game_system_id: @tournament.game_system_id).order(:name).to_a,
+                   error_flags: error_flags } %>
 
 				<div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem;">
 					<%= link_to t('layouts.shared.cancel'), "#", data: { action: "click->modal#close" }, class: "btn" %>

@@ -29,3 +29,6 @@ application.register("elo-chart", EloChartController)
 
 import StatsController from "controllers/stats_controller"
 application.register("stats", StatsController)
+
+import FormErrorsController from "controllers/form_errors_controller"
+application.register("form-errors", FormErrorsController)

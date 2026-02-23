@@ -45,7 +45,7 @@ module Tournament
           @game = Game::Event.new
           set_preselection_flags
           @game.game_participations.build while @game.game_participations.size < 2
-          return render :new, status: :unprocessable_content
+          return render :new, formats: :html, status: :unprocessable_content
         end
       end
 
@@ -89,7 +89,7 @@ module Tournament
       else
         @game = game
         respond_to do |format|
-          format.turbo_stream { render :new, status: :unprocessable_content }
+          format.turbo_stream { render :new, formats: :html, status: :unprocessable_content }
           format.html { render :new, status: :unprocessable_content }
         end
       end
@@ -124,7 +124,9 @@ module Tournament
                     errs = result.event&.errors
                     errs&.full_messages&.to_sentence
                   end
-        flash.now[:alert] = message
+        @eligible_users = ::Tournament::SwapPairing.eligible_users_for(@tournament, @match)
+        @match_error_message = message
+        @match_error_flags = match_report_error_flags(result)
         return render :show, status: :unprocessable_content
       end
 
@@ -226,6 +228,18 @@ module Tournament
       # Only participants (registered) or organizer can add
       participant_ids = @tournament.registrations.pluck(:user_id)
       (@tournament.creator_id == Current.user.id) || participant_ids.include?(Current.user.id)
+    end
+
+    def match_report_error_flags(result)
+      return { scores: true } if %i[scores_missing draw_not_allowed].include?(result.error)
+
+      event_errors = result.event&.errors
+      return { scores: true } if event_errors.blank?
+
+      attrs = event_errors.attribute_names.map(&:to_sym)
+      {
+        scores: attrs.include?(:base) || attrs.include?(:players) || attrs.any? { |attr| attr.to_s.include?('score') }
+      }
     end
 
     # View helper moved to ApplicationHelper#svg_match_list_item
