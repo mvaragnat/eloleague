@@ -19,7 +19,9 @@ module Game
             name: s.name,
             is_default: s.is_default,
             summary: s.summary,
-            description_html: s.description.to_s
+            description_html: s.description.to_s,
+            max_score_per_player: s.max_score_per_player,
+            fix_total_score: s.fix_total_score
           }
         end
     end
@@ -31,7 +33,9 @@ module Game
         name: s.name,
         is_default: s.is_default,
         summary: s.summary,
-        description_html: s.description.to_s
+        description_html: s.description.to_s,
+        max_score_per_player: s.max_score_per_player,
+        fix_total_score: s.fix_total_score
       }
     end
   end

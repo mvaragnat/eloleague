@@ -45,7 +45,7 @@ module Tournament
           @game = Game::Event.new
           set_preselection_flags
           @game.game_participations.build while @game.game_participations.size < 2
-          return render :new, formats: :html, status: :unprocessable_content
+          return render :new, formats: :html, layout: false, status: :unprocessable_content
         end
       end
 
@@ -89,7 +89,7 @@ module Tournament
       else
         @game = game
         respond_to do |format|
-          format.turbo_stream { render :new, formats: :html, status: :unprocessable_content }
+          format.turbo_stream { render :new, formats: :html, layout: false, status: :unprocessable_content }
           format.html { render :new, status: :unprocessable_content }
         end
       end

@@ -5,7 +5,8 @@ export default class extends Controller {
 
   connect() {
     if (!this.hasSummaryTarget) return
-    if (this.summaryTarget.classList.contains("hidden")) return
+    if (this.summaryTarget.style.display === "none") return
+    if (!this.summaryTarget.textContent.trim()) return
     this.focusFirstInvalidField()
   }
 
