@@ -41,7 +41,7 @@ class TournamentMatchesScoringValidationTest < ActionDispatch::IntegrationTest
     chess = game_systems(:chess)
     scoring = game_scoring_systems(:chess_constrained)
     white = game_factions(:chess_white)
-    black = game_factions(:chess_black)
+    black = Game::Faction.find_or_create_by!(game_system: chess, name: 'Black')
 
     tournament = Tournament::Tournament.create!(
       name: 'Swiss T',
@@ -58,7 +58,7 @@ class TournamentMatchesScoringValidationTest < ActionDispatch::IntegrationTest
     Tournament::Registration.create!(tournament: tournament, user: users(:player_two), status: :checked_in,
                                      faction: black)
     round = Tournament::Round.create!(tournament: tournament, number: 1, state: :pending)
-    match = Tournament::Match.create!(tournament: tournament, tournament_round: round, a_user: users(:player_one),
+    match = Tournament::Match.create!(tournament: tournament, round: round, a_user: users(:player_one),
                                       b_user: users(:player_two), result: :pending)
 
     patch tournament_tournament_match_path(locale: 'en', tournament_id: tournament.to_param, id: match.id), params: {

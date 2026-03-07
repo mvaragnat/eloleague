@@ -4,10 +4,7 @@
 			<h2><%= t('tournaments.show.matches', default: 'Matches') %> — <%= @tournament.name %></h2>
 
       <% error_flags = game_event_error_flags(@game) %>
-			<%= form_with(model: @game, url: tournament_tournament_matches_path(@tournament), scope: :game_event, data: { controller: "game-form form-errors", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true }) do |form| %>
-				<div data-game-form-target="error" data-form-errors-target="summary" role="alert" class="<%= @game&.errors&.any? ? 'form-error-summary' : 'form-error-summary hidden' %>" style="color:#dc2626;font-size:0.875rem;">
-          <%= @game&.errors&.full_messages&.to_sentence %>
-        </div>
+			<%= form_with(model: @game, url: tournament_tournament_matches_path(@tournament), scope: :game_event, data: { controller: "game-form form-errors", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_two_players_value: true, game_form_exactly_two_players_message_value: t('games.errors.exactly_two_players'), game_form_both_scores_required_message_value: t('games.errors.both_scores_required'), game_form_both_factions_required_message_value: t('games.errors.both_factions_required'), game_form_score_exceeds_max_message_value: t('games.errors.score_exceeds_max', max: '%{max}'), game_form_total_must_equal_message_value: t('games.errors.total_must_equal', total: '%{total}'), game_form_scoring_max_value: @tournament.scoring_system&.max_score_per_player, game_form_scoring_total_value: @tournament.scoring_system&.fix_total_score }) do |form| %>
 
 				<!-- Hidden system select to trigger faction loading -->
 				<select name="game_event[game_system_id]" style="display:none;">
@@ -30,6 +27,9 @@
               <% end %>
             <% end %>
           </div>
+        </div>
+				<div data-game-form-target="error" data-form-errors-target="summary" role="alert" class="form-error-summary" style="<%= @game&.errors&.any? ? '' : 'display:none;' %> color:#dc2626;font-size:0.875rem; margin-bottom:0.75rem;">
+          <%= @game&.errors&.full_messages&.to_sentence %>
         </div>
 
 				<% show_secondary = (@tournament.open? || @tournament.swiss?) && [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>

@@ -2,7 +2,18 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["error", "scores"]
-  static values = { factionsUrl: String, scoringSystemsUrl: String, twoPlayers: Boolean }
+  static values = {
+    factionsUrl: String,
+    scoringSystemsUrl: String,
+    twoPlayers: Boolean,
+    exactlyTwoPlayersMessage: String,
+    bothScoresRequiredMessage: String,
+    bothFactionsRequiredMessage: String,
+    scoreExceedsMaxMessage: String,
+    totalMustEqualMessage: String,
+    scoringMax: Number,
+    scoringTotal: Number
+  }
 
   connect() {
     const systemSelect = this.element.querySelector('select[name="game_event[game_system_id]"]')
@@ -31,7 +42,7 @@ export default class extends Controller {
       if (!allHaveOne) {
         event.preventDefault()
         this.showError(
-          window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players',
+          this.exactlyTwoPlayersErrorMessage(),
           '.participation-block [data-player-search-target="input"]'
         )
         return
@@ -41,7 +52,7 @@ export default class extends Controller {
       if (selectionsPerBlock[0] !== 1) {
         event.preventDefault()
         this.showError(
-          window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players',
+          this.exactlyTwoPlayersErrorMessage(),
           '.participation-block [data-player-search-target="input"]'
         )
         return
@@ -54,9 +65,14 @@ export default class extends Controller {
     if (!allScoresPresent) {
       event.preventDefault()
       this.showError(
-        window.I18n?.t('games.errors.both_scores_required') || 'Both scores are required',
+        this.bothScoresRequiredErrorMessage(),
         'input[name^="game_event[game_participations_attributes]"][name$="[score]"]'
       )
+      return
+    }
+
+    if (!this.validateScoringConstraints(scoreInputs)) {
+      event.preventDefault()
       return
     }
 
@@ -66,7 +82,7 @@ export default class extends Controller {
     if (!allUsersPresent) {
       event.preventDefault()
       this.showError(
-        window.I18n?.t('games.errors.exactly_two_players') || 'Select exactly two players',
+        this.exactlyTwoPlayersErrorMessage(),
         '.participation-block [data-player-search-target="input"]'
       )
       return
@@ -78,7 +94,7 @@ export default class extends Controller {
     if (!allFactionsPresent) {
       event.preventDefault()
       this.showError(
-        window.I18n?.t('games.errors.both_factions_required') || 'Both players must select a faction',
+        this.bothFactionsRequiredErrorMessage(),
         'select[name^="game_event[game_participations_attributes]"][name$="[faction_id]"]'
       )
       return
@@ -174,10 +190,14 @@ export default class extends Controller {
       // Single: set hidden value and show info
       wrapper.style.display = 'none'
       select.innerHTML = `<option value="${list[0].id}" selected="selected">${list[0].name}</option>`
+      this.syncScoringConstraintsFrom(list[0])
       info.innerHTML = this.renderScoringInfo(list[0])
       if (!list[0].description_html) {
         this._loadScoringSystemDetails(list[0].id).then(item => {
-          if (item) info.innerHTML = this.renderScoringInfo(item)
+          if (item) {
+            this.syncScoringConstraintsFrom(item)
+            info.innerHTML = this.renderScoringInfo(item)
+          }
         }).catch(() => {})
       }
       return
@@ -197,15 +217,20 @@ export default class extends Controller {
       select.appendChild(opt)
     })
     // Update info
+    this.syncScoringConstraintsFrom(selected || list[0])
     info.innerHTML = this.renderScoringInfo(selected || list[0])
     // Bind change
     select.addEventListener('change', () => {
       const id = select.value
       const chosen = list.find(s => String(s.id) === String(id)) || null
+      this.syncScoringConstraintsFrom(chosen)
       info.innerHTML = chosen ? this.renderScoringInfo(chosen) : ''
       if (chosen && !chosen.description_html) {
         this._loadScoringSystemDetails(chosen.id).then(item => {
-          if (item) info.innerHTML = this.renderScoringInfo(item)
+          if (item) {
+            this.syncScoringConstraintsFrom(item)
+            info.innerHTML = this.renderScoringInfo(item)
+          }
         }).catch(() => {})
       }
     })
@@ -244,7 +269,7 @@ export default class extends Controller {
   showError(message, selector = null) {
     if (!this.hasErrorTarget) return
     this.errorTarget.textContent = message
-    this.errorTarget.classList.remove('hidden')
+    this.errorTarget.style.display = ''
     if (selector) {
       const fields = Array.from(this.element.querySelectorAll(selector))
       fields.forEach(field => this.markFieldError(field))
@@ -255,7 +280,7 @@ export default class extends Controller {
   hideError() {
     if (!this.hasErrorTarget) return
     this.errorTarget.textContent = ''
-    this.errorTarget.classList.add('hidden')
+    this.errorTarget.style.display = 'none'
     this.clearFieldErrors()
   }
 
@@ -286,6 +311,78 @@ export default class extends Controller {
     fields.forEach(field => {
       field.dataset.clientError = 'true'
     })
+  }
+
+  exactlyTwoPlayersErrorMessage() {
+    return this.hasExactlyTwoPlayersMessageValue ? this.exactlyTwoPlayersMessageValue : 'Select exactly two players'
+  }
+
+  bothScoresRequiredErrorMessage() {
+    return this.hasBothScoresRequiredMessageValue ? this.bothScoresRequiredMessageValue : 'Both scores are required'
+  }
+
+  bothFactionsRequiredErrorMessage() {
+    return this.hasBothFactionsRequiredMessageValue ? this.bothFactionsRequiredMessageValue : 'Both players must select a faction'
+  }
+
+  scoreExceedsMaxErrorMessage(max) {
+    const template = this.hasScoreExceedsMaxMessageValue ? this.scoreExceedsMaxMessageValue : 'Each score must be between 0 and %{max}'
+    return template.replace('%{max}', String(max))
+  }
+
+  totalMustEqualErrorMessage(total) {
+    const template = this.hasTotalMustEqualMessageValue ? this.totalMustEqualMessageValue : 'Total of both scores must equal %{total}'
+    return template.replace('%{total}', String(total))
+  }
+
+  syncScoringConstraintsFrom(item) {
+    if (!item) {
+      this.scoringMaxValue = undefined
+      this.scoringTotalValue = undefined
+      return
+    }
+
+    const max = item.max_score_per_player
+    const total = item.fix_total_score
+    this.scoringMaxValue = max == null ? null : Number(max)
+    this.scoringTotalValue = total == null ? null : Number(total)
+  }
+
+  validateScoringConstraints(scoreInputs) {
+    if (!scoreInputs || scoreInputs.length < 2) return true
+
+    const values = Array.from(scoreInputs).slice(0, 2).map(input => Number(input.value))
+    if (values.some(value => Number.isNaN(value))) {
+      this.showError(
+        this.bothScoresRequiredErrorMessage(),
+        'input[name^="game_event[game_participations_attributes]"][name$="[score]"]'
+      )
+      return false
+    }
+
+    if (this.hasScoringMaxValue && Number.isFinite(this.scoringMaxValue)) {
+      const max = this.scoringMaxValue
+      if (values.some(value => value < 0 || value > max)) {
+        this.showError(
+          this.scoreExceedsMaxErrorMessage(max),
+          'input[name^="game_event[game_participations_attributes]"][name$="[score]"]'
+        )
+        return false
+      }
+    }
+
+    if (this.hasScoringTotalValue && Number.isFinite(this.scoringTotalValue)) {
+      const total = this.scoringTotalValue
+      if ((values[0] + values[1]) !== total) {
+        this.showError(
+          this.totalMustEqualErrorMessage(total),
+          'input[name^="game_event[game_participations_attributes]"][name$="[score]"]'
+        )
+        return false
+      }
+    }
+
+    return true
   }
 
   // Update player name headings based on selected players
