@@ -53,8 +53,10 @@ class TournamentMatchesScoringValidationTest < ActionDispatch::IntegrationTest
       score_for_bye: 0,
       scoring_system: scoring
     )
-    Tournament::Registration.create!(tournament: tournament, user: users(:player_one), status: :checked_in, faction: white)
-    Tournament::Registration.create!(tournament: tournament, user: users(:player_two), status: :checked_in, faction: black)
+    Tournament::Registration.create!(tournament: tournament, user: users(:player_one), status: :checked_in,
+                                     faction: white)
+    Tournament::Registration.create!(tournament: tournament, user: users(:player_two), status: :checked_in,
+                                     faction: black)
     round = Tournament::Round.create!(tournament: tournament, number: 1, state: :pending)
     match = Tournament::Match.create!(tournament: tournament, tournament_round: round, a_user: users(:player_one),
                                       b_user: users(:player_two), result: :pending)

@@ -44,6 +44,7 @@ Rails.application.routes.draw do
         post :register
         delete :unregister
         post :check_in
+        post :open_registration
         post :lock_registration
         post :next_round
         post :finalize

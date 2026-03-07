@@ -25,6 +25,7 @@ class EloIntegrationTest < ActionDispatch::IntegrationTest
     }
     assert_response :redirect
     t = ::Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Creator registers and checks in
     post register_tournament_path(t, locale: I18n.locale)

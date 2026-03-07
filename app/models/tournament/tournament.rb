@@ -47,6 +47,10 @@ module Tournament
     scope :non_competitive, -> { where(non_competitive: true) }
 
     def registrations_open?
+      registration?
+    end
+
+    def lockable?
       state.in?(%w[draft registration])
     end
 

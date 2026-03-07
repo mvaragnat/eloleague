@@ -3,8 +3,9 @@
 class TournamentsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
   before_action :set_tournament,
-                only: %i[show register unregister check_in lock_registration finalize next_round update]
-  before_action :authorize_admin!, only: %i[lock_registration finalize next_round update]
+                only: %i[show register unregister check_in open_registration lock_registration finalize next_round
+                         update]
+  before_action :authorize_admin!, only: %i[open_registration lock_registration finalize next_round update]
 
   def index
     # Populate Current.session/user even when authentication is not required
@@ -13,7 +14,7 @@ class TournamentsController < ApplicationController
 
     scope = ::Tournament::Tournament.includes(:game_system, :creator).order(created_at: :desc)
     @my_tournaments = Current.user ? scope.where(creator: Current.user) : scope.none
-    @accepting_tournaments = scope.where(state: %w[draft registration])
+    @accepting_tournaments = scope.where(state: 'registration')
     @ongoing_tournaments = scope.where(state: 'running')
     @closed_tournaments = scope.where(state: 'completed')
   end
@@ -134,8 +135,21 @@ class TournamentsController < ApplicationController
   end
 
   # Admin
+  def open_registration
+    unless @tournament.draft?
+      return redirect_back(
+        fallback_location: tournament_path(@tournament),
+        alert: t('tournaments.not_allowed_state', default: 'Not allowed in current state')
+      )
+    end
+
+    @tournament.update!(state: 'registration')
+    redirect_to tournament_path(@tournament),
+                notice: t('tournaments.registration_opened', default: 'Registration is now open')
+  end
+
   def lock_registration
-    unless can_register?
+    unless @tournament.lockable?
       return redirect_back(
         fallback_location: tournament_path(@tournament),
         alert: t('tournaments.not_allowed_state', default: 'Not allowed in current state')
@@ -289,7 +303,7 @@ class TournamentsController < ApplicationController
   end
 
   def can_register?
-    @tournament.state.in?(%w[draft registration])
+    @tournament.registration?
   end
 
   # Returns rows with primary, points and tiebreak columns and labels

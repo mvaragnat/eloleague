@@ -4,7 +4,11 @@
       <%= t('tournaments.show.admin.actions', default: 'Actions') %>
     </h3>
     <div class="card-body" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-      <% if tournament.registrations_open? %>
+      <% if tournament.draft? %>
+        <%= button_to t('tournaments.show.open_registration'), open_registration_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
+        <span class="card-date" style="font-style:normal;"><%= t('tournaments.show.lock_warning') %></span>
+        <%= button_to t('tournaments.show.lock_registration'), lock_registration_tournament_path(tournament), method: :post, class: 'btn' %>
+      <% elsif tournament.registration? %>
         <span class="card-date" style="font-style:normal;"><%= t('tournaments.show.lock_warning') %></span>
         <%= button_to t('tournaments.show.lock_registration'), lock_registration_tournament_path(tournament), method: :post, class: 'btn' %>
       <% end %>

@@ -14,6 +14,7 @@ module Tournament
         tournament: { name: 'ArmyView', description: 'T', game_system_id: @system.id, format: 'open' }
       }
       @t = ::Tournament::Tournament.order(:created_at).last
+      @t.update!(state: 'registration')
 
       # Register creator and p2
       post register_tournament_path(@t, locale: I18n.locale)

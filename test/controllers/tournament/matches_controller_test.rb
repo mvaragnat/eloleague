@@ -12,6 +12,7 @@ class TournamentMatchesControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Open M', description: 'S', game_system_id: @system.id, format: 'open' }
     }
     @tournament = Tournament::Tournament.order(:created_at).last
+    @tournament.update!(state: 'registration')
     post register_tournament_path(@tournament, locale: I18n.locale)
     f1 = Game::Faction.find_or_create_by!(game_system: @system, name: 'White')
     @tournament.registrations.find_by(user: @user).update!(faction: f1)
@@ -71,6 +72,7 @@ class TournamentMatchesControllerTest < ActionDispatch::IntegrationTest
     # Swiss tournament with 4 players
     sign_out @tournament.creator
     sign_in @tournament.creator
+    @tournament.reload
     @tournament.update!(format: 'swiss', rounds_count: 2, state: 'registration')
 
     # Ensure two more players and register+check-in them
@@ -172,6 +174,7 @@ module Tournament
         tournament: { name: 'KO', description: 'Tree', game_system_id: @system.id, format: 'elimination' }
       }
       t = ::Tournament::Tournament.order(:created_at).last
+      t.update!(state: 'registration')
 
       # Register and check in all three players
       post register_tournament_path(t, locale: I18n.locale)
@@ -229,6 +232,7 @@ module Tournament
         tournament: { name: 'KO Edit', description: 'Tree', game_system_id: @system.id, format: 'elimination' }
       }
       t = ::Tournament::Tournament.order(:created_at).last
+      t.update!(state: 'registration')
 
       [@creator, @p2, @p3, User.create!(username: 'p4', email: 'p4@example.com', password: 'password')].each do |u|
         sign_out @creator
@@ -324,6 +328,7 @@ module Tournament
         tournament: { name: 'Swiss', description: 'S', game_system_id: @system.id, format: 'swiss' }
       }
       t = ::Tournament::Tournament.order(:created_at).last
+      t.update!(state: 'registration')
 
       # Register + check-in creator
       post register_tournament_path(t, locale: I18n.locale)
@@ -383,6 +388,7 @@ module Tournament
         tournament: { name: 'KO', description: 'Tree', game_system_id: @system.id, format: 'elimination' }
       }
       t = ::Tournament::Tournament.order(:created_at).last
+      t.update!(state: 'registration')
 
       # creator
       post register_tournament_path(t, locale: I18n.locale)
