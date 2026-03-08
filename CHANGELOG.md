@@ -1,3 +1,11 @@
+## 2026-03-07
+
+- Feature — Split draft and registration tournament states:
+  - Draft tournaments are only visible in the "My tournaments" tab and display as "Draft" / "Brouillon". Visitors can view the page via direct link but cannot register.
+  - Registration tournaments are visible in the "Accepting signups" tab and display as "Accepting Registration" / "Inscriptions ouvertes". Players can register.
+  - Added "Open Registration" admin action to transition from draft to registration.
+  - Lock registration still works from both draft and registration states.
+
 ## 2026-02-18
 
 - Feature — Stats page now shows all rows with reliability warnings and filters:

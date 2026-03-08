@@ -20,6 +20,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
     # Register four players and check in
     players = [users(:player_one), users(:player_two),
                User.create!(username: 'p3', email: 'p3@example.com', password: 'password'),
@@ -64,6 +65,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     t = Tournament::Tournament.order(:created_at).last
 
     # Register 4 players and check in
+    t.update!(state: 'registration')
     u3 = User.create!(username: 'e3', email: 'e3@example.com', password: 'password')
     u4 = User.create!(username: 'e4', email: 'e4@example.com', password: 'password')
     [users(:player_one), users(:player_two), u3, u4].each do |u|
@@ -232,6 +234,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
          params: { tournament: { name: 'X', description: 'Y', game_system_id: game_systems(:chess).id,
                                  format: 'open' } }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     post register_tournament_path(t, locale: I18n.locale)
     f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
@@ -249,6 +252,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Faction Check', description: 'X', game_system_id: game_systems(:chess).id, format: 'open' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Register (no faction yet)
     post register_tournament_path(t, locale: I18n.locale)
@@ -280,6 +284,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
            }
          }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     post register_tournament_path(t, locale: I18n.locale)
     f = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
@@ -332,6 +337,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'KO', description: 'Tree', game_system_id: game_systems(:chess).id, format: 'elimination' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Creator registers and checks in
     post register_tournament_path(t, locale: I18n.locale)
@@ -384,7 +390,8 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
   test 'guest clicking register gets redirected to login then back to show' do
     t = ::Tournament::Tournament.create!(
       name: 'Public Cup', description: 'Open to all',
-      game_system: game_systems(:chess), format: 'open', creator: @user
+      game_system: game_systems(:chess), format: 'open', creator: @user,
+      state: 'registration'
     )
 
     # Guest attempts to POST register (simulating clicking the button on the show page)
@@ -413,6 +420,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Register
     post register_tournament_path(t, locale: I18n.locale)
@@ -433,6 +441,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # First user registers OK
     post register_tournament_path(t, locale: I18n.locale)
@@ -461,6 +470,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Register and check in two players
     post register_tournament_path(t, locale: I18n.locale)
@@ -517,6 +527,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
            rounds_count: 1
          } }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
     post register_tournament_path(t, locale: I18n.locale)
     f1 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
     t.registrations.find_by(user: @user).update!(faction: f1)
@@ -557,6 +568,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
            rounds_count: 1
          } }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
     post register_tournament_path(t, locale: I18n.locale)
     f1 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
     t.registrations.find_by(user: @user).update!(faction: f1)
@@ -595,6 +607,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Swiss Repeat', description: 'S', game_system_id: game_systems(:chess).id, format: 'swiss' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Create two additional users
     p3 = User.create!(username: 'player_three', email: 'three@example.com', password: 'password')
@@ -659,6 +672,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Swiss TopFill', description: 'S', game_system_id: game_systems(:chess).id, format: 'swiss' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Create 7 additional users
     extra = (3..8).map do |i|
@@ -737,6 +751,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Swiss Bye', description: 'S', game_system_id: game_systems(:chess).id, format: 'swiss' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     extra = (3..5).map do |i|
       User.create!(username: "bye_user#{i}", email: "bye_user#{i}@example.com", password: 'password')
@@ -805,6 +820,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Swiss Rank', description: 'S', game_system_id: game_systems(:chess).id, format: 'swiss' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Register two users and check in
     [users(:player_one), users(:player_two)].each do |u|
@@ -852,6 +868,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Open TB2', description: 'S', game_system_id: game_systems(:chess).id, format: 'open' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Choose secondary score sum as primary tiebreak
     patch tournament_path(t, locale: I18n.locale),
@@ -895,6 +912,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Open SoS', description: 'S', game_system_id: game_systems(:chess).id, format: 'open' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     patch tournament_path(t, locale: I18n.locale),
           params: { tournament: { tiebreak1_strategy_key: 'sos' } }
@@ -960,6 +978,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Columns', description: 'S', game_system_id: game_systems(:chess).id, format: 'open' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Register two players to ensure standings render
     [users(:player_one), users(:player_two)].each do |u|
@@ -999,6 +1018,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Highlight', description: 'S', game_system_id: game_systems(:chess).id, format: 'open' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Select primary = score_sum, tiebreak1 = sos
     patch tournament_path(t, locale: I18n.locale), params: {
@@ -1077,6 +1097,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       tournament: { name: 'Army View', description: 'X', game_system_id: game_systems(:chess).id, format: 'open' }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Register two users
     post register_tournament_path(t, locale: I18n.locale)
@@ -1133,6 +1154,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Register two users
     post register_tournament_path(t, locale: I18n.locale)
@@ -1171,6 +1193,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
 
     # Set primary to score_sum
     patch tournament_path(t, locale: I18n.locale), params: { tournament: { primary_strategy_key: 'score_sum' } }
@@ -1219,6 +1242,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
       }
     }
     t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
     assert_equal 10, t.score_for_bye
 
     # Register 3 players
@@ -1274,5 +1298,124 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     # Just verify the tournament has the correct score_for_bye value
     assert_equal 10, t.score_for_bye, 'Tournament should have score_for_bye = 10'
+  end
+
+  test 'draft tournaments are hidden from Accepting tab but visible in My tournaments' do
+    sign_in @user
+    draft = ::Tournament::Tournament.create!(
+      name: 'Draft Cup',
+      description: 'Not yet open',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'draft'
+    )
+
+    get tournaments_path(locale: I18n.locale)
+    assert_response :success
+
+    panels = @response.body.split('<div data-tabs-target="panel')
+    assert_operator panels.size, :>=, 5
+
+    assert_not_includes panels[1], draft.name
+    assert_not_includes panels[2], draft.name
+    assert_not_includes panels[3], draft.name
+    assert_includes panels[4], draft.name
+  end
+
+  test 'registration state tournaments appear in Accepting tab' do
+    sign_in @user
+    reg_tournament = ::Tournament::Tournament.create!(
+      name: 'Open Cup',
+      description: 'Come join',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+
+    get tournaments_path(locale: I18n.locale)
+    assert_response :success
+
+    panels = @response.body.split('<div data-tabs-target="panel')
+    assert_includes panels[1], reg_tournament.name
+  end
+
+  test 'registration is blocked in draft state' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Draft Block', description: 'X', game_system_id: game_systems(:chess).id, format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    assert_equal 'draft', t.state
+
+    post register_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+    assert_equal 0, t.registrations.count
+  end
+
+  test 'open_registration transitions draft to registration' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Open Me', description: 'X', game_system_id: game_systems(:chess).id, format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    assert_equal 'draft', t.state
+
+    post open_registration_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+    assert_equal 'registration', t.reload.state
+  end
+
+  test 'open_registration is blocked for non-draft tournaments' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Already Open', description: 'X',
+      game_system: game_systems(:chess), format: 'open', creator: @user,
+      state: 'registration'
+    )
+
+    post open_registration_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+    assert_equal 'registration', t.reload.state
+  end
+
+  test 'lock_registration works from draft state' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Draft Lock', description: 'X', game_system_id: game_systems(:chess).id, format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    assert_equal 'draft', t.state
+
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+    assert_equal 'running', t.reload.state
+  end
+
+  test 'guests can see draft tournament page via direct link but cannot register' do
+    t = ::Tournament::Tournament.create!(
+      name: 'Secret Draft', description: 'Preview only',
+      game_system: game_systems(:chess), format: 'open', creator: @user,
+      state: 'draft'
+    )
+
+    get tournament_path(t, locale: I18n.locale)
+    assert_response :success
+    assert_includes @response.body, 'Secret Draft'
+    assert_not_includes @response.body, I18n.t('tournaments.show.register')
+  end
+
+  test 'non-creator cannot register for draft tournament even with direct link' do
+    t = ::Tournament::Tournament.create!(
+      name: 'Draft No Reg', description: 'X',
+      game_system: game_systems(:chess), format: 'open', creator: @user,
+      state: 'draft'
+    )
+
+    sign_in users(:player_two)
+    post register_tournament_path(t, locale: I18n.locale)
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+    assert_equal 0, t.registrations.count
   end
 end

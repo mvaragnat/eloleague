@@ -45,6 +45,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 ### Tournament Domain
 - `Tournament::Tournament`
   - Root entity for a competition. Attributes: `name`, `description`, `creator_id`, `game_system_id`, `format` (open|swiss|elimination), `rounds_count` (for Swiss), `starts_at`, `ends_at`, `state` (draft|registration|running|completed|cancelled), `settings`, `slug`.
+  - **Draft vs Registration states**: A newly created tournament starts in `draft` state. Draft tournaments are only visible in the creator's "My tournaments" tab and cannot accept player registrations. Visitors can view a draft tournament via direct link but cannot register. The organizer transitions to `registration` via the "Open Registration" admin action, which makes the tournament visible in the public "Accepting signups" tab and allows players to register. Lock registration works from both draft (skipping registration) and registration states.
   - Associations: `has_many :registrations` (participants), `has_many :rounds`, `has_many :matches`.
   - New optional fields: `location` (string) and `online` (boolean, default false). If `online` is true, the address field is hidden and the Overview tab shows an "Online tournament" badge. When `location` is present and `online` is false, the Overview tab displays the address and a small Google Maps embed.
   - New optional `max_players` (integer). When set, registrations are blocked once the number of registrations reaches this cap; UI shows a "Tournament is full" message and the register button is hidden.
