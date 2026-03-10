@@ -62,7 +62,7 @@ export default class extends Controller {
 
   showFlash(message, type) {
     const container = document.createElement("div")
-    container.className = "flash-container"
+    container.className = "flash-toast"
 
     const flash = document.createElement("div")
     flash.className = `flash ${type === "alert" ? "flash--alert" : "flash--notice"}`
@@ -79,11 +79,13 @@ export default class extends Controller {
     flash.appendChild(span)
     container.appendChild(flash)
 
-    const main = document.querySelector("main")
-    if (main) {
-      main.insertBefore(container, main.firstChild)
-      setTimeout(() => container.remove(), 2500)
-    }
+    document.body.appendChild(container)
+    requestAnimationFrame(() => container.classList.add("flash-toast--visible"))
+    setTimeout(() => {
+      container.classList.remove("flash-toast--visible")
+      container.addEventListener("transitionend", () => container.remove(), { once: true })
+      setTimeout(() => container.remove(), 500)
+    }, 2500)
   }
 
   csrfToken() {
