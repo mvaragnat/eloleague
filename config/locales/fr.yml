@@ -247,6 +247,18 @@ fr:
       type: "Tournoi"
       settings: "Paramètres"
       online_label: "Tournoi en ligne"
+    email_players:
+      title: "Envoyer un email aux joueurs"
+      description: "Envoyer un message à tous les joueurs inscrits. Votre email (%{organizer_email}) sera indiqué dans l'email pour que les joueurs puissent vous répondre directement."
+      subject: "Objet"
+      subject_placeholder: "Saisissez l'objet"
+      body: "Message"
+      body_placeholder: "Rédigez votre message ici..."
+      submit: "Envoyer à tous les joueurs"
+      sent:
+        one: "1 email envoyé"
+        other: "%{count} emails envoyés"
+      blank_fields: "L'objet et le message ne peuvent pas être vides"
     registration_opened: "Les inscriptions sont maintenant ouvertes"
     full: "Le tournoi est complet"
     state:
@@ -329,6 +341,11 @@ fr:
       insufficient_games: "Nombre de matchs insuffisant"
       player_match_share: "Un joueur représente plus de %{percent}% des matchs"
   mailers:
+    tournament_organizer:
+      message_players:
+        subject: "[%{tournament}] %{subject}"
+        from_organizer_html: "Message de l'organisateur de <strong>%{tournament}</strong>, %{organizer} :"
+        reply_to_html: "Pour répondre, envoyez un email à %{email}"
     user_notifications:
       hello: "Bonjour %{username}"
       problem_html: "Si quelque chose semble incorrect, contactez Marquis via le <a href=\"%{contact_url}\">formulaire de contact</a>."

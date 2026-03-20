@@ -31,6 +31,46 @@
 
 
 
+  <div class="card" style="margin-bottom:0.5rem;">
+    <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
+      <%= t('tournaments.email_players.title', default: 'Email players') %>
+    </h3>
+    <div class="card-body">
+      <p class="card-date" style="font-style:normal; margin-bottom:0.5rem;">
+        <%= t('tournaments.email_players.description',
+              organizer_email: tournament.creator.email,
+              default: 'Send a message to all registered players. Your email (%{organizer_email}) will be shown in the email so players can reply directly.') %>
+      </p>
+      <%= form_with url: email_players_tournament_path(tournament), method: :post do |f| %>
+        <div style="display:grid; gap:0.5rem;">
+          <div>
+            <label for="email_subject" class="card-date" style="font-style:normal; font-weight:600;">
+              <%= t('tournaments.email_players.subject', default: 'Subject') %>
+            </label>
+            <input type="text"
+                   id="email_subject"
+                   name="email_subject"
+                   style="width:100%;"
+                   placeholder="<%= t('tournaments.email_players.subject_placeholder', default: 'Enter subject') %>" />
+          </div>
+          <div>
+            <label for="email_body" class="card-date" style="font-style:normal; font-weight:600;">
+              <%= t('tournaments.email_players.body', default: 'Message') %>
+            </label>
+            <textarea id="email_body"
+                      name="email_body"
+                      rows="5"
+                      style="width:100%;"
+                      placeholder="<%= t('tournaments.email_players.body_placeholder', default: 'Write your message here...') %>"></textarea>
+          </div>
+          <div>
+            <%= f.submit t('tournaments.email_players.submit', default: 'Send to all players'), class: 'btn btn-primary' %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
   <div style="flex-basis:100%; height:1px;"></div>
   <div style="width:100%;">
     <div class="card" style="margin-bottom:0.5rem;">

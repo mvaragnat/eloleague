@@ -1,0 +1,18 @@
+<p><%= t('mailers.user_notifications.hello', username: @user.username) %>,</p>
+
+<p><%= t('mailers.tournament_organizer.message_players.from_organizer_html',
+         organizer: @organizer.username,
+         tournament: @tournament.name) %></p>
+
+<div style="border-left: 3px solid #ccc; padding: 0.5rem 1rem; margin: 1rem 0;">
+  <%= simple_format(h(@body)) %>
+</div>
+
+<p>
+  <%= t('mailers.tournament_organizer.message_players.reply_to_html',
+        email: @organizer.email) %>
+</p>
+
+<p>
+  <a href="<%= @tournament_url %>"><%= @tournament.name %></a>
+</p>
