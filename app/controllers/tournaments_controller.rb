@@ -4,8 +4,9 @@ class TournamentsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
   before_action :set_tournament,
                 only: %i[show register unregister check_in open_registration lock_registration finalize next_round
-                         update]
-  before_action :authorize_admin!, only: %i[open_registration lock_registration finalize next_round update]
+                         update email_players]
+  before_action :authorize_admin!,
+                only: %i[open_registration lock_registration finalize next_round update email_players]
 
   def index
     # Populate Current.session/user even when authentication is not required
@@ -216,6 +217,32 @@ class TournamentsController < ApplicationController
 
     redirect_to tournament_path(@tournament, tab: 1, round_tab: @tournament.rounds.count - 1),
                 notice: t('tournaments.round_advanced', default: 'Moved to next round')
+  end
+
+  def email_players
+    subject = params[:email_subject].to_s.strip
+    body = params[:email_body].to_s.strip
+    admin_tab_index = @tournament.elimination? ? 3 : 4
+
+    if subject.blank? || body.blank?
+      return redirect_to tournament_path(@tournament, tab: admin_tab_index),
+                         alert: t('.blank_fields', default: 'Subject and message cannot be blank')
+    end
+
+    recipients = @tournament.registrations.includes(:user).map(&:user).uniq
+    recipients.each do |user|
+      TournamentOrganizerMailer.with(
+        tournament: @tournament,
+        user: user,
+        subject: subject,
+        body: body
+      ).message_players.deliver_later
+    end
+
+    redirect_to tournament_path(@tournament, tab: admin_tab_index),
+                notice: t('.sent',
+                          count: recipients.size,
+                          default: { one: '1 email sent', other: '%<count>s emails sent' })
   end
 
   def finalize

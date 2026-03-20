@@ -1418,4 +1418,102 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to tournament_path(t, locale: I18n.locale)
     assert_equal 0, t.registrations.count
   end
+
+  test 'organizer can send email to all registered players' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Cup',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+    player = users(:player_two)
+    t.registrations.create!(user: player)
+
+    assert_enqueued_emails 1 do
+      post email_players_tournament_path(t, locale: I18n.locale),
+           params: { email_subject: 'Important news', email_body: 'Please check the schedule.' }
+    end
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
+  end
+
+  test 'email_players enqueues one email per registered player' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Cup Multi',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+    t.registrations.create!(user: users(:player_two))
+
+    assert_enqueued_emails 1 do
+      post email_players_tournament_path(t, locale: I18n.locale),
+           params: { email_subject: 'Hello', email_body: 'See you soon!' }
+    end
+  end
+
+  test 'email_players is blocked for non-organizer' do
+    sign_in users(:player_two)
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Cup Guard',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+
+    assert_no_enqueued_emails do
+      post email_players_tournament_path(t, locale: I18n.locale),
+           params: { email_subject: 'Hello', email_body: 'Unauthorized attempt' }
+    end
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+  end
+
+  test 'email_players requires subject and body' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Cup Blank',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+    t.registrations.create!(user: users(:player_two))
+
+    assert_no_enqueued_emails do
+      post email_players_tournament_path(t, locale: I18n.locale),
+           params: { email_subject: '', email_body: 'Some content' }
+    end
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
+  end
+
+  test 'email_players for elimination tournament redirects to tab 3' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Elim',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'elimination',
+      creator: @user,
+      state: 'registration'
+    )
+    t.registrations.create!(user: users(:player_two))
+
+    assert_enqueued_emails 1 do
+      post email_players_tournament_path(t, locale: I18n.locale),
+           params: { email_subject: 'Bracket info', email_body: 'Check the bracket.' }
+    end
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 3)
+  end
 end

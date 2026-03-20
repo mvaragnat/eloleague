@@ -48,6 +48,7 @@ Rails.application.routes.draw do
         post :lock_registration
         post :next_round
         post :finalize
+        post :email_players
       end
 
       namespace :tournament do
