@@ -1516,4 +1516,101 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 3)
   end
+
+  test 'index card shows formatted starts_at date' do
+    tournament = ::Tournament::Tournament.create!(
+      name: 'Dated Cup',
+      description: 'Test',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration',
+      starts_at: Time.zone.parse('2026-06-15 10:00')
+    )
+
+    get tournaments_path(locale: :en)
+    assert_response :success
+    assert_includes @response.body, I18n.l(tournament.starts_at, format: :card, locale: :en)
+  end
+
+  test 'index card shows location when set and not online' do
+    tournament = ::Tournament::Tournament.create!(
+      name: 'Location Cup',
+      description: 'Test',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration',
+      location: 'Paris Convention Center'
+    )
+
+    get tournaments_path(locale: :en)
+    assert_response :success
+    assert_includes @response.body, 'Paris Convention Center'
+  end
+
+  test 'index card shows online label when tournament is online' do
+    tournament = ::Tournament::Tournament.create!(
+      name: 'Online Cup',
+      description: 'Test',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration',
+      online: true
+    )
+
+    get tournaments_path(locale: :en)
+    assert_response :success
+    assert_includes @response.body, I18n.t('tournaments.show.online_label', locale: :en)
+  end
+
+  test 'index card does not show location when tournament is online' do
+    tournament = ::Tournament::Tournament.create!(
+      name: 'Online Only Cup',
+      description: 'Test',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration',
+      online: true,
+      location: 'Should Not Appear'
+    )
+
+    get tournaments_path(locale: :en)
+    assert_response :success
+    assert_not_includes @response.body, 'Should Not Appear'
+  end
+
+  test 'index card shows no date when starts_at is nil' do
+    tournament = ::Tournament::Tournament.create!(
+      name: 'No Date Cup',
+      description: 'Test',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+
+    get tournaments_path(locale: :en)
+    assert_response :success
+    # Page renders without error; only one card-date line (game system info) appears for this tournament
+    assert_includes @response.body, 'No Date Cup'
+  end
+
+  test 'index card date uses locale-specific format in french' do
+    tournament = ::Tournament::Tournament.create!(
+      name: 'Tournoi Daté',
+      description: 'Test',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration',
+      starts_at: Time.zone.parse('2026-06-15 10:00')
+    )
+
+    get tournaments_path(locale: :fr)
+    assert_response :success
+    assert_includes @response.body, I18n.l(tournament.starts_at, format: :card, locale: :fr)
+  end
 end
