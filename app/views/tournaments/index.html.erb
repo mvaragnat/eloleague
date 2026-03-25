@@ -17,9 +17,11 @@
         <div class="card-header">
           <h3><%= t.name %></h3>
           <p class="card-date"><%= t.game_system.localized_name %> · <%= t.format %> · <strong><%= t.state_label %></strong></p>
+          <%- card_meta = [(l(t.starts_at, format: :card) if t.starts_at.present?), (t.online ? I18n.t('tournaments.show.online_label') : t.location.presence)].compact %>
+          <% if card_meta.any? %><p class="card-date"><%= card_meta.join(' · ') %></p><% end %>
         </div>
         <div class="card-body">
-          <%= link_to t('tournaments.open'), tournament_path(t), class: 'btn' %>
+          <%= link_to I18n.t('tournaments.open'), tournament_path(t), class: 'btn' %>
         </div>
       </div>
     <% end %>
@@ -31,9 +33,11 @@
         <div class="card-header">
           <h3><%= t.name %></h3>
           <p class="card-date"><%= t.game_system.localized_name %> · <%= t.format %> · <strong><%= t.state_label %></strong></p>
+          <%- card_meta = [(l(t.starts_at, format: :card) if t.starts_at.present?), (t.online ? I18n.t('tournaments.show.online_label') : t.location.presence)].compact %>
+          <% if card_meta.any? %><p class="card-date"><%= card_meta.join(' · ') %></p><% end %>
         </div>
         <div class="card-body">
-          <%= link_to t('tournaments.open'), tournament_path(t), class: 'btn' %>
+          <%= link_to I18n.t('tournaments.open'), tournament_path(t), class: 'btn' %>
         </div>
       </div>
     <% end %>
@@ -45,9 +49,11 @@
         <div class="card-header">
           <h3><%= t.name %></h3>
           <p class="card-date"><%= t.game_system.localized_name %> · <%= t.format %> · <strong><%= t.state_label %></strong></p>
+          <%- card_meta = [(l(t.starts_at, format: :card) if t.starts_at.present?), (t.online ? I18n.t('tournaments.show.online_label') : t.location.presence)].compact %>
+          <% if card_meta.any? %><p class="card-date"><%= card_meta.join(' · ') %></p><% end %>
         </div>
         <div class="card-body">
-          <%= link_to t('tournaments.open'), tournament_path(t), class: 'btn' %>
+          <%= link_to I18n.t('tournaments.open'), tournament_path(t), class: 'btn' %>
         </div>
       </div>
     <% end %>
@@ -59,9 +65,11 @@
         <div class="card-header">
           <h3><%= t.name %></h3>
           <p class="card-date"><%= t.game_system.localized_name %> · <%= t.format %> · <strong><%= t.state_label %></strong></p>
+          <%- card_meta = [(l(t.starts_at, format: :card) if t.starts_at.present?), (t.online ? I18n.t('tournaments.show.online_label') : t.location.presence)].compact %>
+          <% if card_meta.any? %><p class="card-date"><%= card_meta.join(' · ') %></p><% end %>
         </div>
         <div class="card-body">
-          <%= link_to t('tournaments.open'), tournament_path(t), class: 'btn' %>
+          <%= link_to I18n.t('tournaments.open'), tournament_path(t), class: 'btn' %>
         </div>
       </div>
     <% end %>
