@@ -1534,7 +1534,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'index card shows location when set and not online' do
-    tournament = ::Tournament::Tournament.create!(
+    ::Tournament::Tournament.create!(
       name: 'Location Cup',
       description: 'Test',
       game_system: game_systems(:chess),
@@ -1550,7 +1550,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'index card shows online label when tournament is online' do
-    tournament = ::Tournament::Tournament.create!(
+    ::Tournament::Tournament.create!(
       name: 'Online Cup',
       description: 'Test',
       game_system: game_systems(:chess),
@@ -1566,7 +1566,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'index card does not show location when tournament is online' do
-    tournament = ::Tournament::Tournament.create!(
+    ::Tournament::Tournament.create!(
       name: 'Online Only Cup',
       description: 'Test',
       game_system: game_systems(:chess),
@@ -1583,7 +1583,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'index card shows no date when starts_at is nil' do
-    tournament = ::Tournament::Tournament.create!(
+    ::Tournament::Tournament.create!(
       name: 'No Date Cup',
       description: 'Test',
       game_system: game_systems(:chess),
@@ -1594,7 +1594,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     get tournaments_path(locale: :en)
     assert_response :success
-    # Page renders without error; only one card-date line (game system info) appears for this tournament
+    # Page renders without error; no extra card-date line appears for this tournament
     assert_includes @response.body, 'No Date Cup'
   end
 
