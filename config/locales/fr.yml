@@ -65,11 +65,11 @@ fr:
     browse_tournaments: "Parcourir les tournois"
   dashboard:
     welcome_box:
-      description: |
-        Bienvenue sur Eloleague, le site qui garde l'historique de vos parties !
-        Vous pouvez rentrer des parties libres, hors tournoi : cela génère des stats qui permettent ensuite d'équilibrer vos jeux favoris.
-        Vous pouvez créer des tournois ou évènements gratuitement, selon tous les formats : éliminatoires, ronde suisse, ou matchs libres.
-        En participant à des tournois, vous accumulez des points pour un championnat annuel !
+      title: "Bienvenue sur Eloleague 👋"
+      paragraph_1: "Ici, vous gardez l'historique de vos parties en un clin d'oeil."
+      paragraph_2: "Enregistrez des parties libres (hors tournoi) pour générer des stats utiles et mieux équilibrer vos jeux favoris."
+      paragraph_3: "Créez des tournois ou evenements gratuitement, avec tous les formats : elimination, ronde suisse ou matchs libres."
+      paragraph_4: "Participez aux tournois pour accumuler des points vers le championnat annuel."
       add_game: "Ajouter une partie hors tournoi"
       view_my_stats: "Voir mes statistiques de jeu"
       join_or_organize_event: "Participer ou organiser un évènement"
@@ -316,6 +316,7 @@ fr:
     no_stats_for_system: "Aucune statistique disponible pour ce système de jeu"
     stats_total: "Total"
     stats_by_faction: "Par faction"
+    sort_hint: "Cliquez sur un en-tête pour trier"
   time:
     formats:
       long: "Le %d/%m/%Y à %Hh%M"

@@ -1,4 +1,4 @@
-<div class="games-container">
+<div class="games-container" data-controller="table-sort">
   <div class="page-header">
     <h1><%= t('players.title', username: @user.username) %></h1>
   </div>
@@ -21,6 +21,7 @@
     <div class="card">
       <div class="card-header">
         <h3><%= t('players.stats_by_system') %></h3>
+        <p class="card-date"><%= t('players.sort_hint') %></p>
       </div>
       <div class="card-body">
         <% @player_stats.each do |system_stats| %>
@@ -34,13 +35,13 @@
                 <table class="table w-full">
                   <thead>
                     <tr>
-                      <th><%= t('stats.total_games') %></th>
-                      <th><%= t('stats.wins') %></th>
-                      <th><%= t('stats.losses') %></th>
-                      <th><%= t('stats.draws') %></th>
-                      <th><%= t('stats.win_percent') %></th>
-                      <th><%= t('stats.loss_percent') %></th>
-                      <th><%= t('stats.draw_percent') %></th>
+                      <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.total_games') %></th>
+                      <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.wins') %></th>
+                      <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.losses') %></th>
+                      <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.draws') %></th>
+                      <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.win_percent') %></th>
+                      <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.loss_percent') %></th>
+                      <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.draw_percent') %></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -66,14 +67,14 @@
                   <table class="table w-full">
                     <thead>
                       <tr>
-                        <th><%= t('stats.faction') %></th>
-                        <th><%= t('stats.total_games') %></th>
-                        <th><%= t('stats.wins') %></th>
-                        <th><%= t('stats.losses') %></th>
-                        <th><%= t('stats.draws') %></th>
-                        <th><%= t('stats.win_percent') %></th>
-                        <th><%= t('stats.loss_percent') %></th>
-                        <th><%= t('stats.draw_percent') %></th>
+                        <th class="sortable" data-action="click->table-sort#sort" data-sort-type="text"><%= t('stats.faction') %></th>
+                        <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.total_games') %></th>
+                        <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.wins') %></th>
+                        <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.losses') %></th>
+                        <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.draws') %></th>
+                        <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.win_percent') %></th>
+                        <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.loss_percent') %></th>
+                        <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.draw_percent') %></th>
                       </tr>
                     </thead>
                     <tbody>

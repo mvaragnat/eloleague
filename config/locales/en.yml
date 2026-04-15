@@ -94,11 +94,11 @@ en:
     browse_tournaments: "Browse tournaments"
   dashboard:
     welcome_box:
-      description: |
-        Welcome to Eloleague, the place that keeps the history of your games!
-        You can record casual games outside tournaments: this creates stats that help balance your favorite games.
-        You can create tournaments or events for free, in any format: elimination, Swiss rounds, or open matches.
-        By taking part in tournaments, you collect points toward an annual championship!
+      title: "Welcome to Eloleague 👋"
+      paragraph_1: "Keep a clean history of your games in one place."
+      paragraph_2: "Record casual games outside tournaments to generate useful stats and better balance your favorite formats."
+      paragraph_3: "Create tournaments or events for free in any format: elimination, Swiss rounds, or open matches."
+      paragraph_4: "Join tournaments to collect points toward the annual championship."
       add_game: "Add a game outside tournaments"
       view_my_stats: "View my game stats"
       join_or_organize_event: "Join or organize an event"
@@ -349,6 +349,7 @@ en:
     no_stats_for_system: "No stats available for this game system"
     stats_total: "Total"
     stats_by_faction: "By faction"
+    sort_hint: "Click a header to sort"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"

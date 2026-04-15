@@ -3,26 +3,34 @@
     <h1><%= t('hello') %> <%= @user.username %></h1>
   </div>
 
-  <div class="card" style="max-width: 1100px; margin: 0 auto 1rem;">
-    <div class="card-body" style="display:grid; gap:1rem;">
-      <p style="margin:0; white-space:pre-line;"><%= t('dashboard.welcome_box.description') %></p>
+  <div class="dashboard-layout">
+    <div class="card dashboard-welcome-card">
+      <div class="dashboard-welcome-card__header">
+        <h2><%= t('dashboard.welcome_box.title') %></h2>
+      </div>
+      <div class="dashboard-welcome-card__body">
+        <p><%= t('dashboard.welcome_box.paragraph_1') %></p>
+        <p><%= t('dashboard.welcome_box.paragraph_2') %></p>
+        <p><%= t('dashboard.welcome_box.paragraph_3') %></p>
+        <p><%= t('dashboard.welcome_box.paragraph_4') %></p>
+      </div>
 
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:0.75rem;">
-        <%= link_to new_game_event_path, class: "btn", data: { turbo_frame: "modal" } do %>
-          <%= t('dashboard.welcome_box.add_game') %>
+      <div class="dashboard-actions-grid">
+        <%= link_to new_game_event_path, class: "dashboard-action", data: { turbo_frame: "modal" } do %>
+          <span class="dashboard-action__emoji">🎲</span>
+          <span><%= t('dashboard.welcome_box.add_game') %></span>
         <% end %>
-        <%= link_to user_path(@user), class: "btn" do %>
-          <%= t('dashboard.welcome_box.view_my_stats') %>
+        <%= link_to user_path(@user), class: "dashboard-action" do %>
+          <span class="dashboard-action__emoji">📊</span>
+          <span><%= t('dashboard.welcome_box.view_my_stats') %></span>
         <% end %>
-        <%= link_to tournaments_path, class: "btn", style: "grid-column: 1 / -1;" do %>
-          <%= t('dashboard.welcome_box.join_or_organize_event') %>
+        <%= link_to tournaments_path, class: "dashboard-action dashboard-action--wide" do %>
+          <span class="dashboard-action__emoji">🏆</span>
+          <span><%= t('dashboard.welcome_box.join_or_organize_event') %></span>
         <% end %>
       </div>
     </div>
-  </div>
 
-  <div style="display:grid; grid-template-columns: 1fr 320px; gap: 1rem; align-items:start; max-width: 1100px; margin: 0 auto;">
-    <!-- Left: Games -->
     <div class="games-container">
       <div id="games-list">
         <% if @games.any? %>
@@ -36,18 +44,6 @@
         <% end %>
       </div>
     </div>
-
-    <!-- Right: Tools -->
-    <aside>
-      <div class="card" style="margin-bottom:1rem;">
-        <div class="card-header">
-          <h3><%= t('games.add_title') %></h3>
-        </div>
-        <div class="card-body">
-          <%= link_to t('games.add'), new_game_event_path, class: "btn btn-primary", data: { turbo_frame: "modal" } %>
-        </div>
-      </div>
-    </aside>
   </div>
 </div>
 

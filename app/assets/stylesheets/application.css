@@ -254,3 +254,63 @@ input:focus, select:focus, textarea:focus {
 
 /* Chart wrapper inside a card should not overflow */
 .chart-wrapper { width: 100%; overflow: hidden; }
+
+/* Dashboard welcome card */
+.dashboard-layout { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+.dashboard-welcome-card {
+  border-color: #dbeafe;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  margin-bottom: 1rem;
+}
+.dashboard-welcome-card__header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+.dashboard-welcome-card__body {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.65rem;
+  color: #1f2937;
+}
+.dashboard-welcome-card__body p {
+  margin: 0;
+}
+.dashboard-actions-grid {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.dashboard-action {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 0.6rem;
+  padding: 0.8rem 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #0f172a;
+}
+.dashboard-action:hover,
+.dashboard-action:focus {
+  border-color: #93c5fd;
+  background: #f8fbff;
+}
+.dashboard-action__emoji {
+  font-size: 1.15rem;
+}
+.dashboard-action--wide {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .dashboard-actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-action--wide {
+    grid-column: auto;
+  }
+}
