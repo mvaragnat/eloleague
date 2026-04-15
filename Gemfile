@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby '3.4.1'
+ruby '3.4.3'
 source 'https://rubygems.org'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
