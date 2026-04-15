@@ -95,10 +95,10 @@ en:
   dashboard:
     welcome_box:
       title: "Welcome to Eloleague 👋"
-      paragraph_1: "Keep a clean history of your games in one place."
-      paragraph_2: "Record casual games outside tournaments to generate useful stats and better balance your favorite formats."
-      paragraph_3: "Create tournaments or events for free in any format: elimination, Swiss rounds, or open matches."
-      paragraph_4: "Join tournaments to collect points toward the annual championship."
+      paragraph_1: "Here, you can keep the history of your games and take part in tournaments."
+      paragraph_2: "Record casual games outside tournaments for your personal tracking, and help build statistics that make your favorite games easier to balance."
+      paragraph_3: "Create tournaments or events for free with any format: elimination, Swiss rounds, or open matches."
+      paragraph_4: "Join tournaments and collect points in the annual championship!"
       add_game: "Add a game outside tournaments"
       view_my_stats: "View my game stats"
       join_or_organize_event: "Join or organize an event"
@@ -349,7 +349,7 @@ en:
     no_stats_for_system: "No stats available for this game system"
     stats_total: "Total"
     stats_by_faction: "By faction"
-    sort_hint: "Click a header to sort"
+    sort_hint: "In the faction table, click a header to sort"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"

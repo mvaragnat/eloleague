@@ -258,13 +258,15 @@ input:focus, select:focus, textarea:focus {
 /* Dashboard welcome card */
 .dashboard-layout { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
 .dashboard-welcome-card {
-  border-color: #dbeafe;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  border: 2px solid #93c5fd;
+  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+  box-shadow: 0 12px 28px rgba(30, 64, 175, 0.12);
   margin-bottom: 1rem;
 }
 .dashboard-welcome-card__header h2 {
   margin: 0;
   font-size: 1.35rem;
+  text-align: center;
 }
 .dashboard-welcome-card__body {
   margin-top: 0.9rem;
@@ -284,19 +286,22 @@ input:focus, select:focus, textarea:focus {
 .dashboard-action {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.55rem;
   background: #ffffff;
-  border: 1px solid #dbeafe;
+  border: 2px solid #bfdbfe;
   border-radius: 0.6rem;
   padding: 0.8rem 0.9rem;
   font-weight: 700;
   text-decoration: none;
   color: #0f172a;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+  text-align: center;
 }
 .dashboard-action:hover,
 .dashboard-action:focus {
-  border-color: #93c5fd;
-  background: #f8fbff;
+  border-color: #60a5fa;
+  background: #eff6ff;
 }
 .dashboard-action__emoji {
   font-size: 1.15rem;
