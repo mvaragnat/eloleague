@@ -3,6 +3,24 @@
     <h1><%= t('hello') %> <%= @user.username %></h1>
   </div>
 
+  <div class="card" style="max-width: 1100px; margin: 0 auto 1rem;">
+    <div class="card-body" style="display:grid; gap:1rem;">
+      <p style="margin:0; white-space:pre-line;"><%= t('dashboard.welcome_box.description') %></p>
+
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:0.75rem;">
+        <%= link_to new_game_event_path, class: "btn", data: { turbo_frame: "modal" } do %>
+          <%= t('dashboard.welcome_box.add_game') %>
+        <% end %>
+        <%= link_to user_path(@user), class: "btn" do %>
+          <%= t('dashboard.welcome_box.view_my_stats') %>
+        <% end %>
+        <%= link_to tournaments_path, class: "btn", style: "grid-column: 1 / -1;" do %>
+          <%= t('dashboard.welcome_box.join_or_organize_event') %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
   <div style="display:grid; grid-template-columns: 1fr 320px; gap: 1rem; align-items:start; max-width: 1100px; margin: 0 auto;">
     <!-- Left: Games -->
     <div class="games-container">
@@ -19,7 +37,7 @@
       </div>
     </div>
 
-    <!-- Right: Tools + Elo -->
+    <!-- Right: Tools -->
     <aside>
       <div class="card" style="margin-bottom:1rem;">
         <div class="card-header">
@@ -29,27 +47,6 @@
           <%= link_to t('games.add'), new_game_event_path, class: "btn btn-primary", data: { turbo_frame: "modal" } %>
         </div>
       </div>
-
-      <% if @elo_ratings.present? %>
-        <div class="card card--draw">
-          <div class="card-header">
-            <h3><%= t('elo.my_current_rankings', default: 'My current ELO rankings') %></h3>
-          </div>
-          <div class="card-body">
-            <ul style="list-style:none; padding-left:0; margin:0;">
-              <% @elo_ratings.each do |er| %>
-                <li style="display:flex; justify-content:space-between; padding:0.25rem 0; border-bottom:1px solid var(--gray-300);">
-                  <span><%= er.game_system.localized_name %></span>
-                  <strong><%= er.rating %></strong>
-                </li>
-              <% end %>
-            </ul>
-            <div style="margin-top: 0.75rem; text-align: right;">
-              <%= link_to t('elo.view_all_my_stats'), user_path(@user), class: "text-sm" %>
-            </div>
-          </div>
-        </div>
-      <% end %>
     </aside>
   </div>
 </div>
