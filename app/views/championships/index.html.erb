@@ -3,6 +3,17 @@
     <h1><%= t('championship.title') %></h1>
   </div>
 
+  <div class="card dashboard-welcome-card">
+    <div class="dashboard-welcome-card__header">
+      <h2><%= t('championship.rules_box.title') %></h2>
+    </div>
+    <div class="dashboard-welcome-card__body">
+      <p><%= t('championship.rules_box.eligible') %></p>
+      <p><%= t('championship.rules_box.match_points') %></p>
+      <p><%= t('championship.rules_box.placement_bonus') %></p>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-body">
       <h3><%= t('championship.game_system') %></h3>
@@ -121,10 +132,5 @@
       </div>
     <% end %>
 
-    <div class="card">
-      <div class="card-body">
-        <p class="hint"><%= t('championship.rules_hint') %></p>
-      </div>
-    </div>
   <% end %>
 </div>

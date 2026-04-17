@@ -421,7 +421,11 @@ en:
     total: "Total"
     standings_title: "%{year} Championship — %{system}"
     breakdown_title: "Points breakdown by tournament (%{year})"
-    rules_hint: "Points per match: Win = 3, Draw = 2, Loss = 1. Placement bonus: 1st = +3, 2nd = +2, 3rd = +1. Only Swiss and Elimination tournaments count."
+    rules_box:
+      title: "How does the championship work? 🏆"
+      eligible: "Play in tournaments in format Swiss or Elimination, and score points towards the yearly Championship !"
+      match_points: "For each tournament match played, you earn points: 3 for a win, 2 for a draw, 1 for a loss."
+      placement_bonus: "A placement bonus is awarded to the top 3 finishers of each tournament (+3, +2 and +1)."
   scoring_system:
     summary:
       max_per_player: "Max per player: %{value}"

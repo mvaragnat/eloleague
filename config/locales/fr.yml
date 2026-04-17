@@ -388,7 +388,11 @@ fr:
     total: "Total"
     standings_title: "Championnat %{year} — %{system}"
     breakdown_title: "Détail des points par tournoi (%{year})"
-    rules_hint: "Points par match : Victoire = 3, Nul = 2, Défaite = 1. Bonus de classement : 1er = +3, 2e = +2, 3e = +1. Seuls les tournois Suisse et Élimination comptent."
+    rules_box:
+      title: "Comment fonctionne le championnat ? 🏆"
+      eligible: "Participez à des tounois en format Ronde Suisse ou Élimination, et accumulez des points pour le Championnat annuel !"
+      match_points: "Pour chaque match de tournoi joué, vous gagnez des points : 3 pour une victoire, 2 pour un nul, 1 pour une défaite."
+      placement_bonus: "Un bonus de classement est attribué aux 3 premiers de chaque tournoi (+3, +2 et +1)"
   scoring_system:
     summary:
       max_per_player: "Max par joueur: %{value}"
