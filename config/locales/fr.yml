@@ -66,7 +66,7 @@ fr:
   dashboard:
     welcome_box:
       title: "Bienvenue sur Eloleague 👋"
-      paragraph_1: "Ici, vous pouvez conservez l'historique de vos parties, et participer à des tournois."
+      paragraph_1: "Sur Eloleague, vous pouvez conservez l'historique de vos parties, et participer à des tournois."
       paragraph_2: "Enregistrez des parties libres (hors tournoi) pour votre suivi personnel, et contribuez ainsi aux statistiques permettant d'équilibrer vos jeux favoris."
       paragraph_3: "Créez des tournois ou événements gratuitement, avec tous les formats : élimination, ronde suisse, ou matchs libres."
       paragraph_4: "Participez aux tournois, et accumulez des points dans le championnat annuel !"
