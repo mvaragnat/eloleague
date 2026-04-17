@@ -6,12 +6,25 @@ module Championship
       win: 3,
       draw: 2,
       loss: 1
+
+      # version anglaise
+      # win: 0, 
+      # draw: 0, 
+      # loss: 0,
     }.freeze
 
     PLACEMENT_BONUS = {
+      # ma proposition
       1 => 3,
       2 => 2,
       3 => 1
+
+      # version anglaise
+      # 1 => 10,
+      # 2 => 8,
+      # 3 => 6,
+      # 4 => 4,
+      # 5 => 2
     }.freeze
 
     ELIGIBLE_FORMATS = %w[swiss elimination].freeze
