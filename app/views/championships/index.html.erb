@@ -42,16 +42,16 @@
       <div class="card-header">
         <h3><%= t('championship.standings_title', year: @selected_year, system: @system.localized_name) %></h3>
       </div>
-      <div class="card-body" style="overflow-x: auto;">
+      <div class="card-body" style="overflow-x: auto;" data-controller="table-sort">
         <table class="table">
           <thead>
             <tr>
-              <th>#</th>
-              <th><%= t('championship.player') %></th>
-              <th style="text-align: right;"><%= t('championship.total_points') %></th>
-              <th style="text-align: right;"><%= t('championship.match_points') %></th>
-              <th style="text-align: right;"><%= t('championship.placement_bonus') %></th>
-              <th style="text-align: right;"><%= t('championship.tournaments_played') %></th>
+              <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number">#</th>
+              <th class="sortable" data-action="click->table-sort#sort"><%= t('championship.player') %></th>
+              <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number" style="text-align: right;"><%= t('championship.total_points') %></th>
+              <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number" style="text-align: right;"><%= t('championship.match_points') %></th>
+              <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number" style="text-align: right;"><%= t('championship.placement_bonus') %></th>
+              <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number" style="text-align: right;"><%= t('championship.tournaments_played') %></th>
             </tr>
           </thead>
           <tbody>
@@ -79,17 +79,19 @@
         <div class="card-header">
           <h3><%= t('championship.breakdown_title', year: @selected_year) %></h3>
         </div>
-        <div class="card-body" style="overflow-x: auto;">
+        <div class="card-body" style="overflow-x: auto;" data-controller="table-sort">
           <table class="table">
             <thead>
               <tr>
-                <th><%= t('championship.player') %></th>
+                <th class="sortable" data-action="click->table-sort#sort"><%= t('championship.player') %></th>
                 <% @tournaments.each do |tournament| %>
-                  <th style="text-align: right; font-size: 0.85rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis;">
+                  <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"
+                      style="text-align: right; font-size: 0.85rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis;">
                     <%= link_to tournament.name, tournament_path(tournament) %>
                   </th>
                 <% end %>
-                <th style="text-align: right; font-weight: 700;"><%= t('championship.total') %></th>
+                <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"
+                    style="text-align: right; font-weight: 700;"><%= t('championship.total') %></th>
               </tr>
             </thead>
             <tbody>

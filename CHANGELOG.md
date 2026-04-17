@@ -8,6 +8,13 @@
   - Championship page features a game system selector, year selector, player ranking table, and a cross-reference table showing points earned per tournament.
   - Rake task `championship:recalculate[YEAR]` allows full recalculation for a given year (defaults to current year).
   - Fully localized (EN/FR). Tests for model, service, and controller.
+## 2026-04-15
+
+- Feature — Dashboard and profile UX cleanup:
+  - Removed the public ELO page (`/elo`) and related navigation entry.
+  - Reworked the authenticated dashboard to replace the ELO card with a welcome information block and quick actions (add casual game, view personal stats, join/organize events).
+  - Simplified player profile by removing ELO tables/charts and keeping stats-by-system with a game system selector.
+  - Updated non-competitive checkbox copy in game and tournament forms to clarify that unusual/intro/house-rule matches are excluded from statistics.
 
 ## 2026-03-07
 
