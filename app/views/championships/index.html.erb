@@ -1,0 +1,128 @@
+<div class="tournament-container">
+  <div class="page-header">
+    <h1><%= t('championship.title') %></h1>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h3><%= t('championship.game_system') %></h3>
+      <%= form_with url: championships_path, method: :get, local: true do %>
+        <%= select_tag :game_system_id,
+                       options_from_collection_for_select(@systems, :id, :localized_name, @system&.id),
+                       include_blank: t('championship.select_system'),
+                       onchange: 'this.form.submit()' %>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @system && @years.present? %>
+    <div class="card">
+      <div class="card-body">
+        <h3><%= t('championship.year') %></h3>
+        <%= form_with url: championships_path, method: :get, local: true do %>
+          <%= hidden_field_tag :game_system_id, @system.id %>
+          <%= select_tag :year,
+                         options_for_select(@years, @selected_year),
+                         onchange: 'this.form.submit()' %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @system && @years.blank? %>
+    <div class="card">
+      <div class="card-body">
+        <p class="text-muted"><%= t('championship.no_data') %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <% if @standings.present? %>
+    <div class="card">
+      <div class="card-header">
+        <h3><%= t('championship.standings_title', year: @selected_year, system: @system.localized_name) %></h3>
+      </div>
+      <div class="card-body" style="overflow-x: auto;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th><%= t('championship.player') %></th>
+              <th style="text-align: right;"><%= t('championship.total_points') %></th>
+              <th style="text-align: right;"><%= t('championship.match_points') %></th>
+              <th style="text-align: right;"><%= t('championship.placement_bonus') %></th>
+              <th style="text-align: right;"><%= t('championship.tournaments_played') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @standings.each_with_index do |entry, idx| %>
+              <tr>
+                <td><%= idx + 1 %></td>
+                <td>
+                  <% is_current = Current.user && entry[:user].id == Current.user.id %>
+                  <% name = is_current ? content_tag(:strong, entry[:user].username) : entry[:user].username %>
+                  <%= link_to name, user_path(entry[:user]) %>
+                </td>
+                <td style="text-align: right; font-weight: 700;"><%= entry[:total_points] %></td>
+                <td style="text-align: right;"><%= entry[:match_points] %></td>
+                <td style="text-align: right;"><%= entry[:placement_bonus] %></td>
+                <td style="text-align: right;"><%= entry[:tournaments_count] %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <% if @tournaments.present? %>
+      <div class="card">
+        <div class="card-header">
+          <h3><%= t('championship.breakdown_title', year: @selected_year) %></h3>
+        </div>
+        <div class="card-body" style="overflow-x: auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th><%= t('championship.player') %></th>
+                <% @tournaments.each do |tournament| %>
+                  <th style="text-align: right; font-size: 0.85rem; max-width: 120px; overflow: hidden; text-overflow: ellipsis;">
+                    <%= link_to tournament.name, tournament_path(tournament) %>
+                  </th>
+                <% end %>
+                <th style="text-align: right; font-weight: 700;"><%= t('championship.total') %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @standings.each do |entry| %>
+                <tr>
+                  <td>
+                    <% is_current = Current.user && entry[:user].id == Current.user.id %>
+                    <% name = is_current ? content_tag(:strong, entry[:user].username) : entry[:user].username %>
+                    <%= link_to name, user_path(entry[:user]) %>
+                  </td>
+                  <% @tournaments.each do |tournament| %>
+                    <% score = @tournament_scores[[entry[:user].id, tournament.id]] %>
+                    <td style="text-align: right;">
+                      <% if score %>
+                        <%= score.total_points %>
+                      <% else %>
+                        <span class="text-muted">-</span>
+                      <% end %>
+                    </td>
+                  <% end %>
+                  <td style="text-align: right; font-weight: 700;"><%= entry[:total_points] %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="card">
+      <div class="card-body">
+        <p class="hint"><%= t('championship.rules_hint') %></p>
+      </div>
+    </div>
+  <% end %>
+</div>

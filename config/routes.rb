@@ -15,6 +15,9 @@ Rails.application.routes.draw do
     # Elo
     get 'elo', to: 'elo#index', as: :elo
 
+    # Championship
+    resources :championships, only: %i[index]
+
     # Dashboard
     resource :dashboard, only: :show
 

@@ -396,6 +396,22 @@ en:
       tournament_completed:
         subject: "%{name} has finished"
         body_html: "The tournament <strong>%{name}</strong> is now completed. Here are the top players:"
+  championship:
+    title: "Championship"
+    nav_link: "Championship"
+    game_system: "Game system"
+    select_system: "Select a game system"
+    year: "Year"
+    no_data: "No championship data available for this game system yet."
+    player: "Player"
+    total_points: "Total"
+    match_points: "Match pts"
+    placement_bonus: "Bonus"
+    tournaments_played: "Tournaments"
+    total: "Total"
+    standings_title: "%{year} Championship — %{system}"
+    breakdown_title: "Points breakdown by tournament (%{year})"
+    rules_hint: "Points per match: Win = 3, Draw = 2, Loss = 1. Placement bonus: 1st = +3, 2nd = +2, 3rd = +1. Only Swiss and Elimination tournaments count."
   scoring_system:
     summary:
       max_per_player: "Max per player: %{value}"

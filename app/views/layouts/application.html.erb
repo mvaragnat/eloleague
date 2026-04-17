@@ -32,6 +32,7 @@
         <%= link_to t('stats.title', default: 'Stats'), stats_path, class: "brand" %>
       <% end %>
       <%= link_to t('tournaments.index_title'), tournaments_path, class: "brand" %>
+      <%= link_to t('championship.nav_link'), championships_path, class: "brand" %>
       <span class="spacer"></span>
       <% if user_signed_in? %>
         <span class="user-email" style="font-weight:600; margin-right: .75rem; color: var(--text-muted);">

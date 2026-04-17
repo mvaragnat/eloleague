@@ -363,6 +363,22 @@ fr:
       tournament_completed:
         subject: "%{name} est terminé"
         body_html: "Le tournoi <strong>%{name}</strong> est maintenant terminé. Voici les meilleurs joueurs :"
+  championship:
+    title: "Championnat"
+    nav_link: "Championnat"
+    game_system: "Système de jeu"
+    select_system: "Sélectionnez un système de jeu"
+    year: "Année"
+    no_data: "Aucune donnée de championnat disponible pour ce système de jeu."
+    player: "Joueur"
+    total_points: "Total"
+    match_points: "Pts matchs"
+    placement_bonus: "Bonus"
+    tournaments_played: "Tournois"
+    total: "Total"
+    standings_title: "Championnat %{year} — %{system}"
+    breakdown_title: "Détail des points par tournoi (%{year})"
+    rules_hint: "Points par match : Victoire = 3, Nul = 2, Défaite = 1. Bonus de classement : 1er = +3, 2e = +2, 3e = +1. Seuls les tournois Suisse et Élimination comptent."
   scoring_system:
     summary:
       max_per_player: "Max par joueur: %{value}"

@@ -227,6 +227,17 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Strength of Schedule (SoS)
   The Admin tab includes a dropdown for Primary with localized explanations; Overview and Ranking reflect the selected strategy.
 
+### Annual Championship
+- A championship page (`/championships`) aggregates results from Swiss and Elimination tournaments completed in a given calendar year.
+- Points system per tournament match: Win = 3, Draw = 2, Loss = 1.
+- Placement bonus: 1st place = +3, 2nd = +2, 3rd = +1.
+- Points are configured as constants in `Championship::ScoreCalculator` for easy customization.
+- Championship scores are stored in `championship_scores` table (per user, per tournament) with `match_points`, `placement_bonus`, `total_points`, `year`, and `game_system_id`.
+- Scores are computed automatically when a tournament is finalized via `Championship::ScoreCalculator`.
+- A rake task `championship:recalculate[YEAR]` recalculates all scores for a given year (defaults to current year).
+- The championship page provides a game system selector, a year selector, a player ranking table (sorted by total points), and a tournament breakdown table (players × tournaments cross-reference).
+- Only tournaments with format Swiss or Elimination and state `completed` are eligible. Open format tournaments are excluded.
+
 ### Homepage
 - Hero section with background image (`public/ork-wallpaper.jpg`), localized subtitle, and buttons to browse tournaments and see ELO rankings.
 
