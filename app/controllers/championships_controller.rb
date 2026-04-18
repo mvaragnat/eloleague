@@ -64,6 +64,22 @@ class ChampionshipsController < ApplicationController
     end
 
     @standings.sort_by! { |s| [-s[:total_points], s[:user].username] }
+
+    rank = 1
+    previous_score = nil
+    previous_rank = nil
+
+    # on autorise les doublons
+    @standings.each do |standing|
+      standing[:rank] = if previous_score && previous_rank && standing[:total_points] == previous_score
+                          previous_rank
+                        else
+                          rank
+                        end
+      previous_rank = standing[:rank]
+      previous_score = standing[:total_points]
+      rank += 1
+    end
   end
 
   def build_tournament_breakdown(scores)

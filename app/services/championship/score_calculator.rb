@@ -3,21 +3,23 @@
 module Championship
   class ScoreCalculator
     MATCH_POINTS = {
-      win: 3,
-      draw: 2,
-      loss: 1
+      # win: 3,
+      # draw: 2,
+      # loss: 1
 
-      # version anglaise
-      # win: 0, 
-      # draw: 0, 
-      # loss: 0,
+      # # version anglaise
+      win: 0,
+      draw: 0,
+      loss: 0
     }.freeze
+
+    DOUBLE_BONUS_MIN_SIZE = 12
 
     PLACEMENT_BONUS = {
       # ma proposition
-      1 => 3,
-      2 => 2,
-      3 => 1
+      # 1 => 3,
+      # 2 => 2,
+      # 3 => 1
 
       # version anglaise
       # 1 => 10,
@@ -96,9 +98,12 @@ module Championship
     def compute_placement_bonus(standings)
       bonus = {}
 
-      standings.first(3).each_with_index do |row, index|
-        placement = index + 1
-        bonus[row.user.id] = PLACEMENT_BONUS.fetch(placement, 0)
+      multiple = 1.0 # @tournament.participants.count >= DOUBLE_BONUS_MIN_SIZE ? 2.0 : 1.0
+
+      standings.each_with_index do |row, index|
+        # placement = index + 1
+        # bonus[row.user.id] = PLACEMENT_BONUS.fetch(placement, 0) * multiple
+        bonus[row.user.id] = (@tournament.participants.count - index) * multiple
       end
 
       bonus

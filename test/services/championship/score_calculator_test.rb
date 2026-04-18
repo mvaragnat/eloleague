@@ -52,8 +52,8 @@ module Championship
 
     test 'calculates placement bonus for top 3' do
       tournament = create_tournament(format: :swiss)
-      reg1 = tournament.registrations.create!(user: @player1, faction: @faction)
-      reg2 = tournament.registrations.create!(user: @player2, faction: @faction)
+      tournament.registrations.create!(user: @player1, faction: @faction)
+      tournament.registrations.create!(user: @player2, faction: @faction)
 
       create_match(tournament: tournament, result: 'a_win')
 

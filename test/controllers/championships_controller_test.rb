@@ -23,7 +23,7 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'index with game system shows year selector when data exists' do
-    tournament = create_scored_tournament
+    create_scored_tournament
 
     get championships_path(game_system_id: @system.id)
     assert_response :success
@@ -31,7 +31,7 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'index shows standings table' do
-    tournament = create_scored_tournament
+    create_scored_tournament
 
     get championships_path(game_system_id: @system.id, year: 2026)
     assert_response :success

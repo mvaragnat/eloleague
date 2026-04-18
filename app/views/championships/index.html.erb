@@ -68,7 +68,7 @@
           <tbody>
             <% @standings.each_with_index do |entry, idx| %>
               <tr>
-                <td><%= idx + 1 %></td>
+                <td><%= entry[:rank] %></td>
                 <td>
                   <% is_current = Current.user && entry[:user].id == Current.user.id %>
                   <% name = is_current ? content_tag(:strong, entry[:user].username) : entry[:user].username %>
