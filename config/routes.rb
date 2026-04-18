@@ -5,6 +5,10 @@ Rails.application.routes.draw do
   authenticate :admin do
     mount_avo
   end
+
+  namespace :api do
+    get 'championships/rankings', to: 'championships#rankings'
+  end
   scope '(:locale)', locale: /en|fr/ do
     devise_for :users, controllers: { sessions: 'users/sessions' }
     devise_for :admins, skip: %i[registrations passwords], controllers: { sessions: 'devise/sessions' }

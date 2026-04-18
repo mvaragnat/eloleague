@@ -286,6 +286,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Avo sidebar now includes Elo Rankings (EloRating). Index is filterable by Game System.
   - Game Events, Tournaments, Tournament Matches, and Tournament Registrations are also filterable by Game System in Avo. Matches and Registrations filter via the related Tournament’s Game System.
 
+### API
+- A JSON API is available under `/api`, backed by `Api::BaseController` (inherits `ActionController::API`, no CSRF, no authentication).
+- `GET /api/championships/rankings?game_system=<name>&year=<year>` — returns the championship standings for the given game system name and calendar year. Response includes rank, username, total_points, match_points, placement_bonus, and tournaments_count per player. Returns 400 if parameters are missing or invalid, 404 if the game system is not found.
+
 ### Footer & Contact
 - A global footer appears on all pages: "Made by Marquis with ❤️. A bug, a suggestion, a new game to add? Write me"
 - The "Write me" link opens a one-page contact form with subject and message fields
