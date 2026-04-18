@@ -3,15 +3,10 @@
 module Api
   class ChampionshipsController < BaseController
     def rankings
-      game_system = Game::System.find_by(name: params[:game_system])
-      return render json: { error: 'game_system is required' }, status: :bad_request if params[:game_system].blank?
+      game_system = Game::System.find_by(id: params[:game_system_id])
       return render json: { error: 'game_system not found' }, status: :not_found unless game_system
 
       year = params[:year].to_i
-      unless params[:year].present? && year.positive?
-        return render json: { error: 'year is required' },
-                      status: :bad_request
-      end
 
       scores = Championship::Score
                .for_game_system(game_system)

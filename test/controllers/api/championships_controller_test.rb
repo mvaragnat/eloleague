@@ -12,29 +12,15 @@ module Api
       @faction = game_factions(:chess_white)
     end
 
-    test 'rankings returns 400 when game_system is missing' do
-      get api_championships_rankings_path(year: 2026)
-      assert_response :bad_request
-      json = response.parsed_body
-      assert_equal 'game_system is required', json['error']
-    end
-
-    test 'rankings returns 404 when game_system is unknown' do
-      get api_championships_rankings_path(game_system: 'Unknown', year: 2026)
+    test 'rankings returns 404 when game_system_id is unknown' do
+      get api_championships_rankings_path(game_system_id: 999_999, year: 2026)
       assert_response :not_found
       json = response.parsed_body
       assert_equal 'game_system not found', json['error']
     end
 
-    test 'rankings returns 400 when year is missing' do
-      get api_championships_rankings_path(game_system: @system.name)
-      assert_response :bad_request
-      json = response.parsed_body
-      assert_equal 'year is required', json['error']
-    end
-
     test 'rankings returns empty rankings when no data exists' do
-      get api_championships_rankings_path(game_system: @system.name, year: 2026)
+      get api_championships_rankings_path(game_system_id: @system.id, year: 2026)
       assert_response :success
       json = response.parsed_body
       assert_equal @system.name, json['game_system']
@@ -45,7 +31,7 @@ module Api
     test 'rankings returns ranked players' do
       create_scored_tournament
 
-      get api_championships_rankings_path(game_system: @system.name, year: 2026)
+      get api_championships_rankings_path(game_system_id: @system.id, year: 2026)
       assert_response :success
       json = response.parsed_body
 
@@ -65,7 +51,7 @@ module Api
     test 'rankings assigns equal ranks to tied players' do
       create_two_tournaments_with_tie
 
-      get api_championships_rankings_path(game_system: @system.name, year: 2026)
+      get api_championships_rankings_path(game_system_id: @system.id, year: 2026)
       assert_response :success
       json = response.parsed_body
 

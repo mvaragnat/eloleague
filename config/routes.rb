@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   end
 
   namespace :api do
-    get 'championships/rankings', to: 'championships#rankings'
+    get 'championships/:game_system_id/year/:year', to: 'championships#rankings', as: :championships_rankings
   end
   scope '(:locale)', locale: /en|fr/ do
     devise_for :users, controllers: { sessions: 'users/sessions' }

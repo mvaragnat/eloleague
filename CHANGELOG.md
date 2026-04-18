@@ -1,9 +1,9 @@
 ## 2026-04-18
 
 - Feature — API endpoint for championship rankings:
-  - New `GET /api/championships/rankings` endpoint returning JSON rankings for a given game system and year.
-  - Required parameters: `game_system` (name) and `year`. Returns rank, username, total points, match points, placement bonus, and tournaments count per player.
-  - No authentication required. Proper error handling (400/404) for missing or invalid parameters.
+  - New `GET /api/championships/:game_system_id/year/:year` endpoint returning JSON rankings for a given game system and year.
+  - Path parameters: `game_system_id` (ID) and `year`. Returns rank, username, total points, match points, placement bonus, and tournaments count per player.
+  - No authentication required. Returns 404 if game system is not found.
 
 ## 2026-04-17
 
