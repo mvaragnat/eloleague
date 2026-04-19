@@ -4,6 +4,9 @@
   - New `GET /api/championships/:game_system_id/year/:year` endpoint returning JSON rankings for a given game system and year.
   - Path parameters: `game_system_id` (ID) and `year`. Returns rank, username, total points, match points, placement bonus, and tournaments count per player.
   - No authentication required. Returns 404 if game system is not found.
+  - New `GET /api/tournaments/:game_system_id/finished` endpoint listing completed tournaments for a game system.
+  - New `GET /api/tournaments/:game_system_id/open` endpoint listing tournaments accepting registration or currently running.
+  - Both return name, slug, url, state, format, starts_at, and ends_at per tournament. Returns 404 if game system is not found.
 
 ## 2026-04-17
 

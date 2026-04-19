@@ -289,6 +289,8 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 ### API
 - A JSON API is available under `/api`, backed by `Api::BaseController` (inherits `ActionController::API`, no CSRF, no authentication).
 - `GET /api/championships/:game_system_id/year/:year` — returns the championship standings for the given game system ID and calendar year. Response includes rank, username, total_points, match_points, placement_bonus, and tournaments_count per player. Returns 404 if the game system is not found.
+- `GET /api/tournaments/:game_system_id/finished` — returns completed tournaments for the given game system. Each entry includes name, slug, url, state, format, starts_at, and ends_at. Cancelled tournaments are excluded.
+- `GET /api/tournaments/:game_system_id/open` — returns tournaments in registration or running state for the given game system. Same response shape as finished. Cancelled tournaments are excluded.
 
 ### Footer & Contact
 - A global footer appears on all pages: "Made by Marquis with ❤️. A bug, a suggestion, a new game to add? Write me"
