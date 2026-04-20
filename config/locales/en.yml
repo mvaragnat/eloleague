@@ -349,7 +349,7 @@ en:
     no_stats_for_system: "No stats available for this game system"
     stats_total: "Total"
     stats_by_faction: "By faction"
-    sort_hint: "In the faction table, click a header to sort"
+    elo_label: "ELO:"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"

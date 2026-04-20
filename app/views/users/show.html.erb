@@ -21,12 +21,14 @@
     <div class="card">
       <div class="card-header">
         <h3><%= t('players.stats_by_system') %></h3>
-        <p class="card-date"><%= t('players.sort_hint') %></p>
       </div>
       <div class="card-body">
         <% @player_stats.each do |system_stats| %>
           <div class="mb-6">
             <h4 class="text-lg font-semibold mb-2"><%= system_stats[:system_name] %></h4>
+
+            <% elo = @elo_by_system[system_stats[:system_id]] %>
+            <h5 class="text-sm font-medium text-gray-600 mb-1"><%= t('players.elo_label') %> <%= elo&.rating || EloRating::START_RATING %></h5>
 
             <%# Overall stats for this system %>
             <div class="mb-4">

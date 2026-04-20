@@ -316,7 +316,7 @@ fr:
     no_stats_for_system: "Aucune statistique disponible pour ce système de jeu"
     stats_total: "Total"
     stats_by_faction: "Par faction"
-    sort_hint: "Dans le tableau des factions, cliquez sur un en-tête pour trier"
+    elo_label: "ELO :"
   time:
     formats:
       long: "Le %d/%m/%Y à %Hh%M"
