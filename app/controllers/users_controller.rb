@@ -27,26 +27,21 @@ class UsersController < ApplicationController
     Current.user = current_user
     @user = User.find(params[:id])
 
-    @elo_ratings = EloRating.where(user: @user).includes(:game_system).order(:game_system_id)
+    # Player stats per system and faction
+    stats = Stats::PlayerWinRates.new(user: @user).call
+    @stats_system_options = stats.map { |row| [row[:system_name], row[:system_id]] }.sort_by(&:first)
+    @selected_system_id = params[:game_system_id].presence&.to_i
+    @player_stats = if @selected_system_id.present?
+                      stats.select { |row| row[:system_id] == @selected_system_id }
+                    else
+                      stats
+                    end
 
-    # All elo changes for the user across systems, newest first
-    @elo_changes = EloChange.where(user: @user).includes(:game_system, :game_event).order(game_event_id: :desc)
-
-    # Build a timeline per system for the chart: [{system_id, system_name, points: [{t, r}...]}]
-    @elo_series_by_system = @elo_changes.group_by(&:game_system_id).map do |gs_id, changes|
-      system = changes.first.game_system
-      points = changes.sort_by { |ch| ch.game_event&.played_at || Time.zone.at(0) }.map do |ch|
-        { t: (ch.game_event&.played_at || Time.zone.at(0)).to_i * 1000, r: ch.rating_after }
-      end
-      { id: gs_id, name: system.localized_name, points: points }
-    end
+    @elo_by_system = EloRating.where(user: @user).index_by(&:game_system_id)
 
     # Recent games (all systems)
     @events = @user.game_events.includes(:game_system, :game_participations, :players,
                                          :tournament).order(played_at: :desc)
-
-    # Player stats per system and faction
-    @player_stats = Stats::PlayerWinRates.new(user: @user).call
   end
 
   private
