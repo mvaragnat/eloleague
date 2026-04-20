@@ -12,8 +12,8 @@ Rails.application.routes.draw do
 
     # Devise handles sessions/registrations/passwords
 
-    # Elo
-    get 'elo', to: 'elo#index', as: :elo
+    # Championship
+    resources :championships, only: %i[index]
 
     # Dashboard
     resource :dashboard, only: :show

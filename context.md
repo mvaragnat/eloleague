@@ -83,17 +83,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 ### Player Profile Page
 - Public page at `/users/:id` showing a player's cross-system profile
 - Sections:
-  - Current ELO by game system (rating and games played)
-  - ELO over time chart (one color per game system)
   - Statistics by game system: shows per-system totals (games, wins, losses, draws, percentages) and per-faction breakdown with the same stats. Uses the same table styling as the Stats page.
+  - Game system selector to filter displayed statistics on demand.
   - All games played by the user across systems (same card component used elsewhere)
-- Profile links are available from Elo standings, tournament participants, and tournament ranking tables.
-
-### ELO Rankings Page
-- `/elo` lists player ELO standings per selected game system.
-- Standings are server-paginated (default 25 per page; configurable via `?per=`, max 100).
-- When a user is signed in and has a rating for the selected system, the default page is the one containing the user; their username is bolded in the table.
-- Pagination controls are localized (EN/FR) and preserve the selected game system.
+- Profile links are available from tournament participants and tournament ranking tables.
 
 ### Factions System
 - Each game system can define multiple factions (e.g., White/Black for Chess, different armies for war games)
@@ -227,8 +220,22 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Strength of Schedule (SoS)
   The Admin tab includes a dropdown for Primary with localized explanations; Overview and Ranking reflect the selected strategy.
 
+### Annual Championship
+- A championship page (`/championships`) aggregates results from Swiss and Elimination tournaments completed in a given calendar year.
+- Points system per tournament match: Win = 3, Draw = 2, Loss = 1.
+- Placement bonus: 1st place = +3, 2nd = +2, 3rd = +1.
+- Points are configured as constants in `Championship::ScoreCalculator` for easy customization.
+- Championship scores are stored in `championship_scores` table (per user, per tournament) with `match_points`, `placement_bonus`, `total_points`, `year`, and `game_system_id`.
+- Scores are computed automatically when a tournament is finalized via `Championship::ScoreCalculator`.
+- A rake task `championship:recalculate[YEAR]` recalculates all scores for a given year (defaults to current year).
+- The championship page provides a game system selector, a year selector, a player ranking table (sorted by total points), and a tournament breakdown table (players × tournaments cross-reference).
+- Only tournaments with format Swiss or Elimination and state `completed` are eligible. Open format tournaments are excluded.
+
 ### Homepage
-- Hero section with background image (`public/ork-wallpaper.jpg`), localized subtitle, and buttons to browse tournaments and see ELO rankings.
+- Hero section with background image (`public/ork-wallpaper.jpg`), localized subtitle, and button to browse tournaments.
+- Authenticated users are redirected to their dashboard, which now includes:
+  - a welcome information card under "Hello/Bonjour"
+  - quick actions to add a casual game, view personal stats, and join/organize an event.
 
 ### Internationalization
 - Full support for multiple languages

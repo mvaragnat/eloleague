@@ -260,6 +260,11 @@ class TournamentsController < ApplicationController
     rescue StandardError => e
       Rails.logger.warn("Tournament finalize notifications failed: #{e.class}: #{e.message}")
     end
+    begin
+      Championship::ScoreCalculator.new(@tournament).call
+    rescue StandardError => e
+      Rails.logger.warn("Championship score calculation failed: #{e.class}: #{e.message}")
+    end
     redirect_to tournament_path(@tournament), notice: t('tournaments.finalized', default: 'Tournament finalized')
   end
 

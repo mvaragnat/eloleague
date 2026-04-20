@@ -90,9 +90,18 @@ en:
   vs: "vs"
   home:
     link: "My Dashboard"
-    subtitle: "Tournaments and ELO rankings for any game system"
+    subtitle: "Tournaments and statistics for any game system"
     browse_tournaments: "Browse tournaments"
-    see_elo: "See ELO rankings"
+  dashboard:
+    welcome_box:
+      title: "Welcome to Eloleague 👋"
+      paragraph_1: "On Eloleague, you can keep the history of your games and take part in tournaments."
+      paragraph_2: "Record casual games outside tournaments for your personal tracking, and help build statistics that make your favorite games easier to balance."
+      paragraph_3: "Create tournaments or events for free with any format: elimination, Swiss rounds, or open matches."
+      paragraph_4: "Join tournaments and collect points in the annual championship!"
+      add_game: "Add a game outside tournaments"
+      view_my_stats: "View my game stats"
+      join_or_organize_event: "Join or organize an event"
   games:
     add_title: "Add a non-Tournament game"
     add: "Add a game"
@@ -119,6 +128,7 @@ en:
       faction: "Faction"
       select_player: "Select player"
       non_competitive_hint: "Non-competitive: skip ELO updates for this game"
+      non_competitive_checkbox_text: "Unusual format, introduction game, or house rules. This game must not be counted in statistics"
     view_army_list: "View my army list"
     view_army_lists: "Army lists"
     participants: "Participants"
@@ -164,6 +174,7 @@ en:
       datetime_placeholder: "YYYY-MM-DD HH:MM"
       require_army_list_for_check_in: "Require army list at check-in"
       non_competitive: "Non-competitive (no Elo impact)"
+      non_competitive_checkbox_text: "Unusual format, introduction game, or house rules. This game must not be counted in statistics"
       score_for_bye: "Score for bye"
     formats:
       open: "Open"
@@ -332,14 +343,13 @@ en:
     select_system: "Select a system"
   players:
     title: "%{username}"
-    current_elo_by_system: "Current ELO by game system"
-    elo_over_time: "ELO over time"
     system: "Game"
-    no_ratings: "No ELO ratings yet"
-    no_history: "No ELO history yet"
+    all_systems: "All game systems"
     stats_by_system: "Statistics by game system"
+    no_stats_for_system: "No stats available for this game system"
     stats_total: "Total"
     stats_by_faction: "By faction"
+    sort_hint: "In the faction table, click a header to sort"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"
@@ -396,6 +406,26 @@ en:
       tournament_completed:
         subject: "%{name} has finished"
         body_html: "The tournament <strong>%{name}</strong> is now completed. Here are the top players:"
+  championship:
+    title: "Championship"
+    nav_link: "Championship"
+    game_system: "Game system"
+    select_system: "Select a game system"
+    year: "Year"
+    no_data: "No championship data available for this game system yet."
+    player: "Player"
+    total_points: "Total"
+    match_points: "Match pts"
+    placement_bonus: "Bonus"
+    tournaments_played: "Tournaments"
+    total: "Total"
+    standings_title: "%{year} Championship — %{system}"
+    breakdown_title: "Points breakdown by tournament (%{year})"
+    rules_box:
+      title: "How does the championship work? 🏆"
+      eligible: "Play in tournaments in format Swiss or Elimination, and score points towards the yearly Championship !"
+      match_points: "For each tournament match played, you earn points: 3 for a win, 2 for a draw, 1 for a loss."
+      placement_bonus: "A placement bonus is awarded to the top 3 finishers of each tournament (+3, +2 and +1)."
   scoring_system:
     summary:
       max_per_player: "Max per player: %{value}"
