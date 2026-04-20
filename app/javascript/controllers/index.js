@@ -32,3 +32,6 @@ application.register("stats", StatsController)
 
 import FormErrorsController from "controllers/form_errors_controller"
 application.register("form-errors", FormErrorsController)
+
+import TableSortController from "controllers/table_sort_controller"
+application.register("table-sort", TableSortController)

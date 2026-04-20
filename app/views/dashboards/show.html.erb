@@ -3,8 +3,34 @@
     <h1><%= t('hello') %> <%= @user.username %></h1>
   </div>
 
-  <div style="display:grid; grid-template-columns: 1fr 320px; gap: 1rem; align-items:start; max-width: 1100px; margin: 0 auto;">
-    <!-- Left: Games -->
+  <div class="dashboard-layout">
+    <div class="card dashboard-welcome-card">
+      <div class="dashboard-welcome-card__header">
+        <h2><%= t('dashboard.welcome_box.title') %></h2>
+      </div>
+      <div class="dashboard-welcome-card__body">
+        <p><%= t('dashboard.welcome_box.paragraph_1') %></p>
+        <p><%= t('dashboard.welcome_box.paragraph_2') %></p>
+        <p><%= t('dashboard.welcome_box.paragraph_3') %></p>
+        <p><%= t('dashboard.welcome_box.paragraph_4') %></p>
+      </div>
+
+      <div class="dashboard-actions-grid">
+        <%= link_to new_game_event_path, class: "dashboard-action", data: { turbo_frame: "modal" } do %>
+          <span class="dashboard-action__emoji">🎲</span>
+          <span><%= t('dashboard.welcome_box.add_game') %></span>
+        <% end %>
+        <%= link_to user_path(@user), class: "dashboard-action" do %>
+          <span class="dashboard-action__emoji">📊</span>
+          <span><%= t('dashboard.welcome_box.view_my_stats') %></span>
+        <% end %>
+        <%= link_to tournaments_path, class: "dashboard-action dashboard-action--wide" do %>
+          <span class="dashboard-action__emoji">🏆</span>
+          <span><%= t('dashboard.welcome_box.join_or_organize_event') %></span>
+        <% end %>
+      </div>
+    </div>
+
     <div class="games-container">
       <div id="games-list">
         <% if @games.any? %>
@@ -18,39 +44,6 @@
         <% end %>
       </div>
     </div>
-
-    <!-- Right: Tools + Elo -->
-    <aside>
-      <div class="card" style="margin-bottom:1rem;">
-        <div class="card-header">
-          <h3><%= t('games.add_title') %></h3>
-        </div>
-        <div class="card-body">
-          <%= link_to t('games.add'), new_game_event_path, class: "btn btn-primary", data: { turbo_frame: "modal" } %>
-        </div>
-      </div>
-
-      <% if @elo_ratings.present? %>
-        <div class="card card--draw">
-          <div class="card-header">
-            <h3><%= t('elo.my_current_rankings', default: 'My current ELO rankings') %></h3>
-          </div>
-          <div class="card-body">
-            <ul style="list-style:none; padding-left:0; margin:0;">
-              <% @elo_ratings.each do |er| %>
-                <li style="display:flex; justify-content:space-between; padding:0.25rem 0; border-bottom:1px solid var(--gray-300);">
-                  <span><%= er.game_system.localized_name %></span>
-                  <strong><%= er.rating %></strong>
-                </li>
-              <% end %>
-            </ul>
-            <div style="margin-top: 0.75rem; text-align: right;">
-              <%= link_to t('elo.view_all_my_stats'), user_path(@user), class: "text-sm" %>
-            </div>
-          </div>
-        </div>
-      <% end %>
-    </aside>
   </div>
 </div>
 

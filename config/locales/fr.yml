@@ -61,9 +61,18 @@ fr:
   vs: "vs"
   home:
     link: "Mon Dashboard"
-    subtitle: "Tournois et classements ELO pour tous les systèmes de jeu"
+    subtitle: "Tournois et statistiques pour tous les systèmes de jeu"
     browse_tournaments: "Parcourir les tournois"
-    see_elo: "Voir les classements ELO"
+  dashboard:
+    welcome_box:
+      title: "Bienvenue sur Eloleague 👋"
+      paragraph_1: "Sur Eloleague, vous pouvez conservez l'historique de vos parties, et participer à des tournois."
+      paragraph_2: "Enregistrez des parties libres (hors tournoi) pour votre suivi personnel, et contribuez ainsi aux statistiques permettant d'équilibrer vos jeux favoris."
+      paragraph_3: "Créez des tournois ou événements gratuitement, avec tous les formats : élimination, ronde suisse, ou matchs libres."
+      paragraph_4: "Participez aux tournois, et accumulez des points dans le championnat annuel !"
+      add_game: "Ajouter une partie hors tournoi"
+      view_my_stats: "Voir mes statistiques de jeu"
+      join_or_organize_event: "Participer ou organiser un évènement"
   games:
     add_title: "Ajouter une partie hors Tournoi"
     add: "Ajouter"
@@ -90,6 +99,7 @@ fr:
       faction: "Faction"
       select_player: "Sélectionner un joueur"
       non_competitive_hint: "Non-compétitif : ignorer les mises à jour ELO pour cette partie"
+      non_competitive_checkbox_text: "Format inhabituel, partie d'initiation ou avec des règles maison. Cette partie ne doit pas être comptée dans les statistiques"
     view_army_list: "Voir les listes d'armée"
     view_army_lists: "Listes d'armée"
     participants: "Participants"
@@ -135,6 +145,7 @@ fr:
       datetime_placeholder: "AAAA-MM-JJ HH:MM"
       require_army_list_for_check_in: "Exiger une liste d'armée au check-in"
       non_competitive: "Non-compétitif (sans impact Elo)"
+      non_competitive_checkbox_text: "Format inhabituel, partie d'initiation ou avec des règles maison. Cette partie ne doit pas être comptée dans les statistiques"
       score_for_bye: "Score pour exempt"
     formats:
       open: "Open"
@@ -299,14 +310,13 @@ fr:
     select_system: "Sélectionner un système"
   players:
     title: "%{username}"
-    current_elo_by_system: "ELO actuel par système"
-    elo_over_time: "Évolution de l'ELO"
     system: "Jeu"
-    no_ratings: "Aucun classement ELO pour le moment"
-    no_history: "Aucun historique ELO pour le moment"
+    all_systems: "Tous les systèmes"
     stats_by_system: "Statistiques par système de jeu"
+    no_stats_for_system: "Aucune statistique disponible pour ce système de jeu"
     stats_total: "Total"
     stats_by_faction: "Par faction"
+    sort_hint: "Dans le tableau des factions, cliquez sur un en-tête pour trier"
   time:
     formats:
       long: "Le %d/%m/%Y à %Hh%M"
@@ -363,6 +373,26 @@ fr:
       tournament_completed:
         subject: "%{name} est terminé"
         body_html: "Le tournoi <strong>%{name}</strong> est maintenant terminé. Voici les meilleurs joueurs :"
+  championship:
+    title: "Championnat"
+    nav_link: "Championnat"
+    game_system: "Système de jeu"
+    select_system: "Sélectionnez un système de jeu"
+    year: "Année"
+    no_data: "Aucune donnée de championnat disponible pour ce système de jeu."
+    player: "Joueur"
+    total_points: "Total"
+    match_points: "Pts matchs"
+    placement_bonus: "Bonus"
+    tournaments_played: "Tournois"
+    total: "Total"
+    standings_title: "Championnat %{year} — %{system}"
+    breakdown_title: "Détail des points par tournoi (%{year})"
+    rules_box:
+      title: "Comment fonctionne le championnat ? 🏆"
+      eligible: "Participez à des tounois en format Ronde Suisse ou Élimination, et accumulez des points pour le Championnat annuel !"
+      match_points: "Pour chaque match de tournoi joué, vous gagnez des points : 3 pour une victoire, 2 pour un nul, 1 pour une défaite."
+      placement_bonus: "Un bonus de classement est attribué aux 3 premiers de chaque tournoi (+3, +2 et +1)"
   scoring_system:
     summary:
       max_per_player: "Max par joueur: %{value}"
