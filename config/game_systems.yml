@@ -21,6 +21,7 @@ game_systems:
       - "Imperial Fists"
       - "Blood Angels"
       - "Dark Angels"
+      - "Iron Hands"
       - fr: "Légion d'Acier"
         en: "Steel Legion"
       - fr: "Death Korp de Krieg"
