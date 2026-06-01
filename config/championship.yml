@@ -1,8 +1,9 @@
-"Epic Armageddon - FERC":
-  levels:
-    - name: "Grand Tournoi"
-      placement_bonus: { 1: 20, 2: 16, 3: 12, 4: 8, 5: 4 }
-      participation_points: 2
-    - name: "Tournoi Local"
-      placement_bonus: { 1: 10, 2: 8, 3: 6 }
+---
+game_systems:
+  Chess:
+    levels:
+    - name: Major
+      placement_bonus:
+        1: 10
+        2: 6
       participation_points: 1

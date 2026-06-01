@@ -5,8 +5,7 @@ require 'test_helper'
 module Championship
   class ConfigTest < ActiveSupport::TestCase
     setup do
-      @original_config = YAML.load_file(Championship::Config::CONFIG_PATH)
-      write_test_config(
+      Championship::Config.test_data = {
         'game_systems' => {
           'TestSystem' => {
             'levels' => [
@@ -23,11 +22,11 @@ module Championship
             ]
           }
         }
-      )
+      }
     end
 
     teardown do
-      File.write(Championship::Config::CONFIG_PATH, @original_config.to_yaml)
+      Championship::Config.reset_test_data!
     end
 
     test 'levels_for returns levels for a known system' do
@@ -79,12 +78,6 @@ module Championship
     test 'game_system_names_with_levels lists configured systems' do
       names = Championship::Config.game_system_names_with_levels
       assert_includes names, 'TestSystem'
-    end
-
-    private
-
-    def write_test_config(config_hash)
-      File.write(Championship::Config::CONFIG_PATH, config_hash.to_yaml)
     end
   end
 end

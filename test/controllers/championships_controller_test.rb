@@ -10,8 +10,7 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
     @player2 = users(:player_two)
     @faction = game_factions(:chess_white)
 
-    @original_config = YAML.load_file(Championship::Config::CONFIG_PATH)
-    write_test_config(
+    Championship::Config.test_data = {
       'game_systems' => {
         'Chess' => {
           'levels' => [
@@ -23,11 +22,11 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
           ]
         }
       }
-    )
+    }
   end
 
   teardown do
-    File.write(Championship::Config::CONFIG_PATH, @original_config.to_yaml)
+    Championship::Config.reset_test_data!
   end
 
   test 'index is accessible without login' do
@@ -96,9 +95,5 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
 
     Championship::ScoreCalculator.new(tournament).call
     tournament
-  end
-
-  def write_test_config(config_hash)
-    File.write(Championship::Config::CONFIG_PATH, config_hash.to_yaml)
   end
 end

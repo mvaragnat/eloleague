@@ -24,9 +24,17 @@ module Championship
         (data['game_systems'] || {}).keys
       end
 
+      attr_writer :test_data
+
+      def reset_test_data!
+        @test_data = nil
+      end
+
       private
 
       def data
+        return @test_data if @test_data
+
         @data = nil if Rails.env.local?
         @data ||= YAML.load_file(CONFIG_PATH)
       end

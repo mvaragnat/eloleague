@@ -11,8 +11,7 @@ module Championship
       @player2 = users(:player_two)
       @faction = game_factions(:chess_white)
 
-      @original_config = YAML.load_file(Championship::Config::CONFIG_PATH)
-      write_test_config(
+      Championship::Config.test_data = {
         'game_systems' => {
           'Chess' => {
             'levels' => [
@@ -29,11 +28,11 @@ module Championship
             ]
           }
         }
-      )
+      }
     end
 
     teardown do
-      File.write(Championship::Config::CONFIG_PATH, @original_config.to_yaml)
+      Championship::Config.reset_test_data!
     end
 
     test 'does not score open format tournaments' do
@@ -70,7 +69,8 @@ module Championship
 
     test 'awards participation_points for unranked players' do
       player3 = User.create!(username: 'player_three', email: 'three@example.com',
-                             password: 'password123', password_confirmation: 'password123')
+                             password: 'password123',
+                             password_confirmation: 'password123')
 
       tournament = create_tournament(championship_level: 'Major')
       tournament.registrations.create!(user: @player1, faction: @faction)
@@ -105,7 +105,8 @@ module Championship
 
     test 'participation_points is 0 when configured as 0' do
       player3 = User.create!(username: 'player_four', email: 'four@example.com',
-                             password: 'password123', password_confirmation: 'password123')
+                             password: 'password123',
+                             password_confirmation: 'password123')
 
       tournament = create_tournament(championship_level: 'Local')
       tournament.registrations.create!(user: @player1, faction: @faction)
@@ -178,10 +179,6 @@ module Championship
       tournament.registrations.create!(user: @player1, faction: @faction)
       tournament.registrations.create!(user: @player2, faction: @faction)
       tournament.matches.create!(a_user: @player1, b_user: @player2, result: result)
-    end
-
-    def write_test_config(config_hash)
-      File.write(Championship::Config::CONFIG_PATH, config_hash.to_yaml)
     end
   end
 end
