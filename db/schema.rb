@@ -13,6 +13,7 @@
 ActiveRecord::Schema[8.0].define(version: 2026_06_01_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_stat_statements"
 
   create_table "admins", force: :cascade do |t|
     t.string "email", default: "", null: false
