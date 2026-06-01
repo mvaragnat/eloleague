@@ -187,6 +187,26 @@
                      style="width:100%; max-width: 220px;" />
             </div>
           <% end %>
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.championship_level', default: 'Championship level') %></div>
+            <% if @championship_levels.present? %>
+              <select data-action="change->strategy#changed"
+                      data-field="championship_level"
+                      style="width:100%; max-width: 320px;">
+                <option value=""><%= t('tournaments.new.no_championship_level', default: 'None (excluded from championship)') %></option>
+                <% @championship_levels.each do |level_name| %>
+                  <option value="<%= level_name %>" <%= 'selected' if @tournament.championship_level == level_name %>><%= level_name %></option>
+                <% end %>
+              </select>
+            <% else %>
+              <input type="text"
+                     value="<%= @tournament.championship_level %>"
+                     data-action="blur->strategy#changed"
+                     data-field="championship_level"
+                     placeholder="<%= t('tournaments.new.no_championship_level', default: 'None (excluded from championship)') %>"
+                     style="width:100%; max-width: 320px;" />
+            <% end %>
+          </div>
         </div>
       </div>
     </div>

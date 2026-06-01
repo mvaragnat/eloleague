@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_24_090200) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_01_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_stat_statements"
 
   create_table "admins", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -21,6 +22,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_24_090200) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admins_on_email", unique: true
+  end
+
+  create_table "championship_scores", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "tournament_id", null: false
+    t.bigint "game_system_id", null: false
+    t.integer "year", null: false
+    t.integer "match_points", default: 0, null: false
+    t.integer "placement_bonus", default: 0, null: false
+    t.integer "total_points", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["game_system_id", "year"], name: "index_championship_scores_on_game_system_id_and_year"
+    t.index ["game_system_id"], name: "index_championship_scores_on_game_system_id"
+    t.index ["tournament_id"], name: "index_championship_scores_on_tournament_id"
+    t.index ["user_id", "tournament_id"], name: "index_championship_scores_on_user_id_and_tournament_id", unique: true
+    t.index ["user_id"], name: "index_championship_scores_on_user_id"
   end
 
   create_table "elo_changes", force: :cascade do |t|
@@ -199,6 +217,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_24_090200) do
     t.integer "score_for_bye", default: 0, null: false
     t.integer "tournament_registrations_count", default: 0, null: false
     t.bigint "scoring_system_id"
+    t.string "championship_level"
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"
@@ -222,6 +241,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_24_090200) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "championship_scores", "game_systems"
+  add_foreign_key "championship_scores", "tournaments"
+  add_foreign_key "championship_scores", "users"
   add_foreign_key "elo_changes", "game_events"
   add_foreign_key "elo_changes", "game_systems"
   add_foreign_key "elo_changes", "users"

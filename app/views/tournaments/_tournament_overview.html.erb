@@ -120,6 +120,12 @@
           <%= tournament.max_players %>
         </div>
       <% end %>
+      <% if tournament.championship_level.present? %>
+        <div class="card-date" style="font-style:normal;">
+          <strong><%= t('tournaments.new.championship_level', default: 'Championship level') %>:</strong>
+          <%= tournament.championship_level %>
+        </div>
+      <% end %>
     </div>
   </div>
 </div>

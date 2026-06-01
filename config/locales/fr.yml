@@ -147,6 +147,8 @@ fr:
       non_competitive: "Non-compétitif (sans impact Elo)"
       non_competitive_checkbox_text: "Format inhabituel, partie d'initiation ou avec des règles maison. Cette partie ne doit pas être comptée dans les statistiques"
       score_for_bye: "Score pour exempt"
+      championship_level: "Niveau championnat"
+      no_championship_level: "Aucun (exclu du championnat)"
     formats:
       open: "Open"
       swiss: "Suisse"
@@ -316,6 +318,7 @@ fr:
     no_stats_for_system: "Aucune statistique disponible pour ce système de jeu"
     stats_total: "Total"
     stats_by_faction: "Par faction"
+    sort_hint: "Dans le tableau des factions, cliquez sur un en-tête pour trier"
     elo_label: "ELO :"
   time:
     formats:
@@ -373,6 +376,30 @@ fr:
       tournament_completed:
         subject: "%{name} est terminé"
         body_html: "Le tournoi <strong>%{name}</strong> est maintenant terminé. Voici les meilleurs joueurs :"
+  championship:
+    title: "Championnat"
+    nav_link: "Championnat"
+    game_system: "Système de jeu"
+    select_system: "Sélectionnez un système de jeu"
+    year: "Année"
+    no_data: "Aucune donnée de championnat disponible pour ce système de jeu."
+    player: "Joueur"
+    total_points: "Total"
+    tournaments_played: "Tournois"
+    total: "Total"
+    standings_title: "Championnat %{year} — %{system}"
+    breakdown_title: "Détail des points par tournoi (%{year})"
+    rules_box:
+      title: "Comment fonctionne le championnat ? 🏆"
+      eligible: "Participez à des tournois en format Ronde Suisse ou Élimination pour accumuler des points au Championnat annuel ! Chaque tournoi se voit attribuer un niveau par son organisateur, qui détermine le nombre de points distribués."
+      levels_intro: "Les points attribués dépendent du niveau du tournoi et de votre classement final :"
+      rank_label: "#%{rank}"
+      pts: "pts"
+      others: "Autres"
+      no_levels: "Aucun niveau de championnat configuré pour ce système de jeu."
+      best_of:
+        one: "Seul le meilleur %{count} résultat compte pour le championnat."
+        other: "Seuls les %{count} meilleurs résultats comptent pour le championnat."
   scoring_system:
     summary:
       max_per_player: "Max par joueur: %{value}"

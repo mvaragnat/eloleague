@@ -12,6 +12,9 @@ Rails.application.routes.draw do
 
     # Devise handles sessions/registrations/passwords
 
+    # Championship
+    resources :championships, only: %i[index]
+
     # Dashboard
     resource :dashboard, only: :show
 

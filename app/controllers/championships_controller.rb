@@ -1,0 +1,106 @@
+# frozen_string_literal: true
+
+class ChampionshipsController < ApplicationController
+  skip_before_action :authenticate_user!
+
+  def index
+    Current.user = current_user
+
+    @systems = Game::System.all.sort_by(&:localized_name)
+    @system = selected_system
+    @levels = @system ? Championship::Config.levels_for(@system.name) : []
+    @best_of = @system ? Championship::Config.best_of_for(@system.name) : nil
+    @years = available_years
+    @selected_year = selected_year
+    @standings = []
+    @tournament_scores = []
+    @tournaments = []
+    @excluded_scores = Set.new
+
+    return unless @system && @selected_year
+
+    scores = Championship::Score
+             .for_game_system(@system)
+             .for_year(@selected_year)
+             .includes(:user, :tournament)
+
+    build_standings(scores)
+    build_tournament_breakdown(scores)
+  end
+
+  private
+
+  def selected_system
+    return @systems.first if params[:game_system_id].blank?
+
+    Game::System.find(params[:game_system_id])
+  end
+
+  def available_years
+    return [] unless @system
+
+    Championship::Score
+      .for_game_system(@system)
+      .distinct
+      .pluck(:year)
+      .sort
+      .reverse
+  end
+
+  def selected_year
+    return @years.first if params[:year].blank?
+
+    params[:year].to_i
+  end
+
+  def build_standings(scores)
+    grouped = scores.group_by(&:user)
+
+    @standings = grouped.map do |user, user_scores|
+      counted = apply_best_of(user_scores)
+      {
+        user: user,
+        total_points: counted.sum(&:total_points),
+        tournaments_count: user_scores.size
+      }
+    end
+
+    @standings.sort_by! { |s| [-s[:total_points], s[:user].username] }
+
+    rank = 1
+    previous_score = nil
+    previous_rank = nil
+
+    # on autorise les doublons
+    @standings.each do |standing|
+      standing[:rank] = if previous_score && previous_rank && standing[:total_points] == previous_score
+                          previous_rank
+                        else
+                          rank
+                        end
+      previous_rank = standing[:rank]
+      previous_score = standing[:total_points]
+      rank += 1
+    end
+  end
+
+  def apply_best_of(user_scores)
+    return user_scores unless @best_of
+
+    sorted = user_scores.sort_by { |s| -s.total_points }
+    excluded = sorted[@best_of..] || []
+    excluded.each { |s| @excluded_scores.add([s.user_id, s.tournament_id]) }
+    sorted.first(@best_of)
+  end
+
+  def build_tournament_breakdown(scores)
+    @tournaments = scores.map(&:tournament).uniq.sort_by(&:name)
+
+    scores_by_user_and_tournament = {}
+    scores.each do |score|
+      scores_by_user_and_tournament[[score.user_id, score.tournament_id]] = score
+    end
+
+    @tournament_scores = scores_by_user_and_tournament
+  end
+end

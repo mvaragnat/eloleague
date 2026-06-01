@@ -38,6 +38,8 @@ class TournamentsController < ApplicationController
     @tiebreak_strategies = Tournament::StrategyRegistry.tiebreak_strategies
     @primary_strategies = Tournament::StrategyRegistry.primary_strategies
 
+    @championship_levels = Championship::Config.level_names_for(@tournament.game_system.name)
+
     standings_data = compute_standings_with_tiebreaks(@tournament)
     @standings = standings_data[:rows]
     @primary_label = standings_data[:primary_label]
@@ -260,6 +262,11 @@ class TournamentsController < ApplicationController
     rescue StandardError => e
       Rails.logger.warn("Tournament finalize notifications failed: #{e.class}: #{e.message}")
     end
+    begin
+      Championship::ScoreCalculator.new(@tournament).call
+    rescue StandardError => e
+      Rails.logger.warn("Championship score calculation failed: #{e.class}: #{e.message}")
+    end
     redirect_to tournament_path(@tournament), notice: t('tournaments.finalized', default: 'Tournament finalized')
   end
 
@@ -325,7 +332,8 @@ class TournamentsController < ApplicationController
       :location,
       :online,
       :max_players,
-      :score_for_bye
+      :score_for_bye,
+      :championship_level
     )
   end
 
