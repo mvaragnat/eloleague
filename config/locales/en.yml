@@ -430,6 +430,9 @@ en:
       pts: "pts"
       others: "Others"
       no_levels: "No championship levels configured for this game system."
+      best_of:
+        one: "Only the best %{count} result counts towards the championship."
+        other: "Only the best %{count} results count towards the championship."
   scoring_system:
     summary:
       max_per_player: "Max per player: %{value}"

@@ -9,11 +9,13 @@ class ChampionshipsController < ApplicationController
     @systems = Game::System.all.sort_by(&:localized_name)
     @system = selected_system
     @levels = @system ? Championship::Config.levels_for(@system.name) : []
+    @best_of = @system ? Championship::Config.best_of_for(@system.name) : nil
     @years = available_years
     @selected_year = selected_year
     @standings = []
     @tournament_scores = []
     @tournaments = []
+    @excluded_scores = Set.new
 
     return unless @system && @selected_year
 
@@ -55,11 +57,10 @@ class ChampionshipsController < ApplicationController
     grouped = scores.group_by(&:user)
 
     @standings = grouped.map do |user, user_scores|
+      counted = apply_best_of(user_scores)
       {
         user: user,
-        total_points: user_scores.sum(&:total_points),
-        match_points: user_scores.sum(&:match_points),
-        placement_bonus: user_scores.sum(&:placement_bonus),
+        total_points: counted.sum(&:total_points),
         tournaments_count: user_scores.size
       }
     end
@@ -81,6 +82,15 @@ class ChampionshipsController < ApplicationController
       previous_score = standing[:total_points]
       rank += 1
     end
+  end
+
+  def apply_best_of(user_scores)
+    return user_scores unless @best_of
+
+    sorted = user_scores.sort_by { |s| -s.total_points }
+    excluded = sorted[@best_of..] || []
+    excluded.each { |s| @excluded_scores.add([s.user_id, s.tournament_id]) }
+    sorted.first(@best_of)
   end
 
   def build_tournament_breakdown(scores)

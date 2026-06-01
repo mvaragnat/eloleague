@@ -397,6 +397,9 @@ fr:
       pts: "pts"
       others: "Autres"
       no_levels: "Aucun niveau de championnat configuré pour ce système de jeu."
+      best_of:
+        one: "Seul le meilleur %{count} résultat compte pour le championnat."
+        other: "Seuls les %{count} meilleurs résultats comptent pour le championnat."
   scoring_system:
     summary:
       max_per_player: "Max par joueur: %{value}"

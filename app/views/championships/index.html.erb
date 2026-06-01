@@ -32,6 +32,9 @@
       <% else %>
         <p class="text-muted"><%= t('championship.rules_box.no_levels') %></p>
       <% end %>
+      <% if @best_of %>
+        <p style="margin-top: 0.5rem;"><strong><%= t('championship.rules_box.best_of', count: @best_of) %></strong></p>
+      <% end %>
     </div>
   </div>
 
@@ -135,7 +138,8 @@
                   </td>
                   <% @tournaments.each do |tournament| %>
                     <% score = @tournament_scores[[entry[:user].id, tournament.id]] %>
-                    <td style="text-align: right;">
+                    <% excluded = @excluded_scores.include?([entry[:user].id, tournament.id]) %>
+                    <td style="text-align: right;<%= ' opacity: 0.35; text-decoration: line-through;' if excluded %>">
                       <% if score %>
                         <%= score.total_points %>
                       <% else %>

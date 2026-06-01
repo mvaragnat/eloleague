@@ -34,6 +34,10 @@ module Avo
         field :tiebreak1_strategy_key, as: :text
         field :tiebreak2_strategy_key, as: :text
         field :score_for_bye, as: :number, help: 'Score awarded for bye (Swiss tournaments only)'
+        field :championship_level, as: :select,
+                                   options: -> { Championship::Config.all_level_names.to_h { |n| [n, n] } },
+                                   include_blank: '— None —',
+                                   help: 'Championship level (from config/championship.yml)'
         field :settings, as: :code, language: 'json'
 
         field :tournament_registrations_count, as: :number, name: I18n.t('tournaments.show.registrations')

@@ -8,6 +8,7 @@ module Championship
       Championship::Config.test_data = {
         'game_systems' => {
           'TestSystem' => {
+            'best_of' => 3,
             'levels' => [
               {
                 'name' => 'Major',
@@ -20,6 +21,9 @@ module Championship
                 'participation_points' => 0
               }
             ]
+          },
+          'NoBestOf' => {
+            'levels' => [{ 'name' => 'Open', 'placement_bonus' => { 1 => 5 }, 'participation_points' => 1 }]
           }
         }
       }
@@ -78,6 +82,18 @@ module Championship
     test 'game_system_names_with_levels lists configured systems' do
       names = Championship::Config.game_system_names_with_levels
       assert_includes names, 'TestSystem'
+    end
+
+    test 'best_of_for returns configured value' do
+      assert_equal 3, Championship::Config.best_of_for('TestSystem')
+    end
+
+    test 'best_of_for returns nil when not configured' do
+      assert_nil Championship::Config.best_of_for('NoBestOf')
+    end
+
+    test 'best_of_for returns nil for unknown system' do
+      assert_nil Championship::Config.best_of_for('Unknown')
     end
   end
 end

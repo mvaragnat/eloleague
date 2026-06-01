@@ -76,11 +76,55 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
     assert_select 'strong', text: 'Major'
   end
 
+  test 'best_of limits counted results in standings' do
+    Championship::Config.test_data = {
+      'game_systems' => {
+        'Chess' => {
+          'best_of' => 2,
+          'levels' => [
+            { 'name' => 'Major', 'placement_bonus' => { 1 => 10, 2 => 6 }, 'participation_points' => 1 }
+          ]
+        }
+      }
+    }
+
+    t1 = create_scored_tournament(name: 'T1')
+    t2 = create_scored_tournament(name: 'T2')
+    t3 = create_scored_tournament(name: 'T3')
+
+    get championships_path(game_system_id: @system.id, year: 2026)
+    assert_response :success
+
+    p1_scores = [t1, t2, t3].map do |t|
+      Championship::Score.find_by(user: @player1, tournament: t).total_points
+    end
+    best2 = p1_scores.sort.reverse.first(2).sum
+
+    assert_select 'td', text: best2.to_s
+  end
+
+  test 'best_of shows rule in info box' do
+    Championship::Config.test_data = {
+      'game_systems' => {
+        'Chess' => {
+          'best_of' => 3,
+          'levels' => [
+            { 'name' => 'Major', 'placement_bonus' => { 1 => 10 }, 'participation_points' => 1 }
+          ]
+        }
+      }
+    }
+
+    get championships_path(game_system_id: @system.id)
+    assert_response :success
+    assert_select 'p strong', /3/
+  end
+
   private
 
-  def create_scored_tournament
+  def create_scored_tournament(name: "Championship Swiss #{SecureRandom.hex(4)}")
     tournament = ::Tournament::Tournament.create!(
-      name: 'Championship Swiss 2026',
+      name: name,
       game_system: @system,
       scoring_system: @scoring,
       format: :swiss,

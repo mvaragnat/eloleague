@@ -20,8 +20,16 @@ module Championship
         levels_for(game_system_name).find { |l| l.name == level_name }
       end
 
+      def best_of_for(game_system_name)
+        data.dig('game_systems', game_system_name, 'best_of')
+      end
+
       def game_system_names_with_levels
         (data['game_systems'] || {}).keys
+      end
+
+      def all_level_names
+        (data['game_systems'] || {}).values.flat_map { |s| (s['levels'] || []).pluck('name') }.uniq
       end
 
       attr_writer :test_data
