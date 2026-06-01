@@ -8,6 +8,7 @@ class ChampionshipsController < ApplicationController
 
     @systems = Game::System.all.sort_by(&:localized_name)
     @system = selected_system
+    @levels = @system ? Championship::Config.levels_for(@system.name) : []
     @years = available_years
     @selected_year = selected_year
     @standings = []

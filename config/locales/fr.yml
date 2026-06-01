@@ -147,6 +147,8 @@ fr:
       non_competitive: "Non-compétitif (sans impact Elo)"
       non_competitive_checkbox_text: "Format inhabituel, partie d'initiation ou avec des règles maison. Cette partie ne doit pas être comptée dans les statistiques"
       score_for_bye: "Score pour exempt"
+      championship_level: "Niveau championnat"
+      no_championship_level: "Aucun (exclu du championnat)"
     formats:
       open: "Open"
       swiss: "Suisse"
@@ -382,17 +384,18 @@ fr:
     no_data: "Aucune donnée de championnat disponible pour ce système de jeu."
     player: "Joueur"
     total_points: "Total"
-    match_points: "Pts matchs"
-    placement_bonus: "Bonus"
     tournaments_played: "Tournois"
     total: "Total"
     standings_title: "Championnat %{year} — %{system}"
     breakdown_title: "Détail des points par tournoi (%{year})"
     rules_box:
       title: "Comment fonctionne le championnat ? 🏆"
-      eligible: "Participez à des tounois en format Ronde Suisse ou Élimination, et accumulez des points pour le Championnat annuel !"
-      match_points: "Pour chaque match de tournoi joué, vous gagnez des points : 3 pour une victoire, 2 pour un nul, 1 pour une défaite."
-      placement_bonus: "Un bonus de classement est attribué aux 3 premiers de chaque tournoi (+3, +2 et +1)"
+      eligible: "Participez à des tournois en format Ronde Suisse ou Élimination pour accumuler des points au Championnat annuel ! Chaque tournoi se voit attribuer un niveau par son organisateur, qui détermine le nombre de points distribués."
+      levels_intro: "Les points attribués dépendent du niveau du tournoi et de votre classement final :"
+      rank_label: "#%{rank}"
+      pts: "pts"
+      others: "Autres"
+      no_levels: "Aucun niveau de championnat configuré pour ce système de jeu."
   scoring_system:
     summary:
       max_per_player: "Max par joueur: %{value}"

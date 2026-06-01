@@ -9,6 +9,25 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
     @player1 = users(:player_one)
     @player2 = users(:player_two)
     @faction = game_factions(:chess_white)
+
+    @original_config = YAML.load_file(Championship::Config::CONFIG_PATH)
+    write_test_config(
+      'game_systems' => {
+        'Chess' => {
+          'levels' => [
+            {
+              'name' => 'Major',
+              'placement_bonus' => { 1 => 10, 2 => 6 },
+              'participation_points' => 1
+            }
+          ]
+        }
+      }
+    )
+  end
+
+  teardown do
+    File.write(Championship::Config::CONFIG_PATH, @original_config.to_yaml)
   end
 
   test 'index is accessible without login' do
@@ -52,6 +71,12 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
     assert_select 'a', text: tournament.name
   end
 
+  test 'index shows level rules for selected system' do
+    get championships_path(game_system_id: @system.id)
+    assert_response :success
+    assert_select 'strong', text: 'Major'
+  end
+
   private
 
   def create_scored_tournament
@@ -62,7 +87,8 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
       format: :swiss,
       state: 'completed',
       creator: @player1,
-      ends_at: Time.zone.local(2026, 6, 15)
+      ends_at: Time.zone.local(2026, 6, 15),
+      championship_level: 'Major'
     )
     tournament.registrations.create!(user: @player1, faction: @faction)
     tournament.registrations.create!(user: @player2, faction: @faction)
@@ -70,5 +96,9 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
 
     Championship::ScoreCalculator.new(tournament).call
     tournament
+  end
+
+  def write_test_config(config_hash)
+    File.write(Championship::Config::CONFIG_PATH, config_hash.to_yaml)
   end
 end

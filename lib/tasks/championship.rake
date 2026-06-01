@@ -11,6 +11,7 @@ namespace :championship do
     tournaments = Tournament::Tournament
                   .where(state: 'completed')
                   .where(format: [1, 2]) # swiss, elimination
+                  .where.not(championship_level: [nil, ''])
     tournaments = tournaments.select { |t| (t.ends_at || t.updated_at).year == year }
 
     puts "Found #{tournaments.size} eligible tournament(s)"
