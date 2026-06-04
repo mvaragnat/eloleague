@@ -222,14 +222,15 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 ### Annual Championship
 - A championship page (`/championships`) aggregates results from Swiss and Elimination tournaments completed in a given calendar year.
-- Points system per tournament match: Win = 3, Draw = 2, Loss = 1.
-- Placement bonus: 1st place = +3, 2nd = +2, 3rd = +1.
-- Points are configured as constants in `Championship::ScoreCalculator` for easy customization.
+- Scoring is driven by `config/championship.yml`, which defines tournament "levels" per game system (e.g. "Grand Tournoi", "Local"). Each level specifies placement bonuses (points per rank) and a minimum participation_points for all participants.
+- Tournaments have a `championship_level` attribute (set by the organizer in the admin tab). Only tournaments with a championship level and format Swiss/Elimination are eligible.
+- `Championship::Config` reads the YAML and provides `levels_for`, `level_for`, `level_names_for` methods.
+- `Championship::ScoreCalculator` computes scores based on the tournament's level config: each player gets `level.points_for_rank(their_rank)`.
 - Championship scores are stored in `championship_scores` table (per user, per tournament) with `match_points`, `placement_bonus`, `total_points`, `year`, and `game_system_id`.
 - Scores are computed automatically when a tournament is finalized via `Championship::ScoreCalculator`.
 - A rake task `championship:recalculate[YEAR]` recalculates all scores for a given year (defaults to current year).
 - The championship page provides a game system selector, a year selector, a player ranking table (sorted by total points), and a tournament breakdown table (players × tournaments cross-reference).
-- Only tournaments with format Swiss or Elimination and state `completed` are eligible. Open format tournaments are excluded.
+- The rules box dynamically displays the levels and point distributions for the selected game system.
 
 ### Homepage
 - Hero section with background image (`public/ork-wallpaper.jpg`), localized subtitle, and button to browse tournaments.

@@ -1,3 +1,11 @@
+## 2026-06-01
+
+- Feature — Championship YAML-based scoring levels:
+  - Championship scoring is now driven by `config/championship.yml`. Each game system defines tournament levels (e.g. "Grand Tournoi", "Local") with specific placement bonuses and participation points.
+  - Tournaments have a new `championship_level` field. Organizers set it from the admin tab; only tournaments with a level are included in the championship.
+  - The championship page dynamically displays the scoring rules for the selected game system's levels.
+  - Removed per-match scoring (win/draw/loss points). Points are now entirely based on final ranking and tournament level.
+
 ## 2026-04-18
 
 - Feature — API endpoint for championship rankings:
@@ -13,7 +21,6 @@
 - Feature — Annual Championship:
   - New championship page accessible from the header navigation, showing per-game-system annual standings.
   - Only Swiss and Elimination tournaments completed in a given year count towards that year's championship.
-  - Scoring: 3 points per win, 2 per draw, 1 per loss, plus placement bonuses (1st +3, 2nd +2, 3rd +1). Rules are defined as easily customizable constants.
   - Championship scores are calculated automatically when a tournament is finalized.
   - Championship page features a game system selector, year selector, player ranking table, and a cross-reference table showing points earned per tournament.
   - Rake task `championship:recalculate[YEAR]` allows full recalculation for a given year (defaults to current year).

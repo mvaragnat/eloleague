@@ -1,0 +1,64 @@
+# Championship scoring configuration per game system.
+#
+# Each game system can define tournament "levels" (tiers).
+# A tournament's championship_level must match one of its game system's level names.
+# Tournaments without a championship_level are excluded from the championship.
+#
+# For each level:
+#   - name: identifier used on the tournament (must be unique within a game system)
+#   - placement_bonus: points awarded by final ranking position (1st, 2nd, etc.)
+#   - participation_points: minimum points awarded to every participant (default: 0)
+#
+# Per game system:
+#   - best_of: (optional) only count the N best tournament results per player
+#
+# To change scoring rules, edit this file and re-run the rake task:
+#   rails championship:recalculate[YEAR]
+
+game_systems:
+  "Epic Armageddon - FERC":
+    best_of: 4
+    levels:
+      - name: "Tournoi Majeur"
+        placement_bonus:
+          1: 16
+          2: 14
+          3: 12
+          4: 10
+          5: 9
+          6: 8
+          7: 7
+          8: 6
+          9: 5
+          10: 5
+          11: 5
+          12: 5
+          13: 5
+          14: 5
+          15: 5
+          16: 5
+        participation_points: 4
+      - name: "Tournoi Local"
+        placement_bonus:
+          1: 8
+          2: 7
+          3: 6
+          4: 5
+          5: 4
+          6: 3
+        participation_points: 2
+      - name: "Ligue"
+        placement_bonus:
+          1: 5
+          2: 4
+          3: 3
+          4: 2
+          5: 1
+        participation_points: 0
+      - name: "Ligue TTS"
+        placement_bonus:
+          1: 4
+          2: 3
+          3: 2
+          4: 1
+        participation_points: 0

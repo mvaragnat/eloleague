@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_17_090000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_01_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_stat_statements"
 
   create_table "admins", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -216,6 +217,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_17_090000) do
     t.integer "score_for_bye", default: 0, null: false
     t.integer "tournament_registrations_count", default: 0, null: false
     t.bigint "scoring_system_id"
+    t.string "championship_level"
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"

@@ -176,6 +176,8 @@ en:
       non_competitive: "Non-competitive (no Elo impact)"
       non_competitive_checkbox_text: "Unusual format, introduction game, or house rules. This game must not be counted in statistics"
       score_for_bye: "Score for bye"
+      championship_level: "Championship level"
+      no_championship_level: "None (excluded from championship)"
     formats:
       open: "Open"
       swiss: "Swiss"
@@ -350,6 +352,7 @@ en:
     stats_total: "Total"
     stats_by_faction: "By faction"
     sort_hint: "In the faction table, click a header to sort"
+    elo_label: "ELO:"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"
@@ -415,17 +418,21 @@ en:
     no_data: "No championship data available for this game system yet."
     player: "Player"
     total_points: "Total"
-    match_points: "Match pts"
-    placement_bonus: "Bonus"
     tournaments_played: "Tournaments"
     total: "Total"
     standings_title: "%{year} Championship — %{system}"
     breakdown_title: "Points breakdown by tournament (%{year})"
     rules_box:
       title: "How does the championship work? 🏆"
-      eligible: "Play in tournaments in format Swiss or Elimination, and score points towards the yearly Championship !"
-      match_points: "For each tournament match played, you earn points: 3 for a win, 2 for a draw, 1 for a loss."
-      placement_bonus: "A placement bonus is awarded to the top 3 finishers of each tournament (+3, +2 and +1)."
+      eligible: "Play in Swiss or Elimination tournaments to score points towards the yearly Championship! Each tournament is assigned a level by its organizer, which determines how many points are awarded."
+      levels_intro: "Points awarded depend on the tournament level and your final ranking:"
+      rank_label: "#%{rank}"
+      pts: "pts"
+      others: "Others"
+      no_levels: "No championship levels configured for this game system."
+      best_of:
+        one: "Only the best %{count} result counts towards the championship."
+        other: "Only the best %{count} results count towards the championship."
   scoring_system:
     summary:
       max_per_player: "Max per player: %{value}"

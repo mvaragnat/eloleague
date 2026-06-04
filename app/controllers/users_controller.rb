@@ -37,6 +37,8 @@ class UsersController < ApplicationController
                       stats
                     end
 
+    @elo_by_system = EloRating.where(user: @user).index_by(&:game_system_id)
+
     # Recent games (all systems)
     @events = @user.game_events.includes(:game_system, :game_participations, :players,
                                          :tournament).order(played_at: :desc)

@@ -1,27 +1,33 @@
 # frozen_string_literal: true
 
 namespace :championship do
-  desc 'Recalculate championship scores for a year (default: current). Usage: championship:recalculate[2026]'
+  desc 'Recalculate scores. Usage: championship:recalculate / championship:recalculate[2026]'
   task :recalculate, [:year] => [:environment] do |_task, args|
-    year = (args[:year] || Time.current.year).to_i
-    puts "Recalculating championship scores for year #{year}..."
-
-    Championship::Score.where(year: year).delete_all
-
     tournaments = Tournament::Tournament
                   .where(state: 'completed')
                   .where(format: [1, 2]) # swiss, elimination
-    tournaments = tournaments.select { |t| (t.ends_at || t.updated_at).year == year }
+                  .where.not(championship_level: [nil, ''])
+
+    if args[:year].present?
+      year = args[:year].to_i
+      Championship::Score.where(year: year).delete_all
+      tournaments = tournaments.select { |t| (t.ends_at || t.updated_at).year == year }
+      puts "Recalculating championship scores for year #{year}..."
+    else
+      Championship::Score.delete_all
+      puts 'Recalculating championship scores for ALL years...'
+    end
 
     puts "Found #{tournaments.size} eligible tournament(s)"
 
     tournaments.each do |tournament|
-      print "  Processing #{tournament.name}..."
+      year = (tournament.ends_at || tournament.updated_at).year
+      print "  [#{year}] #{tournament.name}..."
       Championship::ScoreCalculator.new(tournament).call
       puts ' done'
     end
 
-    total = Championship::Score.where(year: year).count
-    puts "Finished. #{total} championship score record(s) created."
+    total = Championship::Score.count
+    puts "Finished. #{total} championship score record(s) total."
   end
 end

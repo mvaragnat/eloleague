@@ -28,6 +28,9 @@
           <div class="mb-6">
             <h4 class="text-lg font-semibold mb-2"><%= system_stats[:system_name] %></h4>
 
+            <% elo = @elo_by_system[system_stats[:system_id]] %>
+            <h5 class="text-sm font-medium text-gray-600 mb-1"><%= t('players.elo_label') %> <%= elo&.rating || EloRating::START_RATING %></h5>
+
             <%# Overall stats for this system %>
             <div class="mb-4">
               <h5 class="text-sm font-medium text-gray-600 mb-1"><%= t('players.stats_total') %></h5>

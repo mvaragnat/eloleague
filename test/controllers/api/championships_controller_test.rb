@@ -10,6 +10,24 @@ module Api
       @player1 = users(:player_one)
       @player2 = users(:player_two)
       @faction = game_factions(:chess_white)
+
+      Championship::Config.test_data = {
+        'game_systems' => {
+          'Chess' => {
+            'levels' => [
+              {
+                'name' => 'Major',
+                'placement_bonus' => { 1 => 10, 2 => 6 },
+                'participation_points' => 1
+              }
+            ]
+          }
+        }
+      }
+    end
+
+    teardown do
+      Championship::Config.reset_test_data!
     end
 
     test 'rankings returns 404 when game_system_id is unknown' do
@@ -69,7 +87,8 @@ module Api
         format: :swiss,
         state: 'completed',
         creator: @player1,
-        ends_at: Time.zone.local(2026, 6, 15)
+        ends_at: Time.zone.local(2026, 6, 15),
+        championship_level: 'Major'
       )
       tournament.registrations.create!(user: @player1, faction: @faction)
       tournament.registrations.create!(user: @player2, faction: @faction)
@@ -88,7 +107,8 @@ module Api
           format: :swiss,
           state: 'completed',
           creator: @player1,
-          ends_at: Time.zone.local(2026, 6, 15)
+          ends_at: Time.zone.local(2026, 6, 15),
+          championship_level: 'Major'
         )
         tournament.registrations.create!(user: @player1, faction: @faction)
         tournament.registrations.create!(user: @player2, faction: @faction)

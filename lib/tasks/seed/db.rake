@@ -5,10 +5,21 @@ require 'open3'
 # rubocop:disable Metrics/BlockLength
 namespace :db do
   task refresh: :environment do
+    recreate_empty_database!
     restore_database_dump!
     with_local_timezone_connection do
       reset_seed_passwords!
     end
+  end
+
+  def recreate_empty_database!
+    db_config = ActiveRecord::Base.connection_db_config
+    ActiveRecord::Base.connection_pool.disconnect!
+
+    ActiveRecord::Tasks::DatabaseTasks.drop(db_config)
+    ActiveRecord::Tasks::DatabaseTasks.create(db_config)
+  ensure
+    ActiveRecord::Base.establish_connection
   end
 
   def restore_database_dump!
@@ -21,7 +32,6 @@ namespace :db do
     stdout, stderr, status = Open3.capture3(
       pg_restore_bin,
       '--verbose',
-      '--clean',
       '--no-acl',
       '--no-owner',
       '-h', pg_host.to_s,
@@ -64,35 +74,50 @@ namespace :db do
     env_override = ENV.fetch("#{command_name.upcase}_BIN", nil)
     return env_override if env_override.present?
 
+    # Prefer Homebrew versioned installs over PATH: dumps from production often
+    # require a newer pg_restore than the default linked binary (e.g. PG 18 dump
+    # vs PG 14 on PATH).
+    brew_candidates = [
+      '/opt/homebrew/opt/postgresql@18/bin',
+      '/opt/homebrew/opt/postgresql@17/bin',
+      '/opt/homebrew/opt/postgresql@16/bin',
+      '/opt/homebrew/opt/postgresql@15/bin',
+      '/opt/homebrew/opt/postgresql@14/bin',
+      '/opt/homebrew/opt/postgresql/bin',
+      '/usr/local/opt/postgresql@18/bin',
+      '/usr/local/opt/postgresql@17/bin',
+      '/usr/local/opt/postgresql@16/bin',
+      '/usr/local/opt/postgresql@15/bin',
+      '/usr/local/opt/postgresql@14/bin',
+      '/usr/local/opt/postgresql/bin'
+    ].map { |dir| File.join(dir, command_name) }
+    matched_candidate = brew_candidates.find { |path| File.executable?(path) }
+    return matched_candidate if matched_candidate
+
     path_candidates = ENV.fetch('PATH', '').split(':').map do |path|
       File.join(path, command_name)
     end
     path_command = path_candidates.find { |path| File.executable?(path) }
     return path_command if path_command
 
-    brew_candidates = [
-      "/opt/homebrew/opt/postgresql@18/bin/#{command_name}",
-      "/opt/homebrew/opt/postgresql/bin/#{command_name}",
-      "/usr/local/opt/postgresql@18/bin/#{command_name}",
-      "/usr/local/opt/postgresql/bin/#{command_name}"
-    ]
-    matched_candidate = brew_candidates.find { |path| File.executable?(path) }
-    return matched_candidate if matched_candidate
-
     raise "#{command_name} not found. Set PG_RESTORE_BIN or add PostgreSQL bin to PATH."
   end
 
   def ignorable_restore_failure?(stderr)
-    expected_errors = [
+    ignorable_patterns = [
       'unrecognized configuration parameter "transaction_timeout"',
       'extension "pg_stat_statements" does not exist',
-      'pg_stat_statements.control',
-      'erreurs ignorées lors de la restauration'
+      'pg_stat_statements.control'
+    ]
+    ignored_restore_messages = [
+      'erreurs ignorées lors de la restauration',
+      'warnings ignored on restore'
     ]
     normalized_stderr = stderr.to_s
     return false if normalized_stderr.empty?
 
-    return false unless expected_errors.all? { |error| normalized_stderr.include?(error) }
+    return false unless ignored_restore_messages.any? { |message| normalized_stderr.include?(message) }
+    return false unless ignorable_patterns.any? { |pattern| normalized_stderr.include?(pattern) }
 
     warn 'db:refresh continuing despite known pg_restore warnings (transaction_timeout / pg_stat_statements).'
     true
