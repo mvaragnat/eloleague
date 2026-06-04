@@ -28,6 +28,12 @@
 #       enabled: "ON"
 
 en:
+  activerecord:
+    errors:
+      messages:
+        blank: can't be blank
+        not_a_number: is not a number
+        greater_than: must be greater than %{count}
   errors:
     messages:
       required: 'must exist'

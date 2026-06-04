@@ -42,7 +42,7 @@ module Championship
         total_points: 12
       )
       assert_not score.valid?
-      assert_includes score.errors[:year], "can't be blank"
+      assert score.errors.added?(:year, :blank)
     end
 
     test 'user-tournament uniqueness' do
