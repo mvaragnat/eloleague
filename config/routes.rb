@@ -5,6 +5,12 @@ Rails.application.routes.draw do
   authenticate :admin do
     mount_avo
   end
+
+  namespace :api do
+    get 'championships/:game_system_id/year/:year', to: 'championships#rankings', as: :championships_rankings
+    get 'tournaments/:game_system_id/finished', to: 'tournaments#finished', as: :tournaments_finished
+    get 'tournaments/:game_system_id/open', to: 'tournaments#open', as: :tournaments_open
+  end
   scope '(:locale)', locale: /en|fr/ do
     devise_for :users, controllers: { sessions: 'users/sessions' }
     devise_for :admins, skip: %i[registrations passwords], controllers: { sessions: 'devise/sessions' }

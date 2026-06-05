@@ -27,8 +27,6 @@ module Championship
         ).update!(
           game_system_id: @tournament.game_system_id,
           year: year,
-          match_points: 0,
-          placement_bonus: points,
           total_points: points
         )
       end
