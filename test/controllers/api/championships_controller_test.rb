@@ -61,9 +61,9 @@ module Api
       assert_equal 1, first['rank']
       assert first['username'].present?
       assert first.key?('total_points')
-      assert first.key?('match_points')
-      assert first.key?('placement_bonus')
       assert first.key?('tournaments_count')
+      assert_not first.key?('match_points')
+      assert_not first.key?('placement_bonus')
     end
 
     test 'rankings assigns equal ranks to tied players' do

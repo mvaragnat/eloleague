@@ -25,8 +25,6 @@ module Championship
         tournament: @tournament,
         game_system: @system,
         year: 2026,
-        match_points: 9,
-        placement_bonus: 3,
         total_points: 12
       )
       assert score.valid?
@@ -37,8 +35,6 @@ module Championship
         user: @user,
         tournament: @tournament,
         game_system: @system,
-        match_points: 9,
-        placement_bonus: 3,
         total_points: 12
       )
       assert_not score.valid?
@@ -51,8 +47,6 @@ module Championship
         tournament: @tournament,
         game_system: @system,
         year: 2026,
-        match_points: 9,
-        placement_bonus: 3,
         total_points: 12
       )
 
@@ -61,8 +55,6 @@ module Championship
         tournament: @tournament,
         game_system: @system,
         year: 2026,
-        match_points: 5,
-        placement_bonus: 0,
         total_points: 5
       )
       assert_not duplicate.valid?
@@ -74,8 +66,6 @@ module Championship
         tournament: @tournament,
         game_system: @system,
         year: 2026,
-        match_points: 9,
-        placement_bonus: 3,
         total_points: 12
       )
 

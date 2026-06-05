@@ -62,8 +62,6 @@ Returns annual championship standings for the given game system and year. Rankin
       "rank": 1,
       "username": "alice",
       "total_points": 16,
-      "match_points": 0,
-      "placement_bonus": 16,
       "tournaments_count": 2
     }
   ]
@@ -77,9 +75,7 @@ Returns annual championship standings for the given game system and year. Rankin
 | `rankings` | array | Ordered list of players (may be empty) |
 | `rankings[].rank` | integer | Position (ties share the same rank) |
 | `rankings[].username` | string | Player username |
-| `rankings[].total_points` | integer | Sum of championship points for the year |
-| `rankings[].match_points` | integer | Always `0` (legacy field; scoring is placement-based) |
-| `rankings[].placement_bonus` | integer | Sum of placement/participation points from tournament levels |
+| `rankings[].total_points` | integer | Sum of championship points for the year (from tournament level and final ranking) |
 | `rankings[].tournaments_count` | integer | Number of counted tournaments |
 
 **404 Not Found** — unknown `game_system_id`:

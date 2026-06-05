@@ -23,8 +23,6 @@ module Api
             rank: s[:rank],
             username: s[:user].username,
             total_points: s[:total_points],
-            match_points: s[:match_points],
-            placement_bonus: s[:placement_bonus],
             tournaments_count: s[:tournaments_count]
           }
         end
@@ -40,8 +38,6 @@ module Api
         {
           user: user,
           total_points: user_scores.sum(&:total_points),
-          match_points: user_scores.sum(&:match_points),
-          placement_bonus: user_scores.sum(&:placement_bonus),
           tournaments_count: user_scores.size
         }
       end

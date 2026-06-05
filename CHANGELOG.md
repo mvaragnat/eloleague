@@ -1,3 +1,10 @@
+## 2026-06-04
+
+- Breaking — Championship API and score storage simplified:
+  - Removed obsolete `match_points` and `placement_bonus` fields from the championship rankings API response (`GET /api/championships/:game_system_id/year/:year`). Only `total_points` is returned per player.
+  - Dropped `match_points` and `placement_bonus` columns from `championship_scores` table.
+  - Updated README API documentation.
+
 ## 2026-06-01
 
 - Feature — Championship YAML-based scoring levels:
@@ -10,7 +17,7 @@
 
 - Feature — API endpoint for championship rankings:
   - New `GET /api/championships/:game_system_id/year/:year` endpoint returning JSON rankings for a given game system and year.
-  - Path parameters: `game_system_id` (ID) and `year`. Returns rank, username, total points, match points, placement bonus, and tournaments count per player.
+  - Path parameters: `game_system_id` (ID) and `year`. Returns rank, username, total points, and tournaments count per player.
   - No authentication required. Returns 404 if game system is not found.
   - New `GET /api/tournaments/:game_system_id/finished` endpoint listing completed tournaments for a game system.
   - New `GET /api/tournaments/:game_system_id/open` endpoint listing tournaments accepting registration or currently running.
