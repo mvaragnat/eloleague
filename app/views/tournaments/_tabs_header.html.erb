@@ -1,4 +1,4 @@
-<div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
+<div class="tabs-nav">
   <a href="<%= tournament_path(tournament, tab: 0) %>" data-action="click->tabs#select" data-index="0" data-tabs-target="tab" class="btn btn-primary" aria-selected="true"><%= t('tournaments.show.tabs.overview', default: 'Overview') %></a>
   <% if tournament.elimination? %>
     <a href="<%= tournament_path(tournament, tab: 1) %>" data-action="click->tabs#select" data-index="1" data-tabs-target="tab" class="btn" aria-selected="false"><%= t('tournaments.show.tabs.bracket', default: 'Bracket') %></a>
