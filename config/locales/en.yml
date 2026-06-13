@@ -220,7 +220,6 @@ en:
       move_to_next_round: "Move to next round"
       view_army_list: "Army list"
       edit_army_list: "Edit list"
-      army_list_title: "Army list"
       army_list_label: "Your army list"
       no_army_list: "No army list provided"
       standings:

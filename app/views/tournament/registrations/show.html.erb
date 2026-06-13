@@ -3,15 +3,14 @@
     <%= link_to "← #{@tournament.name}", tournament_path(@tournament, tab: 2) %>
   </div>
 
-  <h1><%= t('tournaments.show.army_list_title', default: 'Army list') %></h1>
-
-  <div class="army-list-meta">
+  
+  <h1 class="army-list-meta">
     <span class="army-list-meta__player"><%= @registration.user.username %></span>
     <% if @registration.faction.present? %>
       <span class="army-list-meta__sep">·</span>
       <span><%= @registration.faction.localized_name(I18n.locale) %></span>
     <% end %>
-  </div>
+  </h1>
 
   <hr class="army-list-divider">
 

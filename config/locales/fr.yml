@@ -191,7 +191,6 @@ fr:
       move_to_next_round: "Passer à la ronde suivante"
       view_army_list: "Liste d'armée"
       edit_army_list: "Modifier la liste"
-      army_list_title: "Liste d'armée"
       army_list_label: "Votre liste d'armée"
       no_army_list: "Aucune liste d'armée fournie"
       standings:
