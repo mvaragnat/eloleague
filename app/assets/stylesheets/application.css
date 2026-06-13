@@ -226,6 +226,22 @@ input:focus, select:focus, textarea:focus {
 .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 9999; overscroll-behavior: contain; }
 .modal-card { background: #ffffff; border-radius: 0.75rem; padding: 2rem; width: 100%; max-width: 520px; max-height: 90vh; max-height: 90dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
 
+/***** Army list page *****/
+.army-list-page { width: 100%; max-width: 760px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+.army-list-back { margin-bottom: 1.25rem; font-size: 0.9rem; }
+.army-list-page h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+.army-list-meta { color: var(--text-muted); font-size: 0.95rem; display: flex; flex-wrap: wrap; gap: 0.25rem 0.5rem; align-items: center; }
+.army-list-meta__player { font-weight: 700; color: var(--text-strong); }
+.army-list-meta__sep { color: var(--gray-300); }
+.army-list-divider { border: none; border-top: 1px solid var(--gray-300); margin: 1.25rem 0; }
+.army-list-pre { white-space: pre-wrap; word-break: break-word; background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: 0.5rem; padding: 1.25rem; font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace; font-size: 0.875rem; line-height: 1.6; margin: 0; }
+.army-list-actions { margin-top: 1rem; display: flex; justify-content: flex-end; }
+
+@media (max-width: 640px) {
+  .army-list-page { padding: 1.25rem 1rem 2.5rem; }
+  .army-list-page h1 { font-size: 1.4rem; }
+}
+
 /***** Footer *****/
 .site-footer { margin-top: 2rem; padding: 1rem; border-top: 1px solid var(--gray-300); background: #fff; }
 .footer-content { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 1rem; text-align: center; color: var(--text-muted); }

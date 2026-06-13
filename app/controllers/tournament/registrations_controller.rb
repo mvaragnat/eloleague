@@ -7,6 +7,8 @@ module Tournament
     before_action :set_tournament
     before_action :set_registration, only: %i[show update]
 
+    layout 'army_list', only: %i[show]
+
     def show
       return if can_view?(@registration)
 
