@@ -23,7 +23,7 @@ module Avo
                         }
 
         field :seed, as: :number
-        field :status, as: :text
+        field :status, as: :select, enum: ::Tournament::Registration::STATUSES
         field :army_list, as: :textarea
         field :created_at, as: :date_time, readonly: true
         field :updated_at, as: :date_time, readonly: true
@@ -59,6 +59,7 @@ module Avo
 
       def filters
         filter Avo::Filters::TournamentGameSystemFilter
+        filter Avo::Filters::TournamentFilter
       end
     end
   end

@@ -8,8 +8,10 @@ module Tournament
     belongs_to :user
     belongs_to :faction, class_name: 'Game::Faction', optional: true
 
+    STATUSES = { pending: 'Pending', checked_in: 'Checked in' }.freeze
+
     validates :user_id, uniqueness: { scope: :tournament_id }
-    validates :status, inclusion: { in: %w[pending checked_in] }
+    validates :status, inclusion: { in: STATUSES.keys.map(&:to_s) }
 
     def registration_label
       user_name = user&.username || '?'
