@@ -150,6 +150,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Organizers can mark a tournament as non-competitive. Default is competitive.
 - When non-competitive, reported tournament games do not affect ELO.
 - The non-competitive flag is copied down to all `Tournament::Match` records and created `Game::Event` records.
+- When the tournament's `non_competitive` flag is changed after matches/events have been created, the new value is automatically propagated to all existing matches and game events via an `after_update` callback.
 - Scopes exist to filter competitive vs non-competitive on tournaments, matches, and events.
 
 #### Admin Check-in Toggle & Tab Persistence

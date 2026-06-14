@@ -131,5 +131,85 @@ module Tournament
       )
       assert_equal t.slug, t.to_param
     end
+
+    test 'changing non_competitive propagates to existing matches and game events' do
+      t = ::Tournament::Tournament.create!(
+        name: 'Friendly Cup',
+        creator: @creator,
+        game_system: @system,
+        format: 'open',
+        non_competitive: true
+      )
+      player_a = users(:player_one)
+      player_b = users(:player_two)
+
+      match = ::Tournament::Match.create!(tournament: t, a_user: player_a, b_user: player_b, result: :pending)
+      event = Game::Event.create!(
+        game_system: @system,
+        tournament: t,
+        played_at: Time.current,
+        game_participations_attributes: [
+          { user: player_a, score: 5, faction: game_factions(:chess_white) },
+          { user: player_b, score: 3, faction: game_factions(:chess_white) }
+        ]
+      )
+
+      assert match.reload.non_competitive
+      assert event.reload.non_competitive
+
+      t.update!(non_competitive: false)
+
+      assert_not match.reload.non_competitive
+      assert_not event.reload.non_competitive
+    end
+
+    test 'changing non_competitive from false to true propagates to children' do
+      t = ::Tournament::Tournament.create!(
+        name: 'Serious Cup',
+        creator: @creator,
+        game_system: @system,
+        format: 'open',
+        non_competitive: false
+      )
+      player_a = users(:player_one)
+      player_b = users(:player_two)
+
+      match = ::Tournament::Match.create!(tournament: t, a_user: player_a, b_user: player_b, result: :pending)
+      event = Game::Event.create!(
+        game_system: @system,
+        tournament: t,
+        played_at: Time.current,
+        game_participations_attributes: [
+          { user: player_a, score: 5, faction: game_factions(:chess_white) },
+          { user: player_b, score: 3, faction: game_factions(:chess_white) }
+        ]
+      )
+
+      assert_not match.reload.non_competitive
+      assert_not event.reload.non_competitive
+
+      t.update!(non_competitive: true)
+
+      assert match.reload.non_competitive
+      assert event.reload.non_competitive
+    end
+
+    test 'updating other attributes does not trigger non_competitive propagation' do
+      t = ::Tournament::Tournament.create!(
+        name: 'Stable Cup',
+        creator: @creator,
+        game_system: @system,
+        format: 'open',
+        non_competitive: true
+      )
+      match = ::Tournament::Match.create!(tournament: t, a_user: users(:player_one),
+                                          b_user: users(:player_two), result: :pending)
+
+      assert match.reload.non_competitive
+
+      t.update!(name: 'Renamed Cup')
+
+      assert match.reload.non_competitive
+    end
   end
 end
