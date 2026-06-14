@@ -1,3 +1,11 @@
+## 2026-06-14
+
+- Feature — Cancelled registration status:
+  - Added `cancelled` status to `Tournament::Registration`.
+  - When a tournament starts (lock registration), all pending registrations are automatically cancelled. Only checked-in players proceed.
+  - In Swiss tournaments, cancelled players are excluded from subsequent round pairings.
+  - Cancelled players do not appear in standings and do not earn championship points.
+
 ## 2026-06-04
 
 - Breaking — Championship API and score storage simplified:

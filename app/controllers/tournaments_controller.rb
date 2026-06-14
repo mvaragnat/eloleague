@@ -161,6 +161,7 @@ class TournamentsController < ApplicationController
 
     ApplicationRecord.transaction do
       @tournament.update!(state: 'running')
+      @tournament.registrations.where(status: 'pending').find_each { |r| r.update!(status: 'cancelled') }
       @tournament.reload
       Tournament::BracketBuilder.new(@tournament).call if @tournament.elimination?
     end

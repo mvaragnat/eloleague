@@ -159,6 +159,24 @@ module Championship
       assert_equal 10, score_p2.total_points
     end
 
+    test 'cancelled registration does not earn championship points' do
+      player3 = User.create!(username: 'cancelled_champ', email: 'cancelled_champ@example.com',
+                             password: 'password123',
+                             password_confirmation: 'password123')
+
+      tournament = create_tournament(championship_level: 'Major')
+      tournament.registrations.create!(user: @player1, faction: @faction)
+      tournament.registrations.create!(user: @player2, faction: @faction)
+      tournament.registrations.create!(user: player3, faction: @faction, status: 'cancelled')
+
+      tournament.matches.create!(a_user: @player1, b_user: @player2, result: 'a_win')
+
+      Championship::ScoreCalculator.new(tournament).call
+
+      assert_nil Championship::Score.find_by(user: player3, tournament: tournament)
+      assert_equal 2, Championship::Score.where(tournament: tournament).count
+    end
+
     private
 
     def create_tournament(format: :swiss, state: 'completed', ends_at: Time.zone.local(2026, 6, 15),

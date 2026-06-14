@@ -1613,4 +1613,95 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes @response.body, I18n.l(tournament.starts_at, format: :card, locale: :fr)
   end
+
+  test 'lock_registration cancels pending registrations' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Cancel Pending Test',
+        description: 'Test',
+        game_system_id: game_systems(:chess).id,
+        format: 'swiss',
+        rounds_count: 2
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+    faction = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
+
+    p2 = users(:player_two)
+    p3 = User.create!(username: 'cancel_p3', email: 'cancel_p3@example.com', password: 'password')
+
+    sign_in @user
+    post register_tournament_path(t, locale: I18n.locale)
+    t.registrations.find_by(user: @user).update!(faction: faction)
+    post check_in_tournament_path(t, locale: I18n.locale)
+
+    sign_in p2
+    post register_tournament_path(t, locale: I18n.locale)
+    t.registrations.find_by(user: p2).update!(faction: faction)
+    post check_in_tournament_path(t, locale: I18n.locale)
+
+    sign_in p3
+    post register_tournament_path(t, locale: I18n.locale)
+    # p3 stays pending (does not check in)
+
+    assert_equal 'pending', t.registrations.find_by(user: p3).status
+
+    sign_in @user
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+
+    t.reload
+    assert_equal 'running', t.state
+    assert_equal 'checked_in', t.registrations.find_by(user: @user).status
+    assert_equal 'checked_in', t.registrations.find_by(user: p2).status
+    assert_equal 'cancelled', t.registrations.find_by(user: p3).status
+  end
+
+  test 'cancelled player excluded from swiss pairings' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Cancelled Exclusion Test',
+        description: 'Test',
+        game_system_id: game_systems(:chess).id,
+        format: 'swiss',
+        rounds_count: 2
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+    faction = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
+
+    p2 = users(:player_two)
+    p3 = User.create!(username: 'excl_p3', email: 'excl_p3@example.com', password: 'password')
+    p4 = User.create!(username: 'excl_p4', email: 'excl_p4@example.com', password: 'password')
+
+    [users(:player_one), p2, p3].each do |u|
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+      t.registrations.find_by(user: u).update!(faction: faction)
+      post check_in_tournament_path(t, locale: I18n.locale)
+    end
+
+    # p4 registers but does not check in (stays pending → will be cancelled)
+    sign_in p4
+    post register_tournament_path(t, locale: I18n.locale)
+
+    sign_in @user
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+
+    # p4 should now be cancelled
+    assert_equal 'cancelled', t.registrations.find_by(user: p4).reload.status
+
+    post next_round_tournament_path(t, locale: I18n.locale)
+
+    round = t.rounds.order(:number).last
+    paired_user_ids = round.matches.flat_map { |m| [m.a_user_id, m.b_user_id] }.compact
+
+    assert_not_includes paired_user_ids, p4.id
+    assert_includes paired_user_ids, @user.id
+    assert_includes paired_user_ids, p2.id
+    assert_includes paired_user_ids, p3.id
+  end
 end
