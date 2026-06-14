@@ -300,12 +300,18 @@ input:focus, select:focus, textarea:focus {
 /* Subtle helper text */
 .hint { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
 
+/* Responsive table wrapper */
+.table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
 /* Table styles shared by Stats */
 .table { width: 100%; border-collapse: collapse; }
-.table th, .table td { padding: 0.5rem 0.5rem; border-bottom: 1px solid var(--gray-300); }
+.table th, .table td { padding: 0.5rem 0.5rem; border-bottom: 1px solid var(--gray-300); white-space: nowrap; }
 .table thead th { font-weight: 700; text-align: left; background: #fafafa; position: sticky; top: 0; z-index: 1; }
 .table tbody tr:hover { background: #f9fafb; }
 .table td:last-child, .table th:last-child { text-align: right; }
+
+/* Red text for outlier differentials */
+.text-red { color: #dc2626; font-weight: 600; }
 
 /* Sortable headers visuals */
 .table th.sortable { cursor: pointer; user-select: none; position: relative; padding-right: 1rem; }

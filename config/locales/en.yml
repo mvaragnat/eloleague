@@ -383,6 +383,7 @@ en:
     draw_percent: "Draw%"
     win_percent: "Win%"
     loss_percent: "Loss%"
+    win_loss_diff: "W-L Diff"
     opponent: "Opponent"
     games: "Games"
     mirrors: "Mirrors"

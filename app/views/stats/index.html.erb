@@ -31,23 +31,26 @@
       <div class="hint text-sm text-gray-500">
         <%= t('stats.mirror_hint', default: 'Mirror games are counted in total but excluded from W/L/D and Win%.') %>
       </div>
-      <table class="table" data-stats-target="factionsTable">
-        <thead>
-          <tr>
-            <th class="sortable" data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="total_games"><%= t('stats.total_games', default: 'Games') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>
-            <th class="sortable" data-action="click->stats#sort" data-key="warning_text"><%= t('stats.warning', default: 'Warning') %></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table" data-stats-target="factionsTable">
+          <thead>
+            <tr>
+              <th class="sortable" data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="total_games"><%= t('stats.total_games', default: 'Games') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="win_loss_diff"><%= t('stats.win_loss_diff', default: 'W-L Diff') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="warning_text"><%= t('stats.warning', default: 'Warning') %></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -67,24 +70,27 @@
     </div>
 
     <div id="versus-table" class="mt-4" hidden>
-      <table class="table" data-stats-target="versusTable">
-        <thead>
-          <tr>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="opponent_faction_name"><%= t('stats.opponent', default: 'Opponent') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="games"><%= t('stats.games', default: 'Games') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>
-            <th><%= t('stats.mirrors', default: 'Mirrors') %></th>
-            <th class="sortable" data-action="click->stats#sortVs" data-key="warning_text"><%= t('stats.warning', default: 'Warning') %></th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table" data-stats-target="versusTable">
+          <thead>
+            <tr>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="opponent_faction_name"><%= t('stats.opponent', default: 'Opponent') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="games"><%= t('stats.games', default: 'Games') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="win_loss_diff"><%= t('stats.win_loss_diff', default: 'W-L Diff') %></th>
+              <th><%= t('stats.mirrors', default: 'Mirrors') %></th>
+              <th class="sortable" data-action="click->stats#sortVs" data-key="warning_text"><%= t('stats.warning', default: 'Warning') %></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
