@@ -86,9 +86,10 @@ export default class extends Controller {
         <td>${row.wins}</td>
         <td>${row.losses}</td>
         <td>${row.draws}</td>
-        <td>${row.win_percent?.toFixed(2)}%</td>
-        <td>${row.loss_percent?.toFixed(2)}%</td>
-        <td>${row.draw_percent?.toFixed(2)}%</td>
+        <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
+        <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
+        <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
+        ${this._diffCell(row.win_loss_diff)}
         <td>${this._e(row.warning_text)}</td>
       </tr>
     `)
@@ -143,9 +144,10 @@ export default class extends Controller {
         <td>${row.wins}</td>
         <td>${row.losses}</td>
         <td>${row.draws}</td>
-        <td>${row.win_percent == null ? '' : (row.win_percent.toFixed(2) + '%')}</td>
-        <td>${row.loss_percent == null ? '' : (row.loss_percent.toFixed(2) + '%')}</td>
-        <td>${row.draw_percent == null ? '' : (row.draw_percent.toFixed(2) + '%')}</td>
+        <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
+        <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
+        <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
+        ${this._diffCell(row.win_loss_diff)}
         <td>${row.mirror_count}</td>
         <td>${this._e(row.warning_text)}</td>
       </tr>
@@ -195,9 +197,10 @@ export default class extends Controller {
             <td>${row.wins}</td>
             <td>${row.losses}</td>
             <td>${row.draws}</td>
-            <td>${row.win_percent?.toFixed(2)}%</td>
-            <td>${row.loss_percent?.toFixed(2)}%</td>
-            <td>${row.draw_percent?.toFixed(2)}%</td>
+            <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
+            <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
+            <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
+            ${this._diffCell(row.win_loss_diff)}
             <td>${this._e(row.warning_text)}</td>
           </tr>
         `
@@ -210,9 +213,10 @@ export default class extends Controller {
           <td>${row.wins}</td>
           <td>${row.losses}</td>
           <td>${row.draws}</td>
-          <td>${row.win_percent == null ? '' : (row.win_percent.toFixed(2) + '%')}</td>
-          <td>${row.loss_percent == null ? '' : (row.loss_percent.toFixed(2) + '%')}</td>
-          <td>${row.draw_percent == null ? '' : (row.draw_percent.toFixed(2) + '%')}</td>
+          <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
+          <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
+          <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
+          ${this._diffCell(row.win_loss_diff)}
           <td>${row.mirror_count}</td>
           <td>${this._e(row.warning_text)}</td>
         </tr>
@@ -223,8 +227,16 @@ export default class extends Controller {
   _normalizeRows(rows) {
     return rows.map(row => {
       const warnings = Array.isArray(row.warnings) ? row.warnings : []
+      const wp = row.win_percent != null ? Math.round(row.win_percent) : null
+      const lp = row.loss_percent != null ? Math.round(row.loss_percent) : null
+      const dp = row.draw_percent != null ? Math.round(row.draw_percent) : null
+      const wld = (wp != null && lp != null) ? (wp - lp) : null
       return {
         ...row,
+        win_percent: wp,
+        loss_percent: lp,
+        draw_percent: dp,
+        win_loss_diff: wld,
         warnings,
         has_warning: warnings.length > 0,
         warning_text: warnings.join(" | ")
@@ -257,6 +269,14 @@ export default class extends Controller {
       url.searchParams.delete('tournament_only')
     }
     return `${url.pathname}${url.search}`
+  }
+
+  _diffCell(val) {
+    if (val == null) return '<td></td>'
+    const abs = Math.abs(val)
+    const cls = abs > 15 ? ' class="text-red"' : ''
+    const sign = val > 0 ? '+' : ''
+    return `<td${cls}>${sign}${val}%</td>`
   }
 
   _setHidden(el, hidden) { if (el) el.hidden = hidden }

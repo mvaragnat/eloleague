@@ -27,6 +27,7 @@ module Avo
         field :state, as: :select, options: ::Tournament::Tournament.states.keys
         field :slug, as: :text
         field :require_army_list_for_check_in, as: :boolean
+        field :non_competitive, as: :boolean
         field :online, as: :boolean
         field :location, as: :text
         field :max_players, as: :number
