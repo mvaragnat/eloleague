@@ -34,6 +34,9 @@ module Tournament
 
       reg.status = 'checked_in'
       assert reg.valid?
+
+      reg.status = 'cancelled'
+      assert reg.valid?
     end
 
     test 'invalid status values' do
@@ -48,6 +51,24 @@ module Tournament
       assert_not reg.valid?
       assert reg.errors[:status].present?
       assert_includes reg.errors[:status].first, 'is not included in the list'
+    end
+
+    test 'active scope excludes cancelled registrations' do
+      reg_active = ::Tournament::Registration.create!(tournament: @t, user: @user, status: 'checked_in')
+      u3 = User.create!(username: 'scope_user', email: 'scope@example.com', password: 'password')
+      reg_cancelled = ::Tournament::Registration.create!(tournament: @t, user: u3, status: 'cancelled')
+
+      active_regs = @t.registrations.active
+      assert_includes active_regs, reg_active
+      assert_not_includes active_regs, reg_cancelled
+    end
+
+    test 'cancelled scope returns only cancelled registrations' do
+      ::Tournament::Registration.create!(tournament: @t, user: @user, status: 'checked_in')
+      u3 = User.create!(username: 'cancelled_user', email: 'cancelled@example.com', password: 'password')
+      reg_cancelled = ::Tournament::Registration.create!(tournament: @t, user: u3, status: 'cancelled')
+
+      assert_equal [reg_cancelled], @t.registrations.cancelled.to_a
     end
   end
 end

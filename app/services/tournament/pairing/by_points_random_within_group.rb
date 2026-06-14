@@ -38,9 +38,8 @@ module Tournament
 
       attr_reader :tournament
 
-      # Users who are checked in if any, else all registered
       def eligible_users
-        regs = tournament.registrations.includes(:user)
+        regs = tournament.registrations.active.includes(:user)
         checked = regs.select { |r| r.status == 'checked_in' }.map(&:user)
         return checked if checked.any?
 

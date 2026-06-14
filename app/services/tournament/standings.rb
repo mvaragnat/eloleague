@@ -30,7 +30,7 @@ module Tournament
     private
 
     def registrations
-      @tournament.registrations.includes(:user, :faction)
+      @tournament.registrations.active.includes(:user, :faction)
     end
 
     def aggregate_all_matches(aggregates)

@@ -8,7 +8,10 @@ module Tournament
     belongs_to :user
     belongs_to :faction, class_name: 'Game::Faction', optional: true
 
-    STATUSES = { pending: 'Pending', checked_in: 'Checked in' }.freeze
+    STATUSES = { pending: 'Pending', checked_in: 'Checked in', cancelled: 'Cancelled' }.freeze
+
+    scope :active, -> { where.not(status: 'cancelled') }
+    scope :cancelled, -> { where(status: 'cancelled') }
 
     validates :user_id, uniqueness: { scope: :tournament_id }
     validates :status, inclusion: { in: STATUSES.keys.map(&:to_s) }

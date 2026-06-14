@@ -42,6 +42,7 @@ module Tournament
 
     before_validation :generate_slug, on: :create
     before_validation :assign_default_scoring_system, on: :create
+    after_update :propagate_non_competitive_to_children, if: :saved_change_to_non_competitive?
 
     scope :competitive, -> { where(non_competitive: false) }
     scope :non_competitive, -> { where(non_competitive: true) }
@@ -114,6 +115,11 @@ module Tournament
 
       errors.add(:scoring_system, I18n.t('tournaments.errors.scoring_system_wrong_system',
                                          default: 'Selected scoring system belongs to a different game system'))
+    end
+
+    def propagate_non_competitive_to_children
+      matches.update_all(non_competitive: non_competitive)
+      Game::Event.where(tournament_id: id).update_all(non_competitive: non_competitive)
     end
 
     def strategy_keys_are_known
