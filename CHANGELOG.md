@@ -1,8 +1,5 @@
 ## 2026-06-14
 
-- Fix — Propagate non_competitive flag on tournament update:
-  - When a tournament's `non_competitive` boolean is changed, the new value is now propagated to all existing `Tournament::Match` and `Game::Event` records associated with that tournament.
-
 - Feature — Cancelled registration status:
   - Added `cancelled` status to `Tournament::Registration`.
   - When a tournament starts (lock registration), all pending registrations are automatically cancelled. Only checked-in players proceed.
