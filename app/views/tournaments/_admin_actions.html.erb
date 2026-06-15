@@ -9,9 +9,7 @@
       <% elsif tournament.registration? %>
         <span class="card-date" style="font-style:normal;"><%= t('tournaments.show.lock_warning') %></span>
         <%= button_to t('tournaments.show.lock_registration'), lock_registration_tournament_path(tournament), method: :post, class: 'btn' %>
-      <% end %>
-
-      <% if tournament.running? %>
+      <% elsif tournament.running? %>
         <%# Only show next-round button section where relevant; only swiss admin need this %>
         <% if tournament.swiss? %>
           <% if can_move_to_next_round %>
