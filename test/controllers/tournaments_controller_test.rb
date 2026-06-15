@@ -1038,27 +1038,23 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     body = @response.body
 
-    highlight_class = 'bg-amber-50'
+    highlight_style = 'background-color:#fff8c4;'
 
     # Score sum header highlighted
     score_sum_label = I18n.t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum')
-    score_regex = %r{
-      <th[^>]*class="[^"]*#{Regexp.escape(highlight_class)}[^"]*"[^>]*>
-      \s*#{Regexp.escape(score_sum_label)}\s*
-      </th>
-    }xm
-    assert_match(score_regex, body)
+    assert_match(
+      %r{<th[^>]*#{Regexp.escape(highlight_style)}[^>]*>#{Regexp.escape(score_sum_label)}</th>},
+      body
+    )
 
     # SoS header highlighted (tolerate HTML escaping of apostrophes)
     sos_label = I18n.t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule')
     sos_label_escaped = ERB::Util.html_escape(sos_label)
     regex = %r{
-      <th[^>]*class="[^"]*#{Regexp.escape(highlight_class)}[^"]*"[^>]*>
-      \s*
+      <th[^>]*#{Regexp.escape(highlight_style)}[^>]*>
       (#{Regexp.escape(sos_label)}|#{Regexp.escape(sos_label_escaped)})
-      \s*
       </th>
-    }xm
+    }x
     assert_match(regex, body)
   end
 
