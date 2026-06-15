@@ -858,7 +858,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
-    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split('<tr>')[1]
+    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
     assert_includes first_row, match.a_user.username
   end
 
@@ -901,7 +901,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
-    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split('<tr>')[1]
+    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
     assert_includes first_row, users(:player_one).username
   end
 
@@ -968,7 +968,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
-    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split('<tr>')[1]
+    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
     assert_includes first_row, b.username
   end
 
@@ -1042,16 +1042,17 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
 
     # Score sum header highlighted
     score_sum_label = I18n.t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum')
-    assert_match(%r{<th[^>]*#{Regexp.escape(highlight_style)}[^>]*>\s*#{Regexp.escape(score_sum_label)}\s*</th>}, body)
+    assert_match(
+      %r{<th[^>]*#{Regexp.escape(highlight_style)}[^>]*>#{Regexp.escape(score_sum_label)}</th>},
+      body
+    )
 
     # SoS header highlighted (tolerate HTML escaping of apostrophes)
     sos_label = I18n.t('tournaments.show.strategies.names.primary.sos', default: 'Strength of Schedule')
     sos_label_escaped = ERB::Util.html_escape(sos_label)
     regex = %r{
       <th[^>]*#{Regexp.escape(highlight_style)}[^>]*>
-      \s*
       (#{Regexp.escape(sos_label)}|#{Regexp.escape(sos_label_escaped)})
-      \s*
       </th>
     }x
     assert_match(regex, body)
@@ -1225,7 +1226,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
-    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split('<tr>')[1]
+    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
     assert_includes first_row, match.a_user.username
   end
 

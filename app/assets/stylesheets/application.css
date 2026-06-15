@@ -386,3 +386,44 @@ input:focus, select:focus, textarea:focus {
     grid-column: auto;
   }
 }
+
+/***** Ranking Table *****/
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+.ranking-th {
+  text-align: right;
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+  border-bottom: 2px solid var(--gray-300);
+  border-right: 1px solid #e5e7eb;
+}
+.ranking-th:last-child { border-right: none; }
+.ranking-th--left { text-align: left; }
+.ranking-td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  border-right: 1px solid #f0f0f0;
+}
+.ranking-td:last-child { border-right: none; }
+.ranking-td--rank {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.ranking-td--player { white-space: nowrap; }
+.ranking-td--num { text-align: right; }
+.ranking-faction { color: var(--text-muted); }
+.ranking-table tbody tr:hover { background: #f9fafb; }
+
+@media (max-width: 640px) {
+  .ranking-table { font-size: 0.75rem; }
+  .ranking-th { padding: 0.375rem 0.4rem; }
+  .ranking-td { padding: 0.375rem 0.4rem; }
+  .ranking-td--player { white-space: normal; }
+  .ranking-faction { display: block; font-size: 0.65rem; }
+}
