@@ -73,7 +73,7 @@ class ChampionshipsControllerTest < ActionDispatch::IntegrationTest
   test 'index shows level rules for selected system' do
     get championships_path(game_system_id: @system.id)
     assert_response :success
-    assert_select 'strong', text: 'Major'
+    assert_select 'td', text: 'Major'
   end
 
   test 'best_of limits counted results in standings' do

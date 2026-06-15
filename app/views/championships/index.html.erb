@@ -3,7 +3,7 @@
     <h1><%= t('championship.title') %></h1>
   </div>
 
-  <div class="card dashboard-welcome-card">
+  <div class="card dashboard-welcome-card hidden md:block">
     <div class="dashboard-welcome-card__header">
       <h2><%= t('championship.rules_box.title') %></h2>
     </div>
@@ -12,23 +12,37 @@
       <p><%= t('championship.rules_box.levels_intro') %></p>
 
       <% if @levels.present? %>
-        <% @levels.each do |level| %>
-          <div class="card" style="padding: 0.75rem; margin-bottom: 0;">
-            <strong><%= level.name %></strong>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 0.25rem;">
-              <% level.placement_bonus.sort_by { |k, _| k }.each do |rank, pts| %>
-                <span class="card-date" style="font-style: normal;">
-                  <%= t('championship.rules_box.rank_label', rank: rank) %>: <strong><%= pts %></strong> <%= t('championship.rules_box.pts') %>
-                </span>
+        <div style="overflow-x: auto;">
+          <table class="table" style="font-size: 0.875rem; margin-bottom: 0;">
+            <thead>
+              <tr>
+                <th><%= t('championship.rules_box.level_header') %></th>
+                <th><%= t('championship.rules_box.scale_header') %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @levels.each do |level| %>
+                <tr>
+                  <td style="white-space: nowrap; font-weight: 600;"><%= level.name %></td>
+                  <td>
+                    <% level.condensed_placement.each_with_index do |(start_rank, end_rank, pts), i| %>
+                      <% if i > 0 %><span style="color: #ccc;"> · </span><% end %>
+                      <% if start_rank == end_rank %>
+                        <%= t('championship.rules_box.rank_label', rank: start_rank) %>:&nbsp;<strong><%= pts %></strong>
+                      <% else %>
+                        <%= t('championship.rules_box.rank_range_label', start: start_rank, end: end_rank) %>:&nbsp;<strong><%= pts %></strong>
+                      <% end %>
+                    <% end %>
+                    <% if level.participation_points.positive? %>
+                      <span style="color: #ccc;"> · </span>
+                      <%= t('championship.rules_box.all_others') %>:&nbsp;<strong><%= level.participation_points %></strong>
+                    <% end %>
+                  </td>
+                </tr>
               <% end %>
-              <% if level.participation_points.positive? %>
-                <span class="card-date" style="font-style: normal;">
-                  <%= t('championship.rules_box.others') %>: <strong><%= level.participation_points %></strong> <%= t('championship.rules_box.pts') %>
-                </span>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
+            </tbody>
+          </table>
+        </div>
       <% else %>
         <p class="text-muted"><%= t('championship.rules_box.no_levels') %></p>
       <% end %>

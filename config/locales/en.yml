@@ -433,8 +433,12 @@ en:
       eligible: "Play in Swiss or Elimination tournaments to score points towards the yearly Championship! Each tournament is assigned a level by its organizer, which determines how many points are awarded."
       levels_intro: "Points awarded depend on the tournament level and your final ranking:"
       rank_label: "#%{rank}"
+      rank_range_label: "#%{start}-%{end}"
       pts: "pts"
       others: "Others"
+      all_others: "All others"
+      level_header: "Level"
+      scale_header: "Points scale"
       no_levels: "No championship levels configured for this game system."
       best_of:
         one: "Only the best %{count} result counts towards the championship."

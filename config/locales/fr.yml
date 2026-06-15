@@ -400,8 +400,12 @@ fr:
       eligible: "Participez à des tournois en format Ronde Suisse ou Élimination pour accumuler des points au Championnat annuel ! Chaque tournoi se voit attribuer un niveau par son organisateur, qui détermine le nombre de points distribués."
       levels_intro: "Les points attribués dépendent du niveau du tournoi et de votre classement final :"
       rank_label: "#%{rank}"
+      rank_range_label: "#%{start}-%{end}"
       pts: "pts"
       others: "Autres"
+      all_others: "Tous les autres"
+      level_header: "Niveau"
+      scale_header: "Barème"
       no_levels: "Aucun niveau de championnat configuré pour ce système de jeu."
       best_of:
         one: "Seul le meilleur %{count} résultat compte pour le championnat."

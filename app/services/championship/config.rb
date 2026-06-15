@@ -60,6 +60,29 @@ module Championship
       def points_for_rank(rank)
         placement_bonus.fetch(rank, participation_points)
       end
+
+      # Groups consecutive ranks with identical points into [start_rank, end_rank, points] tuples.
+      def condensed_placement
+        sorted = placement_bonus.sort_by(&:first)
+        return [] if sorted.empty?
+
+        groups = []
+        start_rank, current_pts = sorted.first
+        end_rank = start_rank
+
+        sorted.drop(1).each do |rank, pts|
+          if pts == current_pts && rank == end_rank + 1
+            end_rank = rank
+          else
+            groups << [start_rank, end_rank, current_pts]
+            start_rank = rank
+            end_rank = rank
+            current_pts = pts
+          end
+        end
+        groups << [start_rank, end_rank, current_pts]
+        groups
+      end
     end
   end
 end
