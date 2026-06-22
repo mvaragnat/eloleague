@@ -40,7 +40,7 @@ en:
       inclusion: 'is not included in the list'
   app:
     name: "Eloleague"
-    description: "Eloleague"
+    description: "Track tournaments, rankings and Elo ratings for your wargaming community."
   hello: "Hello"
   welcome: "Welcome to Eloleague"
   auth:
