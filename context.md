@@ -116,6 +116,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - All authenticated users can access a `Stats` page (`/stats`) to explore per-system and per-faction performance.
 - Selecting a game system reveals a sortable table of all factions with: total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by Win% (descending) by default.
 - Selecting a faction shows:
+  - A "Top players" table listing the 5 players with the most games on that faction (with profile links).
   - A winrate-over-time graph with the same visual style as the ELO chart.
   - A sortable versus table against all factions in the system, with mirror games shown only as a count.
 - Global and versus tables now display **all rows** and include a `Warning` column for low-reliability data:
@@ -125,6 +126,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - A client-side toggle (default ON) hides rows with warnings ("non-representative rows").
 - A second toggle recalculates the whole page using tournament games only (global table, versus table, and winrate series).
 - Non-competitive games are excluded from all Stats computations (tables and time series), including when tournament-only mode is enabled.
+- Selecting a faction also displays a paginated feed of games played with that faction (10 per page), using the same game card component as the dashboard. Pagination uses Turbo Frames for seamless navigation. The feed respects the tournament-only filter.
 
 #### Epic UK Game System
 - Added `Epic UK` as a supported game system with factions sourced from the official Epic UK army lists. See [Epic UK Army Lists](https://epic-uk.co.uk/wp/army-lists/).

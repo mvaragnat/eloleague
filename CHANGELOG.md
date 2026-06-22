@@ -1,3 +1,19 @@
+## 2026-06-22
+
+- Feature — Top players per faction on Stats page:
+  - When a faction is selected, a "Top players" table shows the 5 players with the most games on that faction.
+  - Player names link to their profile page.
+  - Respects the "tournament only" filter.
+
+## 2026-06-21
+
+- Feature — Faction games feed on Stats page:
+  - When a faction is selected on the Stats page, a paginated feed of games played with that faction is displayed below the matchup table.
+  - Game cards use the same layout as the dashboard (GameEventComponent).
+  - Pagination by 10, with Previous/Next navigation via Turbo Frames.
+  - Respects the "tournament only" filter.
+  - Fully localized (EN/FR).
+
 ## 2026-06-14
 
 - Feature — Cancelled registration status:

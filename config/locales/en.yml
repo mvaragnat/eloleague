@@ -388,6 +388,20 @@ en:
     games: "Games"
     mirrors: "Mirrors"
     warning: "Warning"
+    matchups:
+      title: "Win rate by matchup"
+      no_data: "No matchup data available for this faction."
+    top_players:
+      title: "Top players"
+      player: "Player"
+      games_count: "Games"
+    faction_games:
+      title: "Games with this faction"
+      no_games: "No games found for this faction."
+      previous: "← Previous"
+      next: "Next →"
+      page_info: "Page %{page} / %{total}"
+      pagination: "Pagination"
     warnings:
       insufficient_players: "Number of players is insufficient"
       insufficient_games: "Number of games is insufficient"

@@ -5,25 +5,22 @@ class GameEventComponent < ViewComponent::Base
     super()
     @event = event
     @current_user = current_user
-    @participation = event.game_participations.find { |p| p.user_id == current_user.id }
-    @participation ||= event.game_participations.first
+    match = event.game_participations.find { |p| p.user_id == current_user.id }
+    @spectator = match.nil?
+    @participation = match || event.game_participations.first
   end
 
   private
 
-  def other_participants
-    @event.players.reject { |u| u.id == @current_user.id }
+  def left_username
+    @participation.user.username
   end
 
   def opponent_participation
-    @event.game_participations.find { |p| p.user_id != @current_user.id }
+    @event.game_participations.find { |p| p.id != @participation.id }
   end
 
-  def card_accent_classes
-    base = 'rounded-lg border-4'
-    winner = @event.winner_user
-    return "#{base} border-blue-500" if winner.nil?
-
-    winner.id == @current_user.id ? "#{base} border-green-500" : "#{base} border-red-500"
+  def spectator?
+    @spectator
   end
 end

@@ -55,4 +55,35 @@ class GameEventComponentTest < ViewComponent::TestCase
     assert_text my_participation.faction.localized_name
     assert_text opponent_participation.faction.localized_name
   end
+
+  test 'when current_user is not a participant, shows both players with their factions' do
+    spectator = User.create!(username: 'spectator', email: 'spec@example.com',
+                             password: 'password123', password_confirmation: 'password123')
+    component = GameEventComponent.new(event: @game, current_user: spectator)
+    render_inline(component)
+
+    p1 = @game.game_participations.first
+    p2 = @game.game_participations.second
+
+    assert_text p1.user.username
+    assert_text p2.user.username
+    assert_text p1.faction.localized_name
+    assert_text p2.faction.localized_name
+  end
+
+  test 'when current_user is not a participant, card has neutral draw style' do
+    spectator = User.create!(username: 'spectator2', email: 'spec2@example.com',
+                             password: 'password123', password_confirmation: 'password123')
+    component = GameEventComponent.new(event: @game, current_user: spectator)
+    render_inline(component)
+
+    assert_selector '.card--draw'
+    assert_no_selector '.card--win'
+    assert_no_selector '.card--loss'
+  end
+
+  test 'when current_user is a participant and wins, card has win style' do
+    render_inline(@component)
+    assert_selector '.card--win'
+  end
 end

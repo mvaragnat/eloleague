@@ -1,10 +1,16 @@
-<% outcome_class = case @event.winner_user&.id
-when nil then 'card--draw'
-when @current_user.id then 'card--win'
-else 'card--loss'
+<% outcome_class = if spectator?
+  'card--draw'
+else
+  case @event.winner_user&.id
+  when nil then 'card--draw'
+  when @current_user.id then 'card--win'
+  else 'card--loss'
+  end
 end %>
-<% my_change = EloChange.find_by(game_event: @event, user: @current_user) %>
-<% opp_change = EloChange.find_by(game_event: @event, user: opponent_participation&.user) %>
+<% my = @participation %>
+<% opp = opponent_participation %>
+<% my_change = EloChange.find_by(game_event: @event, user: my&.user) %>
+<% opp_change = EloChange.find_by(game_event: @event, user: opp&.user) %>
 <div class="card <%= outcome_class %>">
   <div class="card-header">
     <h3><%= t('games.game_of') %> <%= @event.game_system.localized_name %></h3>
@@ -18,11 +24,9 @@ end %>
   </div>
 
   <div class="card-body">
-    <% my = @participation %>
-    <% opp = opponent_participation %>
     <div class="card-row">
       <div class="player">
-        <%= @current_user.username %>
+        <%= left_username %>
         <% if my&.faction %>
           <div class="card-date"><%= my.faction.localized_name %></div>
         <% end %>
@@ -48,8 +52,7 @@ end %>
         <% end %>
       </div>
     </div>
-    <%# Army list view button for my participation if provided %>
-    <% if my&.army_list.present? %>
+    <% if my&.army_list.present? && !spectator? %>
       <div style="margin-top:0.5rem; text-align:center;">
         <%= link_to t('games.view_army_list', default: 'View my army list'), game_event_path(@event), class: 'btn', data: { turbo_frame: 'modal' } %>
       </div>

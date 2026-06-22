@@ -1,0 +1,35 @@
+<turbo-frame id="faction-games-frame">
+  <% if @games.any? %>
+    <div class="games-container">
+      <div id="faction-games-list">
+        <% @games.each do |game| %>
+          <%= render GameEventComponent.new(event: game, current_user: Current.user) %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @total_pages > 1 %>
+      <nav class="pagination" aria-label="<%= t('stats.faction_games.pagination', default: 'Pagination') %>">
+        <% if @page > 1 %>
+          <%= link_to t('stats.faction_games.previous', default: '← Previous'),
+                stats_faction_games_path(faction_id: @faction.id, page: @page - 1, tournament_only: params[:tournament_only]),
+                class: 'btn btn-inverse',
+                data: { turbo_frame: 'faction-games-frame' } %>
+        <% end %>
+        <span class="pagination-info">
+          <%= t('stats.faction_games.page_info', page: @page, total: @total_pages, default: "Page %{page} / %{total}") %>
+        </span>
+        <% if @page < @total_pages %>
+          <%= link_to t('stats.faction_games.next', default: 'Next →'),
+                stats_faction_games_path(faction_id: @faction.id, page: @page + 1, tournament_only: params[:tournament_only]),
+                class: 'btn btn-inverse',
+                data: { turbo_frame: 'faction-games-frame' } %>
+        <% end %>
+      </nav>
+    <% end %>
+  <% else %>
+    <div class="card">
+      <p class="card-date"><%= t('stats.faction_games.no_games', default: 'No games found for this faction.') %></p>
+    </div>
+  <% end %>
+</turbo-frame>

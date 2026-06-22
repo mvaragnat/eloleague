@@ -23,7 +23,7 @@
     <select id="system-select" class="input" data-stats-target="system" data-action="change->stats#onSystemChange">
       <option value=""><%= t('stats.select_system', default: 'Select a game system') %></option>
       <% @systems.sort_by(&:localized_name).each do |sys| %>
-        <option value="<%= sys.id %>"><%= sys.localized_name %></option>
+        <option value="<%= sys.id %>" <%= 'selected' if @default_system&.id == sys.id %>><%= sys.localized_name %></option>
       <% end %>
     </select>
 
@@ -69,8 +69,29 @@
       </div>
     </div>
 
-    <div id="versus-table" class="mt-4" hidden>
+    <div id="top-players" class="mt-4" hidden data-stats-target="topPlayers">
+      <h4 class="mb-2"><%= t('stats.top_players.title', default: 'Top players') %></h4>
       <div class="table-responsive">
+        <table class="table" data-stats-target="topPlayersTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th><%= t('stats.top_players.player', default: 'Player') %></th>
+              <th><%= t('stats.top_players.games_count', default: 'Games') %></th>
+              <th><%= t('stats.win_percent', default: 'Win%') %></th>
+              <th><%= t('stats.loss_percent', default: 'Loss%') %></th>
+              <th><%= t('stats.draw_percent', default: 'Draw%') %></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="versus-table" class="mt-4" hidden>
+      <h4 class="mb-2"><%= t('stats.matchups.title', default: 'Win rate by matchup') %></h4>
+      <p class="card-date" data-stats-target="versusEmpty" hidden><%= t('stats.matchups.no_data', default: 'No matchup data available for this faction.') %></p>
+      <div class="table-responsive" data-stats-target="versusTableWrapper">
         <table class="table" data-stats-target="versusTable">
           <thead>
             <tr>
@@ -93,6 +114,12 @@
       </div>
     </div>
   </div>
+
+  <div id="faction-games" class="mt-6" hidden data-stats-target="factionGames">
+    <h3 class="mb-3"><%= t('stats.faction_games.title', default: 'Games with this faction') %></h3>
+    <turbo-frame id="faction-games-frame">
+    </turbo-frame>
+  </div>
 </div>
 
-
+<%= turbo_frame_tag "modal" %>
