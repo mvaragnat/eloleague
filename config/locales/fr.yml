@@ -7,7 +7,7 @@ fr:
         greater_than: doit être supérieur à %{count}
   app:
     name: "Eloleague"
-    description: "Eloleague"
+    description: "Suivez vos tournois, classements et scores Elo pour votre communauté de wargame."
   errors:
     messages:
       required: 'must exist'
