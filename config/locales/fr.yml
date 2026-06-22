@@ -355,6 +355,20 @@ fr:
     games: "Matchs"
     mirrors: "Miroirs"
     warning: "Warning"
+    matchups:
+      title: "Taux de victoire par matchup"
+      no_data: "Aucune donnée de matchup disponible pour cette faction."
+    top_players:
+      title: "Principaux joueurs"
+      player: "Joueur"
+      games_count: "Parties"
+    faction_games:
+      title: "Parties avec cette faction"
+      no_games: "Aucune partie trouvée pour cette faction."
+      previous: "← Précédent"
+      next: "Suivant →"
+      page_info: "Page %{page} / %{total}"
+      pagination: "Pagination"
     warnings:
       insufficient_players: "Nombre de joueurs insuffisant"
       insufficient_games: "Nombre de matchs insuffisant"

@@ -35,6 +35,8 @@ module Stats
         points << point(ev.played_at, wins, losses, draws)
       end
 
+      points.shift if points.size > 1
+
       [{ id: @faction.id, name: @faction.localized_name, points: points }]
     end
 

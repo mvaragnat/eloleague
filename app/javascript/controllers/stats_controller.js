@@ -6,9 +6,14 @@ export default class extends Controller {
     "faction",
     "factionsTable",
     "versusTable",
+    "versusTableWrapper",
+    "versusEmpty",
+    "topPlayers",
+    "topPlayersTable",
     "chart",
     "hideWarnings",
-    "tournamentOnly"
+    "tournamentOnly",
+    "factionGames"
   ]
 
   connect() {
@@ -16,6 +21,10 @@ export default class extends Controller {
     this._vsSort = { key: "games", dir: "desc" }
     this._factionOptions = []
     this._lastTournamentOnly = this._tournamentOnlyEnabled()
+
+    if (this.systemTarget.value) {
+      this.onSystemChange()
+    }
   }
 
   async onSystemChange() {
@@ -27,6 +36,8 @@ export default class extends Controller {
     this._setHidden(this.factionsTableTarget.closest('#factions-table'), true)
     this._setHidden(this.chartTarget?.closest('#faction-graph'), true)
     this._setHidden(this.versusTableTarget.closest('#versus-table'), true)
+    this._setHidden(this.topPlayersTarget, true)
+    this._setHidden(this.factionGamesTarget, true)
     // Ensure inner elements are not stuck hidden from a previous state
     this.factionsTableTarget.hidden = false
     if (this.chartTarget) this.chartTarget.hidden = false
@@ -39,12 +50,16 @@ export default class extends Controller {
   async onFactionChange() {
     const factionId = this.factionTarget.value
     this._setHidden(this.chartTarget?.closest('#faction-graph'), true)
+    this._setHidden(this.topPlayersTarget, true)
     this._setHidden(this.versusTableTarget.closest('#versus-table'), true)
+    this._setHidden(this.factionGamesTarget, true)
     if (!factionId) return
 
     await Promise.all([
       this._loadFactionSeries(factionId),
-      this._loadVersusTable(factionId)
+      this._loadTopPlayers(factionId),
+      this._loadVersusTable(factionId),
+      this._loadFactionGames(factionId)
     ])
   }
 
@@ -66,7 +81,9 @@ export default class extends Controller {
 
     await Promise.all([
       this._loadFactionSeries(factionId),
-      this._loadVersusTable(factionId)
+      this._loadTopPlayers(factionId),
+      this._loadVersusTable(factionId),
+      this._loadFactionGames(factionId)
     ])
   }
 
@@ -136,23 +153,60 @@ export default class extends Controller {
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
     this._vsData = this._normalizeRows(data.rows || [])
-    this._renderRows(this.versusTableTarget, this._vsData, row => `
-      <tr data-has-warning="${row.has_warning}">
-        <td>${this._e(row.opponent_faction_name)}</td>
-        <td>${row.games}</td>
-        <td>${row.unique_players}</td>
-        <td>${row.wins}</td>
-        <td>${row.losses}</td>
-        <td>${row.draws}</td>
-        <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
-        <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
-        <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
-        ${this._diffCell(row.win_loss_diff)}
-        <td>${row.mirror_count}</td>
-        <td>${this._e(row.warning_text)}</td>
-      </tr>
-    `)
+
+    if (this._vsData.length > 0) {
+      this._renderRows(this.versusTableTarget, this._vsData, row => `
+        <tr data-has-warning="${row.has_warning}">
+          <td>${this._e(row.opponent_faction_name)}</td>
+          <td>${row.games}</td>
+          <td>${row.unique_players}</td>
+          <td>${row.wins}</td>
+          <td>${row.losses}</td>
+          <td>${row.draws}</td>
+          <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
+          <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
+          <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
+          ${this._diffCell(row.win_loss_diff)}
+          <td>${row.mirror_count}</td>
+          <td>${this._e(row.warning_text)}</td>
+        </tr>
+      `)
+    }
+    this._updateVersusVisibility()
     this._setHidden(this.versusTableTarget.closest('#versus-table'), false)
+  }
+
+  async _loadTopPlayers(factionId) {
+    const url = this._url(this._withStatsFilters(`/stats/faction_top_players?faction_id=${encodeURIComponent(factionId)}`))
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
+    const data = await res.json()
+    const players = data.players || []
+    const tbody = this.topPlayersTableTarget.querySelector('tbody')
+    if (players.length === 0) {
+      tbody.innerHTML = ''
+      this._setHidden(this.topPlayersTarget, true)
+      return
+    }
+    tbody.innerHTML = players.map((p, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${p.profile_url ? `<a href="${this._e(p.profile_url)}">${this._e(p.username)}</a>` : this._e(p.username)}</td>
+        <td>${p.games_count}</td>
+        <td>${p.win_percent != null ? p.win_percent + '%' : ''}</td>
+        <td>${p.loss_percent != null ? p.loss_percent + '%' : ''}</td>
+        <td>${p.draw_percent != null ? p.draw_percent + '%' : ''}</td>
+      </tr>
+    `).join('')
+    this._setHidden(this.topPlayersTarget, false)
+  }
+
+  async _loadFactionGames(factionId) {
+    const url = this._url(this._withStatsFilters(`/stats/faction_games?faction_id=${encodeURIComponent(factionId)}`))
+    const res = await fetch(url, { headers: { 'Accept': 'text/html' } })
+    const html = await res.text()
+    const frame = this.factionGamesTarget.querySelector('#faction-games-frame')
+    if (frame) frame.innerHTML = html
+    this._setHidden(this.factionGamesTarget, false)
   }
 
   _renderRows(tableEl, rows, templateFn) {
@@ -255,6 +309,14 @@ export default class extends Controller {
   _applyHideWarningsToAllTables() {
     this._applyHideWarnings(this.factionsTableTarget)
     this._applyHideWarnings(this.versusTableTarget)
+    this._updateVersusVisibility()
+  }
+
+  _updateVersusVisibility() {
+    const rows = this.versusTableTarget.querySelectorAll('tbody tr')
+    const hasVisibleRows = Array.from(rows).some(r => !r.hidden)
+    this._setHidden(this.versusTableWrapperTarget, !hasVisibleRows)
+    this._setHidden(this.versusEmptyTarget, hasVisibleRows)
   }
 
   _tournamentOnlyEnabled() {
