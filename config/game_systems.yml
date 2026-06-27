@@ -22,6 +22,7 @@ game_systems:
       - "Blood Angels"
       - "Dark Angels"
       - "Iron Hands"
+      - "Sons of Medusa"
       - fr: "Légion d'Acier"
         en: "Steel Legion"
       - fr: "Death Korp de Krieg"
