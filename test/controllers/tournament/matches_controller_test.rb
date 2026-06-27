@@ -141,6 +141,40 @@ class TournamentMatchesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'div[data-controller="player-search"][data-player-search-preselected-user-id-value]'
   end
+
+  test 'match card displays game event faction not registration faction when faction changed' do
+    sign_out @tournament.creator
+    sign_in @user
+    @tournament.update!(state: 'running')
+
+    registration_faction = @tournament.registrations.find_by(user: @user).faction
+    changed_faction = Game::Faction.find_or_create_by!(game_system: @system, name: 'Changed Faction')
+    opponent_faction = @tournament.registrations.find_by(user: @opponent).faction
+
+    post tournament_tournament_matches_path(@tournament, locale: I18n.locale), params: {
+      game_event: {
+        game_participations_attributes: {
+          '0' => { user_id: @user.id, score: 10, faction_id: changed_faction.id },
+          '1' => { user_id: @opponent.id, score: 5, faction_id: opponent_faction.id }
+        }
+      }
+    }
+
+    match = @tournament.matches.last
+    assert_not_nil match
+    assert_equal changed_faction.id,
+                 match.game_event.game_participations.find_by(user: @user).faction_id,
+                 'Game event should store the changed faction'
+
+    get tournament_path(@tournament, locale: I18n.locale, tab: 1)
+    assert_response :success
+
+    matches_section = response.body[%r{id="matches-list".*?</ul>}m]
+    assert_includes matches_section, 'Changed Faction',
+                    'Match card should display the game event faction'
+    assert_not_includes matches_section, registration_faction.name,
+                        'Match card should NOT display the registration faction when game event has a different one'
+  end
 end
 
 # frozen_string_literal: true

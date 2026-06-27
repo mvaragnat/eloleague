@@ -1,3 +1,9 @@
+## 2026-06-27
+
+- Fix — Open tournament match cards display actual game faction:
+  - Match cards in the Matches tab now show the faction from the game event (the one actually played), not the faction chosen at registration/check-in.
+  - This fixes the case where a player changes their faction when reporting a match in an Open tournament.
+
 ## 2026-06-22
 
 - Feature — Top players per faction on Stats page:

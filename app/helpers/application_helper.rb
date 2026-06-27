@@ -174,12 +174,12 @@ module ApplicationHelper
 
     a_label = truncate(a_name, length: 24)
     b_label = truncate(b_name, length: 24)
-    a_faction_label = a_faction.present? ? truncate(a_faction, length: 24) : nil
-    b_faction_label = b_faction.present? ? truncate(b_faction, length: 24) : nil
 
     if match.game_event_id
       pa = match.game_event.game_participations.find_by(user: match.a_user)
       pb = match.game_event.game_participations.find_by(user: match.b_user)
+      a_faction = pa.faction.localized_name(I18n.locale) if pa&.faction
+      b_faction = pb.faction.localized_name(I18n.locale) if pb&.faction
       # Highlight by stored match.result to reflect scoring rules (win green, draw blue)
       case match.result
       when 'a_win'
@@ -213,6 +213,9 @@ module ApplicationHelper
       allowed = both_present && (admin || [match.a_user_id, match.b_user_id].compact.include?(Current.user&.id))
       link = allowed ? tournament_tournament_match_path(tournament, match) : nil
     end
+
+    a_faction_label = a_faction.present? ? truncate(a_faction, length: 24) : nil
+    b_faction_label = b_faction.present? ? truncate(b_faction, length: 24) : nil
 
     table_text = match.respond_to?(:table_number) && match.table_number.present? ? match.table_number.to_s : nil
     text_start_x = pos_x + (table_text ? 40 : 14)
