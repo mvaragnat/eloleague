@@ -41,10 +41,12 @@
                   <td class="ranking-td ranking-td--num" style="<%= highlight_bg %>"><%= row[:secondary_score_sum].to_f %></td>
                 <% end %>
                 <td class="ranking-td" style="text-align:right;">
-                  <% if row[:registration]&.army_list.present? %>
+                  <% can_view_list = (tournament.running? || tournament.completed?) && row[:registration]&.army_list.present? %>
+                  <% if can_view_list %>
                     <%= link_to t('tournaments.show.standings.view_list', default: 'View'),
                         tournament_tournament_registration_path(tournament, row[:registration]),
-                        data: { turbo_frame: "modal" },
+                        target: '_blank',
+                        rel: 'noopener',
                         class: "text-indigo-600 hover:text-indigo-900" %>
                   <% end %>
                 </td>
