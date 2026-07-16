@@ -176,6 +176,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Tournament registrations support an optional army list editable by the participant and the organizer.
 - Tournaments can require an army list at check-in; if enabled, players must provide a list before checking in.
 - Visibility: before the tournament starts, only the organizer and the owner can view/edit their list. Once the tournament is running or completed, all visitors (including guests) can view lists from the Participants tab, and ranking table “View” links open the list modal for everyone.
+- Lock after start: once a tournament is running or completed, players can no longer edit their army list. Only the organizer retains edit access. The show page displays a locked hint to the player, and the controller silently strips any `army_list` param from non-organizer updates.
 
 #### Elimination Bracket
 - On lock, elimination tournaments generate a full bracket tree using `Tournament::BracketBuilder` (Elo-based seeding, power-of-two sizing, byes to top seeds).

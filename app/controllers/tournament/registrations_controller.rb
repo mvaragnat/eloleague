@@ -51,6 +51,10 @@ module Tournament
       registration.user_id == Current.user.id
     end
 
+    def army_list_editable?
+      !@tournament.army_list_locked? || @tournament.creator_id == Current.user.id
+    end
+
     def can_view?(registration)
       return true if @tournament.running? || @tournament.completed?
       return true if @tournament.creator_id == Current.user&.id
@@ -60,7 +64,9 @@ module Tournament
     end
 
     def registration_params
-      params.expect(tournament_registration: %i[faction_id army_list status])
+      permitted = params.expect(tournament_registration: %i[faction_id army_list status])
+      permitted.delete(:army_list) unless army_list_editable?
+      permitted
     end
   end
 end

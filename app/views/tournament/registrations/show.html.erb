@@ -14,7 +14,8 @@
 
   <hr class="army-list-divider">
 
-  <% can_edit = Current.user && (Current.user.id == @registration.user_id || Current.user.id == @tournament.creator_id) %>
+  <% is_owner_or_organizer = Current.user && (Current.user.id == @registration.user_id || Current.user.id == @tournament.creator_id) %>
+  <% can_edit = is_owner_or_organizer && (!@tournament.army_list_locked? || Current.user.id == @tournament.creator_id) %>
   <% if can_edit %>
     <%= form_with(model: @registration, url: tournament_tournament_registration_path(@tournament, @registration), method: :patch, scope: :tournament_registration) do |f| %>
       <div class="form-group">
@@ -26,6 +27,9 @@
       </div>
     <% end %>
   <% else %>
+    <% if is_owner_or_organizer && @tournament.army_list_locked? %>
+      <p class="card-date" style="color:#6b7280; margin-bottom:1rem;"><%= t('tournaments.army_list_locked_hint') %></p>
+    <% end %>
     <pre class="army-list-pre"><%= @registration.army_list.presence || t('tournaments.show.no_army_list', default: 'No army list provided') %></pre>
   <% end %>
 </div>
