@@ -1,3 +1,11 @@
+## 2026-07-10
+
+- Feature — Lock army lists after tournament start:
+  - Players can no longer edit their army list once a tournament is running or completed.
+  - The organizer retains full edit access at all times.
+  - A hint message is shown to players on the army list page when it is locked.
+  - Controller silently strips army_list changes from non-organizer requests.
+
 ## 2026-06-27
 
 - Fix — Open tournament match cards display actual game faction:

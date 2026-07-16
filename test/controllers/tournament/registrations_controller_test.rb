@@ -88,6 +88,61 @@ module Tournament
       assert_response :success
     end
 
+    test 'before running: player can update own army list' do
+      # p2 updates own army list during registration
+      reg = @t.registrations.find_by(user: @p2)
+      patch tournament_tournament_registration_path(@t, reg, locale: I18n.locale), params: {
+        tournament_registration: { army_list: 'NEW LIST B' }, tab: 2
+      }
+      assert_equal 'NEW LIST B', reg.reload.army_list
+    end
+
+    test 'after running: player cannot update own army list' do
+      sign_out @p2
+      sign_in @creator
+      @t.registrations.find_each { |r| r.update!(status: 'checked_in') }
+      post lock_registration_tournament_path(@t, locale: I18n.locale)
+      sign_out @creator
+
+      sign_in @p2
+      reg = @t.registrations.find_by(user: @p2)
+      patch tournament_tournament_registration_path(@t, reg, locale: I18n.locale), params: {
+        tournament_registration: { army_list: 'CHEATED LIST' }, tab: 2
+      }
+      assert_not_equal 'CHEATED LIST', reg.reload.army_list
+      assert_equal 'LIST B', reg.reload.army_list
+    end
+
+    test 'after running: organizer can still update army list' do
+      sign_out @p2
+      sign_in @creator
+      @t.registrations.find_each { |r| r.update!(status: 'checked_in') }
+      post lock_registration_tournament_path(@t, locale: I18n.locale)
+
+      reg = @t.registrations.find_by(user: @p2)
+      patch tournament_tournament_registration_path(@t, reg, locale: I18n.locale), params: {
+        tournament_registration: { army_list: 'ORGANIZER FIX' }, tab: 2
+      }
+      assert_equal 'ORGANIZER FIX', reg.reload.army_list
+    end
+
+    test 'after completed: player cannot update own army list' do
+      sign_out @p2
+      sign_in @creator
+      @t.registrations.find_each { |r| r.update!(status: 'checked_in') }
+      post lock_registration_tournament_path(@t, locale: I18n.locale)
+      post finalize_tournament_path(@t, locale: I18n.locale)
+      sign_out @creator
+
+      sign_in @p2
+      reg = @t.registrations.find_by(user: @p2)
+      patch tournament_tournament_registration_path(@t, reg, locale: I18n.locale), params: {
+        tournament_registration: { army_list: 'CHEATED LIST' }, tab: 2
+      }
+      assert_not_equal 'CHEATED LIST', reg.reload.army_list
+      assert_equal 'LIST B', reg.reload.army_list
+    end
+
     test 'after completed: guest can view any list' do
       # Move to running then finalize
       sign_in @creator

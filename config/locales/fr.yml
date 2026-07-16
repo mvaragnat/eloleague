@@ -294,6 +294,7 @@ fr:
     faction_required_to_check_in: "Veuillez sélectionner votre faction avant l'enregistrement"
     army_list_required_hint: "La liste d'armée est requise pour le check-in"
     army_list_required_to_check_in: "Veuillez fournir votre liste d'armée avant le check-in"
+    army_list_locked_hint: "Les listes d'armée sont verrouillées une fois le tournoi commencé."
     registration_updated: "Inscription mise à jour"
     errors:
       already_registered: "Vous êtes déjà inscrit"

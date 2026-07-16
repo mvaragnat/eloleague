@@ -325,6 +325,7 @@ en:
     faction_required_to_check_in: "Please select your faction before checking in"
     army_list_required_hint: "Army list is required to check in"
     army_list_required_to_check_in: "Please provide your army list before checking in"
+    army_list_locked_hint: "Army lists are locked once the tournament has started."
     select_faction: "Select faction"
     no_faction: "No faction"
     registration_updated: "Registration updated"

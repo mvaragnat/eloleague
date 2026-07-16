@@ -61,6 +61,10 @@ module Tournament
       registrations.count >= max_players
     end
 
+    def army_list_locked?
+      running? || completed?
+    end
+
     def state_label
       I18n.t("tournaments.state.#{state}", default: state.to_s.humanize)
     end
