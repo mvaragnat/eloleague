@@ -206,6 +206,9 @@ en:
       lock_and_generate: "Lock registration and generate tournament tree"
       finalize: "Finalize"
       organizer: "Organizer"
+      participants_label:
+        one: "participant"
+        other: "participants"
       secondary_score_short: "Points"
       pending: "Pending"
       bye: "Bye"

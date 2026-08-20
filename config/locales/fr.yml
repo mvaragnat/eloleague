@@ -177,6 +177,9 @@ fr:
       lock_and_generate: "Fermer et générer l'arbre du tournoi"
       finalize: "Finaliser"
       organizer: "Organisateur"
+      participants_label:
+        one: "participant"
+        other: "participants"
       secondary_score_short: "Points"
       pending: "En attente"
       bye: "Exempt"

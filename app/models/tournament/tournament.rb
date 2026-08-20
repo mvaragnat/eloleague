@@ -69,6 +69,14 @@ module Tournament
       I18n.t("tournaments.state.#{state}", default: state.to_s.humanize)
     end
 
+    def participants_count
+      registrations.active.size
+    end
+
+    def show_max_players?
+      max_players.present? && state.in?(%w[draft registration])
+    end
+
     def pairing_key
       pairing_strategy_key.presence || ::Tournament::StrategyRegistry.default_pairing_key
     end

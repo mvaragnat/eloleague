@@ -13,7 +13,7 @@ class TournamentsController < ApplicationController
     # Populate Current.user for guest pages
     Current.user = current_user
 
-    scope = ::Tournament::Tournament.includes(:game_system, :creator).order(created_at: :desc)
+    scope = ::Tournament::Tournament.includes(:game_system, :creator, :registrations).order(created_at: :desc)
     @my_tournaments = Current.user ? scope.where(creator: Current.user) : scope.none
     @accepting_tournaments = scope.where(state: 'registration')
     @ongoing_tournaments = scope.where(state: 'running')
