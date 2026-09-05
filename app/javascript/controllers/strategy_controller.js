@@ -6,11 +6,12 @@ export default class extends Controller {
     savedText: String,
     showPairing: Boolean,
     explainPairing: Object,
+    explainFirstRoundPairing: Object,
     explainTiebreak: Object,
     explainPrimary: Object
   }
 
-  static targets = ["pairingExplanation", "tiebreak1Explanation", "tiebreak2Explanation", "primaryExplanation"]
+  static targets = ["pairingExplanation", "firstRoundPairingExplanation", "tiebreak1Explanation", "tiebreak2Explanation", "primaryExplanation"]
 
   async changed(event) {
     const element = event.currentTarget
@@ -45,6 +46,10 @@ export default class extends Controller {
     if (field === "pairing_strategy_key" && this.hasPairingExplanationTarget) {
       const txt = this.explainPairingValue[value] || this.explainPairingValue["default"] || ""
       this.pairingExplanationTarget.textContent = txt
+    }
+    if (field === "first_round_pairing_strategy_key" && this.hasFirstRoundPairingExplanationTarget) {
+      const txt = this.explainFirstRoundPairingValue[value] || this.explainFirstRoundPairingValue["default"] || ""
+      this.firstRoundPairingExplanationTarget.textContent = txt
     }
     if (field === "tiebreak1_strategy_key" && this.hasTiebreak1ExplanationTarget) {
       const txt = this.explainTiebreakValue[value] || this.explainTiebreakValue["default"] || ""

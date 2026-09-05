@@ -53,10 +53,17 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - `Tournament::Registration`
   - Join between a `Tournament::Tournament` and a `User` with optional `seed` (Elo snapshot), `status` (`pending|checked_in|cancelled`), and optional `faction_id`.
   - Optional `army_list` (text) per registration.
+  - Optional `affiliation_id` (club/team the player represents). `affiliation_name` is a virtual attribute: assigning a free-text name reuses the matching affiliation (case-insensitive) or creates it; a blank name clears it.
   - Unique per (tournament, user).
   - When a tournament starts (lock registration), pending registrations are automatically set to `cancelled`. Only checked-in players participate.
   - Cancelled registrations are excluded from Swiss/Open pairings, standings, and championship scoring.
   - Scopes: `active` (excludes cancelled), `cancelled` (only cancelled).
+- `Affiliation`
+  - Simple named entity (club, team, store, ...) shared across tournaments.
+  - `has_many :registrations` (`Tournament::Registration`, nullified on destroy) and `has_many :users, through: :registrations`.
+  - Names are unique case-insensitively (unique index on `LOWER(name)`) and squished on write.
+  - Players pick or create their affiliation from the Participants tab while the tournament is in `registration` state; it becomes read-only in any other state (for players and organizer alike).
+  - `GET /affiliations/search?q=...` returns up to 10 matching affiliations as JSON, used by the autocomplete dropdown.
 - `Tournament::Round`
   - Represents a numbered round within a tournament (`number`, `state`), mainly used by Swiss/Open formats.
   - `has_many :matches` in that round.
@@ -192,7 +199,11 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 #### Swiss/Open Tournaments
 - Swiss/Open tournaments run in rounds. Closing a round validates all results and generates the next-round pairings from checked-in players (or all registrants if none are checked in).
-  - Default strategy: group players by current points and draw opponents within each group while avoiding repeats when possible.
+  - The first round has no result to pair on and uses its own setting, "Pairing strategy for the first round" (`first_round_pairing_strategy_key`):
+    - `random_avoid_same_affiliation` (default): random draw that avoids pairing two players sharing an affiliation; when the draw leaves a conflict, players are swapped between pairs (up to 50 iterations) and a same-affiliation pairing is only accepted when no alternative exists.
+    - `random`: plain random draw.
+  - Subsequent rounds use "Pairing strategy for other rounds" (`pairing_strategy_key`), previously named "Pairing strategy".
+  - Default strategy for the other rounds: group players by current points and draw opponents within each group while avoiding repeats when possible.
   - Alternative strategy: pair strictly by current ranking order (Primary and tie-breakers): 1v2, 3v4, ...; if a neighbor pair already played, the generator attempts a one-position shift (1v3 and 2v4) to avoid repeats.
   - **Extended duplicate prevention**: Both strategies now detect duplicate matches after initial pairing and attempt swaps with progressively further pairs to resolve them. A maximum of 50 swap iterations prevents infinite loops. If no valid swap exists (all combinations exhausted), the duplicate is accepted as a fallback.
   - If there is an odd number of players, one player receives a bye for the round, recorded as an immediate win and counted as a played game; byes are assigned among the lowest-scoring eligible players and not given to the same player twice when possible.
@@ -201,6 +212,10 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Standings award 1 point for a win and 0.5 for a draw. The ranking view lists players by the selected primary strategy with tie-breakers applied. The Ranking tab shows Points, Score sum, Strength of Schedule (SoS), and conditionally Secondary score sum. The table includes each player's faction and a link to view their army list if provided. The table is responsive and scrolls horizontally on small screens. The Secondary column appears only when 'Secondary score sum' is selected as the primary or a tie-break strategy. Columns selected as primary or tie-break are highlighted in pale yellow to make the applied rules explicit.
 
 - Swiss tournaments support a "Score for bye" setting (integer, default 0) that determines the score value awarded to players receiving a bye. This score is included in their score_sum for tie-breaking and rankings. Organizers can configure this in the Admin tab, and it is displayed in the tournament's Overview tab.
+
+#### Participants tab
+- The Participants tab lists Player, Faction, Affiliation and Status columns.
+- While registrations are open, a player (and the organizer) can set the affiliation with an autocomplete field: typing suggests existing affiliations, clicking one saves immediately, and typing a new name reveals a "Save" button that creates it. Outside the `registration` state the affiliation is displayed as plain text.
 
 #### Pairing swap (Swiss & Elimination)
 - The tournament organizer can adjust pairings for unplayed matches directly from the match page.

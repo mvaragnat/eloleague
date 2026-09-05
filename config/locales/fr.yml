@@ -194,6 +194,14 @@ fr:
       move_to_next_round: "Passer à la ronde suivante"
       view_army_list: "Liste d'armée"
       edit_army_list: "Modifier la liste"
+      no_affiliation: "Aucune affiliation"
+      affiliation_placeholder: "Affiliation"
+      affiliation_save: "Enregistrer"
+      participant_columns:
+        player: "Joueur"
+        faction: "Faction"
+        affiliation: "Affiliation"
+        status: "Statut"
       army_list_label: "Votre liste d'armée"
       no_army_list: "Aucune liste d'armée fournie"
       standings:
@@ -208,13 +216,17 @@ fr:
       strategies:
         primary: "Critère principal"
         explanation: "Le classement utilise les critères suivants :"
-        pairing_strategy: "Stratégie d'appariement"
+        pairing_strategy: "Stratégie d'appariement pour les autres tours"
+        first_round_pairing_strategy: "Stratégie d'appariement pour le premier tour"
         tiebreak1: "Départage #1"
         tiebreak2: "Départage #2"
         names:
           pairing:
             by_points_random_within_group: "Par points (aléatoire dans les égalités)"
             by_standings_neighbors: "Par ordre du classement (éviter les re-matchs)"
+          first_round_pairing:
+            random: "Aléatoire"
+            random_avoid_same_affiliation: "Aléatoire en évitant les affiliations identiques"
           primary:
             points: "Points"
             score_sum: "Somme des scores"
@@ -231,6 +243,10 @@ fr:
             by_points_random_within_group: "Apparie par points; aléatoire en cas d'égalité; évite les re-matchs quand possible."
             by_standings_neighbors: "Apparie 1v2, 3v4, ... selon le classement actuel (critère principal et départages) ; tente d'éviter les re-matchs en décalant les voisins."
             default: "Apparie selon les points; mélange les égalités; évite les re-matchs quand possible."
+          first_round_pairing:
+            random: "Apparie les joueurs au hasard."
+            random_avoid_same_affiliation: "Apparie les joueurs au hasard en évitant de faire jouer ensemble deux joueurs de la même affiliation."
+            default: "Apparie les joueurs au hasard pour le premier tour."
           primary:
             points: "Points victoire/défaite (1 victoire, 0,5 nul, 0 défaite)."
             score_sum: "Plus grande somme des scores sur les parties jouées classe en premier."

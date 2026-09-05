@@ -80,7 +80,7 @@
       <% unless tournament.elimination? %>
         <div style="width:100%;">
           <p class="card-date" style="font-style:normal;"><%= t('tournaments.show.strategies.explanation') %></p>
-          <%= render 'strategy_settings', show_pairing: !tournament.open? %>
+          <%= render 'strategy_settings', show_pairing: !tournament.open?, show_first_round_pairing: true %>
         </div>
       <% end %>
     

@@ -12,6 +12,16 @@ module Tournament
       }
     end
 
+    # First round pairing strategies map: key => [human_label, class]
+    # The first round has no standings yet, so it gets its own strategies.
+    def first_round_pairing_strategies
+      {
+        'random_avoid_same_affiliation' => ['Random, avoiding identical affiliations',
+                                            ::Tournament::Pairing::RandomAvoidingSameAffiliation],
+        'random' => ['Random', ::Tournament::Pairing::RandomFirstRound]
+      }
+    end
+
     # Tie-break strategies map for standings (applied in order): key => [human_label, lambda]
     # The lambda receives (user_id, aggregator_hash) and returns a numeric tie-break value.
     def tiebreak_strategies
@@ -47,6 +57,10 @@ module Tournament
 
     def default_pairing_key
       'by_points_random_within_group'
+    end
+
+    def default_first_round_pairing_key
+      'random_avoid_same_affiliation'
     end
 
     def default_tiebreak1_key

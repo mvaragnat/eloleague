@@ -1,9 +1,11 @@
 <%# frozen_string_literal: true %>
 <% show_pairing = local_assigns.fetch(:show_pairing, false) %>
+<% show_first_round_pairing = local_assigns.fetch(:show_first_round_pairing, false) %>
 <% admin_tab_index = @tournament.elimination? ? 3 : 4 %>
 <% pairing_explanations = Tournament::StrategyRegistry.pairing_strategies.transform_values { |v| t("tournaments.show.strategies.explanations.pairing.#{v.last.name.demodulize.underscore}", default: t("tournaments.show.strategies.explanations.pairing.#{v.first.parameterize(separator: '_')}", default: t('tournaments.show.strategies.explanations.pairing.default'))) } %>
 <%# Fallback keys: by_points_random_within_group explicitly %>
 <% pairing_explanations['by_points_random_within_group'] ||= t('tournaments.show.strategies.explanations.pairing.by_points_random_within_group', default: t('tournaments.show.strategies.explanations.pairing.default')) %>
+<% first_round_pairing_explanations = Tournament::StrategyRegistry.first_round_pairing_strategies.keys.index_with { |k| t("tournaments.show.strategies.explanations.first_round_pairing.#{k}", default: t('tournaments.show.strategies.explanations.first_round_pairing.default')) } %>
 <% tiebreak_explanations = Tournament::StrategyRegistry.tiebreak_strategies.transform_values { |v| t("tournaments.show.strategies.explanations.tiebreak.#{v.first.parameterize(separator: '_')}", default: t('tournaments.show.strategies.explanations.tiebreak.default')) } %>
 <% primary_explanations = Tournament::StrategyRegistry.primary_strategies.transform_values { |v| t("tournaments.show.strategies.explanations.primary.#{v.first.parameterize(separator: '_')}", default: t('tournaments.show.strategies.explanations.primary.default')) } %>
 
@@ -13,6 +15,7 @@
   data-strategy-saved-text-value="<%= t('tournaments.show.strategies.saved', default: 'Settings saved') %>"
   data-strategy-show-pairing-value="<%= show_pairing %>"
   data-strategy-explain-pairing-value="<%= pairing_explanations.to_json %>"
+  data-strategy-explain-first-round-pairing-value="<%= first_round_pairing_explanations.to_json %>"
   data-strategy-explain-tiebreak-value="<%= tiebreak_explanations.to_json %>"
   data-strategy-explain-primary-value="<%= primary_explanations.to_json %>"
 >
@@ -56,9 +59,24 @@
       </div>
     </div>
 
+    <% if show_first_round_pairing %>
+      <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+        <div><%= t('tournaments.show.strategies.first_round_pairing_strategy', default: 'Pairing strategy for the first round') %></div>
+        <div>
+          <%= select_tag 'tournament[first_round_pairing_strategy_key]',
+                          options_for_select(@first_round_pairing_strategies.map { |k, v| [t("tournaments.show.strategies.names.first_round_pairing.#{k}", default: v.first), k] }, @tournament.first_round_pairing_key),
+                          class: 'input', style: 'width:100%;',
+                          data: { action: 'change->strategy#changed', field: 'first_round_pairing_strategy_key' } %>
+        </div>
+        <div class="card-date" id="first-round-pairing-explanation" data-strategy-target="firstRoundPairingExplanation">
+          <%= t("tournaments.show.strategies.explanations.first_round_pairing.#{@tournament.first_round_pairing_key}", default: t('tournaments.show.strategies.explanations.first_round_pairing.default')) %>
+        </div>
+      </div>
+    <% end %>
+
     <% if show_pairing %>
       <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
-        <div><%= t('tournaments.show.strategies.pairing_strategy', default: 'Pairing strategy') %></div>
+        <div><%= t('tournaments.show.strategies.pairing_strategy', default: 'Pairing strategy for other rounds') %></div>
         <div>
           <%= select_tag 'tournament[pairing_strategy_key]',
                           options_for_select(@pairing_strategies.map { |k, v| [t("tournaments.show.strategies.names.pairing.#{k}", default: v.first), k] }, @tournament.pairing_key),

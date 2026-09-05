@@ -1,3 +1,13 @@
+## 2026-09-05
+
+- Feature — Player affiliations and first round pairing:
+  - New `Affiliation` model (a simple name, unique case-insensitively) with many registrations and many users through them.
+  - The Participants tab gains an "Affiliation" column. While registrations are open, players (and the organizer) set their affiliation next to their faction with an autocomplete: picking a suggestion saves right away, typing a new name shows a "Save" button that creates the affiliation. Outside the "registration" state, the affiliation is read-only.
+  - New tournament setting "Pairing strategy for the first round", offered on the Administration tab and summarized on the Overview tab:
+    - "Random, avoiding identical affiliations" (default): random draw that never pairs two players from the same affiliation unless no other pairing is possible.
+    - "Random": the previous plain random draw.
+  - The existing "Pairing strategy" setting is renamed "Pairing strategy for other rounds" and now only applies from the second round on.
+
 ## 2026-07-10
 
 - Feature — Lock army lists after tournament start:
