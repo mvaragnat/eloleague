@@ -64,8 +64,9 @@ module Tournament
     end
 
     def registration_params
-      permitted = params.expect(tournament_registration: %i[faction_id army_list status])
+      permitted = params.expect(tournament_registration: %i[faction_id army_list status affiliation_name])
       permitted.delete(:army_list) unless army_list_editable?
+      permitted.delete(:affiliation_name) unless @tournament.affiliation_editable?
       permitted
     end
   end

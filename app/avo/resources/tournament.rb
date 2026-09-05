@@ -31,6 +31,7 @@ module Avo
         field :online, as: :boolean
         field :location, as: :text
         field :max_players, as: :number
+        field :first_round_pairing_strategy_key, as: :text
         field :pairing_strategy_key, as: :text
         field :tiebreak1_strategy_key, as: :text
         field :tiebreak2_strategy_key, as: :text

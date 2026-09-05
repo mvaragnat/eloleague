@@ -35,3 +35,6 @@ application.register("form-errors", FormErrorsController)
 
 import TableSortController from "controllers/table_sort_controller"
 application.register("table-sort", TableSortController)
+
+import AffiliationSearchController from "controllers/affiliation_search_controller"
+application.register("affiliation-search", AffiliationSearchController)

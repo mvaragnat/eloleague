@@ -223,6 +223,14 @@ en:
       move_to_next_round: "Move to next round"
       view_army_list: "Army list"
       edit_army_list: "Edit list"
+      no_affiliation: "No affiliation"
+      affiliation_placeholder: "Affiliation"
+      affiliation_save: "Save"
+      participant_columns:
+        player: "Player"
+        faction: "Faction"
+        affiliation: "Affiliation"
+        status: "Status"
       army_list_label: "Your army list"
       no_army_list: "No army list provided"
       standings:
@@ -237,13 +245,17 @@ en:
       strategies:
         primary: "Primary"
         explanation: "Ranking uses the following criteria:"
-        pairing_strategy: "Pairing strategy"
+        pairing_strategy: "Pairing strategy for other rounds"
+        first_round_pairing_strategy: "Pairing strategy for the first round"
         tiebreak1: "Tie-break #1"
         tiebreak2: "Tie-break #2"
         names:
           pairing:
             by_points_random_within_group: "By Points (random within ties)"
             by_standings_neighbors: "By ranking order (avoid repeats)"
+          first_round_pairing:
+            random: "Random"
+            random_avoid_same_affiliation: "Random, avoiding identical affiliations"
           primary:
             points: "Points"
             score_sum: "Score sum"
@@ -260,6 +272,10 @@ en:
             by_points_random_within_group: "Pairs by points; random within ties; avoids repeats when possible."
             by_standings_neighbors: "Pairs 1v2, 3v4, ... using current ranking (primary and tie-breakers); tries to avoid repeats by shifting neighbors."
             default: "Pairs by current points; shuffles within tied groups; avoids repeats when possible."
+          first_round_pairing:
+            random: "Pairs players at random."
+            random_avoid_same_affiliation: "Pairs players at random, avoiding two players from the same affiliation facing each other."
+            default: "Pairs players at random for the first round."
           primary:
             points: "Win/Lose points (1 win, 0.5 draw, 0 loss)."
             score_sum: "Higher total score across reported games ranks first."

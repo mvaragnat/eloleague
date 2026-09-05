@@ -98,6 +98,13 @@
         <strong><%= t('tournaments.show.strategies.tiebreak2', default: 'Tie-break #2') %>:</strong>
         <%= t("tournaments.show.strategies.names.tiebreak.#{tournament.tiebreak2_key}", default: @tiebreak2_label) %>
       </div>
+      <% unless tournament.elimination? %>
+        <div class="card-date" style="font-style:normal;">
+          <strong><%= t('tournaments.show.strategies.first_round_pairing_strategy', default: 'Pairing strategy for the first round') %>:</strong>
+          <%= t("tournaments.show.strategies.names.first_round_pairing.#{tournament.first_round_pairing_key}",
+                default: Tournament::StrategyRegistry.first_round_pairing_strategies[tournament.first_round_pairing_key]&.first.to_s) %>
+        </div>
+      <% end %>
       <div class="card-date" style="font-style:normal;">
         <strong><%= t('tournaments.new.require_army_list_for_check_in') %>:</strong>
         <%= tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %>

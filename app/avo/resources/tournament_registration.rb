@@ -22,6 +22,8 @@ module Avo
                           end
                         }
 
+        field :affiliation, as: :belongs_to, resource: Avo::Resources::Affiliation
+
         field :seed, as: :number
         field :status, as: :select, enum: ::Tournament::Registration::STATUSES
         field :army_list, as: :textarea

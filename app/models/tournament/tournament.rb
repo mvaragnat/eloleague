@@ -61,6 +61,10 @@ module Tournament
       registrations.count >= max_players
     end
 
+    def affiliation_editable?
+      registrations_open?
+    end
+
     def army_list_locked?
       running? || completed?
     end
@@ -79,6 +83,10 @@ module Tournament
 
     def pairing_key
       pairing_strategy_key.presence || ::Tournament::StrategyRegistry.default_pairing_key
+    end
+
+    def first_round_pairing_key
+      first_round_pairing_strategy_key.presence || ::Tournament::StrategyRegistry.default_first_round_pairing_key
     end
 
     def tiebreak1_key
@@ -135,16 +143,19 @@ module Tournament
     end
 
     def strategy_keys_are_known
-      pairings = ::Tournament::StrategyRegistry.pairing_strategies
-      tbs = ::Tournament::StrategyRegistry.tiebreak_strategies
-      primaries = ::Tournament::StrategyRegistry.primary_strategies
+      registry = ::Tournament::StrategyRegistry
+      validate_strategy_key(:pairing_strategy_key, pairing_key, registry.pairing_strategies, 'pairing strategy')
+      validate_strategy_key(:first_round_pairing_strategy_key, first_round_pairing_key,
+                            registry.first_round_pairing_strategies, 'first round pairing strategy')
+      validate_strategy_key(:primary_strategy_key, primary_key, registry.primary_strategies, 'primary strategy')
+      validate_strategy_key(:tiebreak1_strategy_key, tiebreak1_key, registry.tiebreak_strategies, 'tie-break strategy')
+      validate_strategy_key(:tiebreak2_strategy_key, tiebreak2_key, registry.tiebreak_strategies, 'tie-break strategy')
+    end
 
-      errors.add(:pairing_strategy_key, 'is not a recognized pairing strategy') unless pairing_key.in?(pairings.keys)
-      errors.add(:primary_strategy_key, 'is not a recognized primary strategy') unless primary_key.in?(primaries.keys)
-      errors.add(:tiebreak1_strategy_key, 'is not a recognized tie-break strategy') unless tiebreak1_key.in?(tbs.keys)
-      return if tiebreak2_key.in?(tbs.keys)
+    def validate_strategy_key(attribute, key, strategies, label)
+      return if key.in?(strategies.keys)
 
-      errors.add(:tiebreak2_strategy_key, 'is not a recognized tie-break strategy')
+      errors.add(attribute, "is not a recognized #{label}")
     end
   end
 end

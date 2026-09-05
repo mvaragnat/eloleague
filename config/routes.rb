@@ -43,6 +43,9 @@ Rails.application.routes.draw do
     get 'users/search', to: 'users#search', as: :users_search
     resources :users, only: %i[index show]
 
+    # Affiliations search (used by the registration affiliation autocomplete)
+    get 'affiliations/search', to: 'affiliations#search', as: :affiliations_search
+
     # Contact
     resources :contacts, only: %i[new create]
 

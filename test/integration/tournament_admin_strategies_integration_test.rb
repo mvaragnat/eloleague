@@ -42,6 +42,56 @@ class TournamentAdminStrategiesIntegrationTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, 'name="tournament[tiebreak2_strategy_key]"'
   end
 
+  test 'swiss admin: first round pairing is offered, defaults to avoiding affiliations and persists' do
+    sign_in(@creator)
+
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Swiss First Round', description: 'Z', game_system_id: @system.id, format: 'swiss' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    assert_equal 'random_avoid_same_affiliation', t.first_round_pairing_key
+
+    get tournament_path(t, locale: I18n.locale, tab: 3)
+    assert_response :success
+    assert_includes @response.body, 'name="tournament[first_round_pairing_strategy_key]"'
+
+    patch tournament_path(t, locale: I18n.locale),
+          params: { tournament: { first_round_pairing_strategy_key: 'random' } },
+          as: :json
+    assert_response :success
+    assert_equal 'random', t.reload.first_round_pairing_key
+  end
+
+  test 'unknown first round pairing strategy is rejected' do
+    sign_in(@creator)
+
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Swiss Bad Strategy', description: 'Z', game_system_id: @system.id, format: 'swiss' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    patch tournament_path(t, locale: I18n.locale),
+          params: { tournament: { first_round_pairing_strategy_key: 'nope' } },
+          as: :json
+    assert_response :unprocessable_content
+    assert_equal 'random_avoid_same_affiliation', t.reload.first_round_pairing_key
+  end
+
+  test 'overview shows the first round pairing strategy' do
+    sign_in(@creator)
+
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Swiss Overview', description: 'Z', game_system_id: @system.id, format: 'swiss' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+
+    get tournament_path(t, locale: I18n.locale, tab: 0)
+    assert_response :success
+    assert_includes @response.body,
+                    I18n.t('tournaments.show.strategies.names.first_round_pairing.random_avoid_same_affiliation')
+  end
+
   test 'swiss admin: pairing present, JSON update persists and explanation matches' do
     sign_in(@creator)
 

@@ -26,6 +26,36 @@ module Tournament
       assert dup.errors[:user_id].present?
     end
 
+    test 'affiliation_name assigns an existing affiliation without creating a new one' do
+      affiliation = ::Affiliation.create!(name: 'Club Alpha')
+      reg = ::Tournament::Registration.new(tournament: @t, user: @user)
+
+      assert_no_difference -> { ::Affiliation.count } do
+        reg.affiliation_name = 'club alpha'
+      end
+      assert_equal affiliation, reg.affiliation
+      assert_equal 'Club Alpha', reg.affiliation_name
+    end
+
+    test 'affiliation_name creates the affiliation when it does not exist' do
+      reg = ::Tournament::Registration.new(tournament: @t, user: @user)
+
+      assert_difference -> { ::Affiliation.count }, 1 do
+        reg.affiliation_name = 'Club Beta'
+      end
+      assert_equal 'Club Beta', reg.affiliation_name
+    end
+
+    test 'blank affiliation_name clears the affiliation' do
+      reg = ::Tournament::Registration.new(tournament: @t, user: @user,
+                                           affiliation: ::Affiliation.create!(name: 'Club Gamma'))
+
+      reg.affiliation_name = ''
+
+      assert_nil reg.affiliation
+      assert_nil reg.affiliation_name
+    end
+
     test 'valid status values' do
       reg = ::Tournament::Registration.new(tournament: @t, user: @user)
 

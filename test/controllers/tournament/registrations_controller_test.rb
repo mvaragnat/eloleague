@@ -31,6 +31,39 @@ module Tournament
       @reg_p2 = @t.registrations.find_by(user: @p2)
     end
 
+    test 'player sets their affiliation while registrations are open' do
+      patch tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale), params: {
+        tournament_registration: { affiliation_name: 'Club des Six' }, tab: 2
+      }
+
+      assert_redirected_to tournament_path(@t, locale: I18n.locale, tab: 2)
+      assert_equal 'Club des Six', @reg_p2.reload.affiliation_name
+    end
+
+    test 'affiliation is not editable once the tournament is running' do
+      @reg_p2.update!(affiliation: ::Affiliation.create!(name: 'Club des Six'))
+      @t.update!(state: 'running')
+
+      patch tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale), params: {
+        tournament_registration: { affiliation_name: 'Another Club' }, tab: 2
+      }
+
+      assert_equal 'Club des Six', @reg_p2.reload.affiliation_name
+    end
+
+    test 'organizer cannot change an affiliation once the tournament is running' do
+      @reg_p2.update!(affiliation: ::Affiliation.create!(name: 'Club des Six'))
+      @t.update!(state: 'running')
+      sign_out @p2
+      sign_in @creator
+
+      patch tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale), params: {
+        tournament_registration: { affiliation_name: 'Another Club' }, tab: 2
+      }
+
+      assert_equal 'Club des Six', @reg_p2.reload.affiliation_name
+    end
+
     test 'organizer can toggle participant status regardless of requirements and preserves tab' do
       # Organizer signs in and toggles p2 to checked_in
       sign_out @p2

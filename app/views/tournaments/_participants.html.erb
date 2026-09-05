@@ -1,11 +1,17 @@
 <div class="card">
   <div class="card-body">
     <div class="participants-list">
+      <div class="participant-row participant-header card-date">
+        <div><%= t('tournaments.show.participant_columns.player', default: 'Player') %></div>
+        <div><%= t('tournaments.show.participant_columns.faction', default: 'Faction') %></div>
+        <div><%= t('tournaments.show.participant_columns.affiliation', default: 'Affiliation') %></div>
+        <div class="participant-actions"><%= t('tournaments.show.participant_columns.status', default: 'Status') %></div>
+      </div>
       <% registrations.each do |r| %>
         <div class="participant-row">
+          <% can_edit = (Current.user && (Current.user.id == r.user_id || Current.user.id == tournament.creator_id)) %>
           <div><%= link_to r.user.username, user_path(r.user) %></div>
           <div>
-            <% can_edit = (Current.user && (Current.user.id == r.user_id || Current.user.id == tournament.creator_id)) %>
             <% if can_edit %>
               <%= form_with(model: r, url: tournament_tournament_registration_path(tournament, r), method: :patch, scope: :tournament_registration) do |f| %>
                 <%= hidden_field_tag :tab, 2 %>
@@ -19,6 +25,34 @@
               <% end %>
             <% else %>
               <span class="card-date"><%= r.faction&.localized_name || t('tournaments.show.no_faction', default: 'No faction') %></span>
+            <% end %>
+          </div>
+          <div>
+            <% can_edit_affiliation = can_edit && tournament.affiliation_editable? %>
+            <% if can_edit_affiliation %>
+              <%= form_with(model: r,
+                            url: tournament_tournament_registration_path(tournament, r),
+                            method: :patch,
+                            scope: :tournament_registration,
+                            data: { controller: 'affiliation-search',
+                                    affiliation_search_search_url_value: affiliations_search_path(locale: I18n.locale),
+                                    affiliation_search_current_value: r.affiliation_name.to_s }) do |f| %>
+                <%= hidden_field_tag :tab, 2 %>
+                <div class="affiliation-field">
+                  <%= f.text_field :affiliation_name,
+                                   value: r.affiliation_name,
+                                   autocomplete: 'off',
+                                   placeholder: t('tournaments.show.affiliation_placeholder', default: 'Affiliation'),
+                                   data: { affiliation_search_target: 'input',
+                                           action: 'input->affiliation-search#search blur->affiliation-search#blur' } %>
+                  <div class="affiliation-options" data-affiliation-search-target="results" style="display:none;"></div>
+                </div>
+                <%= f.submit t('tournaments.show.affiliation_save', default: 'Save'),
+                             class: 'btn',
+                             data: { affiliation_search_target: 'save' } %>
+              <% end %>
+            <% else %>
+              <span class="card-date"><%= r.affiliation_name.presence || t('tournaments.show.no_affiliation', default: 'No affiliation') %></span>
             <% end %>
           </div>
           <div class="participant-actions card-date">

@@ -1705,4 +1705,44 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_includes paired_user_ids, p2.id
     assert_includes paired_user_ids, p3.id
   end
+
+  test 'first swiss round avoids pairing players from the same affiliation' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Swiss Affiliations', description: 'S', game_system_id: game_systems(:chess).id,
+                    format: 'swiss' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+
+    club_a = Affiliation.create!(name: 'Club A')
+    club_b = Affiliation.create!(name: 'Club B')
+    clubs = [club_a, club_a, club_b, club_b]
+    players = (1..4).map do |i|
+      User.create!(username: "aff_p#{i}", email: "aff_p#{i}@example.com", password: 'password')
+    end
+
+    players.each_with_index do |u, idx|
+      sign_out @user
+      sign_in u
+      post register_tournament_path(t, locale: I18n.locale)
+      faction = Game::Faction.find_or_create_by!(game_system: t.game_system, name: "F-#{u.username}")
+      t.registrations.find_by(user: u).update!(faction: faction, affiliation: clubs[idx])
+      post check_in_tournament_path(t, locale: I18n.locale)
+    end
+
+    sign_out @user
+    sign_in @user
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+    post next_round_tournament_path(t, locale: I18n.locale)
+
+    round = t.rounds.order(:number).last
+    affiliations = t.registrations.to_h { |r| [r.user_id, r.affiliation_id] }
+
+    assert_equal 2, round.matches.count
+    round.matches.each do |m|
+      assert_not_equal affiliations[m.a_user_id], affiliations[m.b_user_id],
+                       'First round should not pair two players from the same affiliation'
+    end
+  end
 end

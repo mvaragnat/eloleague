@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :game_events, through: :game_participations, class_name: 'Game::Event'
   has_many :game_systems, through: :game_events, class_name: 'Game::System'
   has_many :tournament_registrations, class_name: 'Tournament::Registration', dependent: :destroy
+  has_many :affiliations, through: :tournament_registrations
   has_many :tournament_matches_as_a, class_name: 'Tournament::Match', foreign_key: 'a_user_id',
                                      inverse_of: :a_user, dependent: :nullify
   has_many :tournament_matches_as_b, class_name: 'Tournament::Match', foreign_key: 'b_user_id',

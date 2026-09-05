@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_04_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_05_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
@@ -22,6 +22,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_04_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_admins_on_email", unique: true
+  end
+
+  create_table "affiliations", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_affiliations_on_lower_name", unique: true
   end
 
   create_table "championship_scores", force: :cascade do |t|
@@ -171,6 +178,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_04_120000) do
     t.datetime "updated_at", null: false
     t.bigint "faction_id"
     t.text "army_list"
+    t.bigint "affiliation_id"
+    t.index ["affiliation_id"], name: "index_tournament_registrations_on_affiliation_id"
     t.index ["faction_id"], name: "index_tournament_registrations_on_faction_id"
     t.index ["tournament_id", "user_id"], name: "index_tournament_registrations_on_tournament_id_and_user_id", unique: true
     t.index ["tournament_id"], name: "index_tournament_registrations_on_tournament_id"
@@ -216,6 +225,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_04_120000) do
     t.integer "tournament_registrations_count", default: 0, null: false
     t.bigint "scoring_system_id"
     t.string "championship_level"
+    t.string "first_round_pairing_strategy_key", default: "random_avoid_same_affiliation", null: false
     t.index ["creator_id"], name: "index_tournaments_on_creator_id"
     t.index ["format"], name: "index_tournaments_on_format"
     t.index ["game_system_id"], name: "index_tournaments_on_game_system_id"
@@ -261,6 +271,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_04_120000) do
   add_foreign_key "tournament_matches", "tournaments"
   add_foreign_key "tournament_matches", "users", column: "a_user_id"
   add_foreign_key "tournament_matches", "users", column: "b_user_id"
+  add_foreign_key "tournament_registrations", "affiliations"
   add_foreign_key "tournament_registrations", "game_factions", column: "faction_id"
   add_foreign_key "tournament_registrations", "tournaments"
   add_foreign_key "tournament_registrations", "users"

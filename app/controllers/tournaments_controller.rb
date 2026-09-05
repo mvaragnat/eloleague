@@ -35,6 +35,7 @@ class TournamentsController < ApplicationController
 
     # Expose strategies for Admin dropdowns
     @pairing_strategies = Tournament::StrategyRegistry.pairing_strategies
+    @first_round_pairing_strategies = Tournament::StrategyRegistry.first_round_pairing_strategies
     @tiebreak_strategies = Tournament::StrategyRegistry.tiebreak_strategies
     @primary_strategies = Tournament::StrategyRegistry.primary_strategies
 
@@ -201,8 +202,7 @@ class TournamentsController < ApplicationController
     new_round = @tournament.rounds.create!(number: next_number, state: 'pending')
 
     # Generate pairings via registry strategy
-    pairing_cls = Tournament::StrategyRegistry.pairing_strategies[@tournament.pairing_key].last
-    result = pairing_cls.new(@tournament).call
+    result = pairing_strategy_for(next_number).new(@tournament).call
     pairs = result.pairs
     pairs.each_with_index do |(a_user, b_user), idx|
       @tournament.matches.create!(
@@ -325,6 +325,7 @@ class TournamentsController < ApplicationController
       :starts_at,
       :ends_at,
       :pairing_strategy_key,
+      :first_round_pairing_strategy_key,
       :primary_strategy_key,
       :tiebreak1_strategy_key,
       :tiebreak2_strategy_key,
@@ -340,6 +341,16 @@ class TournamentsController < ApplicationController
 
   def can_register?
     @tournament.registration?
+  end
+
+  # The first round has no result to pair on yet, so it uses its own strategy.
+  def pairing_strategy_for(round_number)
+    registry = Tournament::StrategyRegistry
+    if round_number == 1 && @tournament.matches.none?
+      registry.first_round_pairing_strategies[@tournament.first_round_pairing_key].last
+    else
+      registry.pairing_strategies[@tournament.pairing_key].last
+    end
   end
 
   # Returns rows with primary, points and tiebreak columns and labels
