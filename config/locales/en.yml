@@ -232,12 +232,10 @@ en:
         player: "Player"
         faction: "Faction"
         affiliation: "Affiliation"
+        validation: "Validation"
         status: "Status"
       validation:
-        confirmed: "Confirmed"
-        confirmed_label: "confirmed"
         confirmed_hint: "Registration confirmed by the organizer"
-        awaiting: "Awaiting confirmation"
         awaiting_hint: "Waiting for the organizer to confirm this registration"
         confirm: "Confirm"
         revoke: "Revoke"
@@ -245,9 +243,12 @@ en:
         pending_count:
           one: "%{count} awaiting confirmation"
           other: "%{count} awaiting confirmation"
-        registered_total:
-          one: "%{count} registered in total"
-          other: "%{count} registered in total"
+        registered_label:
+          one: "registered"
+          other: "registered"
+        pre_registered:
+          one: "%{count} pre-registered"
+          other: "%{count} pre-registered"
         overview_hint: "the organizer confirms each registration; only confirmed players count towards the max players and can check in"
       army_list_label: "Your army list"
       no_army_list: "No army list provided"

@@ -195,6 +195,13 @@ input:focus, select:focus, textarea:focus {
 .participant-row:last-child { border-bottom: none; }
 .participant-header { font-style: normal; font-weight: 600; }
 .participant-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; align-items: center; }
+/* Extra column when the organizer validates registrations by hand */
+.participants-list--validation .participant-row { grid-template-columns: 1.1fr 1fr 1fr auto minmax(420px, 1.4fr); }
+.participant-validation { display: flex; align-items: center; gap: 0.5rem; }
+.participant-validation .btn { padding: 0.25rem 0.625rem; font-size: 0.85rem; }
+.validation-mark { font-size: 1.1rem; line-height: 1; }
+.validation-mark--ok { color: #15803d; font-weight: 700; }
+.validation-mark--waiting { color: #b45309; }
 
 /* Affiliation autocomplete */
 .affiliation-field { position: relative; }
@@ -214,7 +221,8 @@ input:focus, select:focus, textarea:focus {
 .affiliation-option:hover { background: var(--gray-100); }
 
 @media (max-width: 640px) {
-  .participant-row {
+  .participant-row,
+  .participants-list--validation .participant-row {
     grid-template-columns: 1fr 1fr;
     row-gap: 0.375rem;
   }

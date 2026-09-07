@@ -203,22 +203,23 @@ fr:
         player: "Joueur"
         faction: "Faction"
         affiliation: "Affiliation"
+        validation: "Validation"
         status: "Statut"
       validation:
-        confirmed: "Validée"
-        confirmed_label: "validés"
         confirmed_hint: "Inscription validée par l'organisateur"
-        awaiting: "En attente de validation"
         awaiting_hint: "En attente de validation par l'organisateur"
         confirm: "Valider"
-        revoke: "Annuler la validation"
+        revoke: "Annuler"
         confirmed_count: "Inscriptions validées"
         pending_count:
           one: "%{count} en attente de validation"
           other: "%{count} en attente de validation"
-        registered_total:
-          one: "%{count} inscrit au total"
-          other: "%{count} inscrits au total"
+        registered_label:
+          one: "inscrit"
+          other: "inscrits"
+        pre_registered:
+          one: "%{count} pré-inscrit"
+          other: "%{count} pré-inscrits"
         overview_hint: "l'organisateur valide chaque inscription ; seuls les joueurs validés comptent dans le nombre max de joueurs et peuvent faire le check-in"
       army_list_label: "Votre liste d'armée"
       no_army_list: "Aucune liste d'armée fournie"

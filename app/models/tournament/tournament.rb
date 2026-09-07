@@ -108,10 +108,6 @@ module Tournament
       max_players.present? && state.in?(%w[draft registration])
     end
 
-    def participants_count_for_display
-      requires_registration_validation? ? confirmed_registrations_count : participants_count
-    end
-
     def pairing_key
       pairing_strategy_key.presence || ::Tournament::StrategyRegistry.default_pairing_key
     end

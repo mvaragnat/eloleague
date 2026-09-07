@@ -2,22 +2,7 @@
   <h1><%= @tournament.name %></h1>
   <p class="card-date"><%= @tournament.game_system.localized_name %> · <%= t("tournaments.formats.#{@tournament.format}", default: @tournament.format.to_s.humanize) %> · <strong><%= @tournament.state_label %></strong></p>
   <p class="card-date"><%= t('tournaments.show.organizer', default: 'Organizer') %>: <%= @tournament.creator.username %></p>
-  <p class="card-date">
-    <% pc = @tournament.participants_count %>
-    <% shown = @tournament.participants_count_for_display %>
-    <% if @tournament.show_max_players? %>
-      <%= "#{shown} / #{@tournament.max_players}" %> <%= t('tournaments.show.participants_label', count: shown) %>
-    <% else %>
-      <%= shown %> <%= t('tournaments.show.participants_label', count: shown) %>
-    <% end %>
-    <% if @tournament.requires_registration_validation? %>
-      <span title="<%= t('tournaments.show.validation.confirmed_hint', default: 'Registration confirmed by the organizer') %>">
-        (<%= t('tournaments.show.validation.confirmed_label', default: 'confirmed') %>) ·
-        <%= t('tournaments.show.validation.registered_total', count: pc,
-              default: { one: '%{count} registered in total', other: '%{count} registered in total' }) %>
-      </span>
-    <% end %>
-  </p>
+  <p class="card-date"><%= participants_summary(@tournament) %></p>
 
   <%= render 'registration_actions', tournament: @tournament, is_registered: @is_registered, my_registration: @my_registration %>
 
