@@ -62,6 +62,15 @@
           <%= f.check_box :require_army_list_for_check_in %>
         </div>
         <div>
+          <label class="card-date" style="font-style:normal; font-weight:600;">
+            <%= t('tournaments.new.require_registration_validation', default: 'Validate registrations by hand') %>
+          </label>
+          <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+            <%= f.check_box :require_registration_validation %>
+            <span><%= t('tournaments.new.require_registration_validation_hint', default: 'Players sign up on a waiting list; only registrations you confirm (for instance once paid) count towards the max players and can check in') %></span>
+          </label>
+        </div>
+        <div>
           <%= f.label :non_competitive, t('tournaments.new.non_competitive_checkbox_text') %>
           <%= f.check_box :non_competitive %>
         </div>

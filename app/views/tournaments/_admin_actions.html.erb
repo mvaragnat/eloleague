@@ -125,6 +125,36 @@
           data-strategy-saved-text-value="<%= t('tournaments.show.strategies.saved', default: 'Settings saved') %>"
         >
           <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.format', default: 'Format') %></div>
+            <% if @tournament.registration_settings_editable? %>
+              <select data-action="change->strategy#changed"
+                      data-field="format"
+                      data-reload="true"
+                      style="width:100%; max-width: 320px;">
+                <% %w[open swiss elimination].each do |fmt| %>
+                  <option value="<%= fmt %>" <%= 'selected' if @tournament.format == fmt %>><%= t("tournaments.formats.#{fmt}") %></option>
+                <% end %>
+              </select>
+            <% else %>
+              <span><%= t("tournaments.formats.#{@tournament.format}") %> <span class="card-date">(<%= t('tournaments.show.admin.locked_after_lock', default: 'locked once registrations are locked') %>)</span></span>
+            <% end %>
+          </div>
+          <% if @tournament.swiss? %>
+            <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+              <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.rounds_count', default: 'Rounds') %></div>
+              <% if @tournament.registration_settings_editable? %>
+                <input type="number"
+                       value="<%= @tournament.rounds_count %>"
+                       min="1"
+                       data-action="blur->strategy#changed"
+                       data-field="rounds_count"
+                       style="width:100%; max-width: 220px;" />
+              <% else %>
+                <span><%= @tournament.rounds_count || '-' %></span>
+              <% end %>
+            </div>
+          <% end %>
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.require_army_list_for_check_in', default: 'Require army list at check-in') %></div>
             <label style="display:inline-flex; align-items:center; gap:0.5rem;">
               <input type="checkbox"
@@ -133,6 +163,26 @@
                      <%= 'checked' if @tournament.require_army_list_for_check_in %> />
               <span><%= @tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
             </label>
+          </div>
+          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:start;">
+            <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.require_registration_validation', default: 'Validate registrations by hand') %></div>
+            <div>
+              <% if @tournament.registration_settings_editable? %>
+                <label style="display:inline-flex; align-items:center; gap:0.5rem;">
+                  <input type="checkbox"
+                         data-action="change->strategy#changed"
+                         data-field="require_registration_validation"
+                         data-reload="true"
+                         <%= 'checked' if @tournament.require_registration_validation %> />
+                  <span><%= @tournament.require_registration_validation ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
+                </label>
+              <% else %>
+                <span><%= @tournament.require_registration_validation ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
+              <% end %>
+              <p class="card-date" style="margin-top:0.25rem; font-size:0.85rem; color:#666;">
+                <%= t('tournaments.new.require_registration_validation_hint', default: 'Players sign up on a waiting list; only registrations you confirm (for instance once paid) count towards the max players and can check in') %>
+              </p>
+            </div>
           </div>
           <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.non_competitive_checkbox_text') %></div>
@@ -165,14 +215,26 @@
           </div>
           <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.max_players', default: 'Max players') %></div>
-            <input type="number"
-                   value="<%= @tournament.max_players %>"
-                   min="1"
-                   data-action="blur->strategy#changed"
-                   data-field="max_players"
-                   placeholder="<%= t('tournaments.new.max_players_placeholder', default: 'No limit') %>"
-                   style="width:100%; max-width: 220px;" />
+            <% if @tournament.registration_settings_editable? %>
+              <input type="number"
+                     value="<%= @tournament.max_players %>"
+                     min="1"
+                     data-action="blur->strategy#changed"
+                     data-field="max_players"
+                     placeholder="<%= t('tournaments.new.max_players_placeholder', default: 'No limit') %>"
+                     style="width:100%; max-width: 220px;" />
+            <% else %>
+              <span><%= @tournament.max_players || t('tournaments.new.max_players_placeholder', default: 'No limit') %></span>
+            <% end %>
           </div>
+          <% if @tournament.requires_registration_validation? %>
+            <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+              <div class="card-date" style="font-style:normal;"><%= t('tournaments.show.validation.confirmed_count', default: 'Confirmed registrations') %></div>
+              <span><%= @tournament.max_players.present? ? "#{@tournament.confirmed_registrations_count} / #{@tournament.max_players}" : @tournament.confirmed_registrations_count %>
+                <span class="card-date">(<%= t('tournaments.show.validation.pending_count', count: @tournament.registrations.active.awaiting_validation.count, default: { one: '%{count} awaiting confirmation', other: '%{count} awaiting confirmation' }) %>)</span>
+              </span>
+            </div>
+          <% end %>
           <% if @tournament.swiss? %>
             <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
               <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.score_for_bye', default: 'Score for bye') %></div>

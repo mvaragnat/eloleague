@@ -1,10 +1,13 @@
 <div class="card">
   <div class="card-body">
-    <div class="participants-list">
+    <div class="participants-list<%= ' participants-list--validation' if tournament.requires_registration_validation? %>">
       <div class="participant-row participant-header card-date">
         <div><%= t('tournaments.show.participant_columns.player', default: 'Player') %></div>
         <div><%= t('tournaments.show.participant_columns.faction', default: 'Faction') %></div>
         <div><%= t('tournaments.show.participant_columns.affiliation', default: 'Affiliation') %></div>
+        <% if tournament.requires_registration_validation? %>
+          <div><%= t('tournaments.show.participant_columns.validation', default: 'Validation') %></div>
+        <% end %>
         <div class="participant-actions"><%= t('tournaments.show.participant_columns.status', default: 'Status') %></div>
       </div>
       <% registrations.each do |r| %>
@@ -55,9 +58,28 @@
               <span class="card-date"><%= r.affiliation_name.presence || t('tournaments.show.no_affiliation', default: 'No affiliation') %></span>
             <% end %>
           </div>
+          <% if tournament.requires_registration_validation? %>
+            <div class="participant-validation">
+              <% if r.validated? %>
+                <span class="validation-mark validation-mark--ok" title="<%= t('tournaments.show.validation.confirmed_hint', default: 'Registration confirmed by the organizer') %>">✓</span>
+              <% else %>
+                <span class="validation-mark validation-mark--waiting" title="<%= t('tournaments.show.validation.awaiting_hint', default: 'Waiting for the organizer to confirm this registration') %>">⏳</span>
+              <% end %>
+              <% if Current.user && Current.user.id == tournament.creator_id && tournament.registration_settings_editable? %>
+                <%= form_with(model: r,
+                              url: tournament_tournament_registration_path(tournament, r),
+                              method: :patch,
+                              scope: :tournament_registration) do |f| %>
+                  <%= f.hidden_field :validated, value: r.validated? ? '0' : '1' %>
+                  <%= hidden_field_tag :tab, 2 %>
+                  <%= f.submit(r.validated? ? t('tournaments.show.validation.revoke', default: 'Revoke') : t('tournaments.show.validation.confirm', default: 'Confirm'), class: 'btn') %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
           <div class="participant-actions card-date">
             <span><%= r.status %></span>
-            <% if Current.user && Current.user.id == tournament.creator_id %>
+            <% if Current.user && Current.user.id == tournament.creator_id && (r.confirmed? || r.status == 'checked_in') %>
               <% new_status = r.status == 'checked_in' ? 'pending' : 'checked_in' %>
               <%= form_with(model: r,
                             url: tournament_tournament_registration_path(tournament, r),

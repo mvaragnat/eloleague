@@ -1,3 +1,11 @@
+## 2026-09-07
+
+- Feature — Organizer-validated registrations (optional at tournament creation):
+  - New tournament setting "Validate registrations by hand". When enabled, a sign-up is only a pre-registration: the organizer confirms each one (for instance once the player has paid) from the Participants tab, which gains a "Validation" column showing a green check or an orange hourglass to everyone, plus a Confirm/Revoke button for the organizer.
+  - Only confirmed players can check in; the check-in button is replaced by an explanatory hint until then, and the organizer cannot check in an unconfirmed registration either.
+  - The "Max players" cap now applies to confirmed registrations only, so pre-registrations may exceed it (waiting list). Confirming past the cap is refused with a message; the organizer raises the cap first. Participant counters on the tournament page and cards read "5/40 registered + 35 pre-registered".
+- Feature — The organizer can change the format (open/swiss/elimination), the number of rounds, the max players and the hand-validation flag from the Administration tab for as long as registrations are not locked (draft or registration state). Once locked, these settings are read-only and the server rejects any attempt to change them.
+
 ## 2026-09-05
 
 - Feature — Player affiliations and first round pairing:

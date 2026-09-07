@@ -2,14 +2,7 @@
   <h1><%= @tournament.name %></h1>
   <p class="card-date"><%= @tournament.game_system.localized_name %> · <%= t("tournaments.formats.#{@tournament.format}", default: @tournament.format.to_s.humanize) %> · <strong><%= @tournament.state_label %></strong></p>
   <p class="card-date"><%= t('tournaments.show.organizer', default: 'Organizer') %>: <%= @tournament.creator.username %></p>
-  <p class="card-date">
-    <% pc = @tournament.participants_count %>
-    <% if @tournament.show_max_players? %>
-      <%= "#{pc} / #{@tournament.max_players}" %> <%= t('tournaments.show.participants_label', count: pc) %>
-    <% else %>
-      <%= pc %> <%= t('tournaments.show.participants_label', count: pc) %>
-    <% end %>
-  </p>
+  <p class="card-date"><%= participants_summary(@tournament) %></p>
 
   <%= render 'registration_actions', tournament: @tournament, is_registered: @is_registered, my_registration: @my_registration %>
 

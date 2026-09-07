@@ -69,8 +69,8 @@ en:
     shared:
       cancel: "Cancel"
       save: "Save"
-  yes: "Yes"
-  no: "No"
+  "yes": "Yes"
+  "no": "No"
   footer:
     made_by_html: "Made by %{name} with %{heart}. A bug, a suggestion, a new game to add?"
     contact_title: "A bug, a suggestion, a new game to add?"
@@ -179,6 +179,8 @@ en:
       ends_at: "Ends at"
       datetime_placeholder: "YYYY-MM-DD HH:MM"
       require_army_list_for_check_in: "Require army list at check-in"
+      require_registration_validation: "Validate registrations by hand"
+      require_registration_validation_hint: "Players sign up on a waiting list; only registrations you confirm (for instance once paid) count towards the max players and can check in"
       non_competitive: "Non-competitive (no Elo impact)"
       non_competitive_checkbox_text: "Unusual format, introduction game, or house rules. This game must not be counted in statistics"
       score_for_bye: "Score for bye"
@@ -230,7 +232,24 @@ en:
         player: "Player"
         faction: "Faction"
         affiliation: "Affiliation"
+        validation: "Validation"
         status: "Status"
+      validation:
+        confirmed_hint: "Registration confirmed by the organizer"
+        awaiting_hint: "Waiting for the organizer to confirm this registration"
+        confirm: "Confirm"
+        revoke: "Revoke"
+        confirmed_count: "Confirmed registrations"
+        pending_count:
+          one: "%{count} awaiting confirmation"
+          other: "%{count} awaiting confirmation"
+        registered_label:
+          one: "registered"
+          other: "registered"
+        pre_registered:
+          one: "%{count} pre-registered"
+          other: "%{count} pre-registered"
+        overview_hint: "the organizer confirms each registration; only confirmed players count towards the max players and can check in"
       army_list_label: "Your army list"
       no_army_list: "No army list provided"
       standings:
@@ -299,6 +318,7 @@ en:
         actions: "Actions"
         strategies: "Strategies"
         slug_warning: "Note: Changing the tournament name will not update the URL slug"
+        locked_after_lock: "locked once registrations are locked"
       tabs:
         overview: "Overview"
         bracket: "Bracket"
@@ -344,6 +364,13 @@ en:
     faction_required_to_check_in: "Please select your faction before checking in"
     army_list_required_hint: "Army list is required to check in"
     army_list_required_to_check_in: "Please provide your army list before checking in"
+    awaiting_validation_hint: "Your registration is waiting for the organizer to confirm it. You will be able to check in once it is confirmed."
+    validation_needed_hint: "The organizer confirms registrations by hand; you will be able to check in once yours is confirmed."
+    waiting_list_hint: "All confirmed seats are taken: you can still sign up and the organizer will put you on the waiting list."
+    validation_required_to_check_in: "Your registration must be validated by the organizer before you can check in"
+    validation_required_before_check_in: "This registration must be validated before check-in"
+    confirmed_full: "The maximum number of confirmed players is reached; raise the cap first"
+    settings_locked: "These settings can no longer be changed once registrations are locked"
     army_list_locked_hint: "Army lists are locked once the tournament has started."
     select_faction: "Select faction"
     no_faction: "No faction"

@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class TournamentsController < ApplicationController
+  # Settings that shape the tournament itself; the organizer keeps a free hand on
+  # them until registrations are locked, and none of them afterwards.
+  PRE_LOCK_SETTINGS = %w[format rounds_count max_players require_registration_validation].freeze
+
   skip_before_action :authenticate_user!, only: %i[index show]
   before_action :set_tournament,
                 only: %i[show register unregister check_in open_registration lock_registration finalize next_round
@@ -119,6 +123,14 @@ class TournamentsController < ApplicationController
     end
 
     reg = @tournament.registrations.find_by!(user: Current.user)
+    if reg.awaiting_validation?
+      return redirect_back(
+        fallback_location: tournament_path(@tournament, tab: 2),
+        alert: t('tournaments.validation_required_to_check_in',
+                 default: 'Your registration must be validated by the organizer before you can check in')
+      )
+    end
+
     if reg.faction_id.blank?
       return redirect_back(
         fallback_location: tournament_path(@tournament, tab: 2),
@@ -273,6 +285,13 @@ class TournamentsController < ApplicationController
 
   def update
     admin_tab_index = @tournament.elimination? ? 3 : 4
+    if locked_settings_submitted?
+      return respond_with_update_error(admin_tab_index,
+                                       [t('tournaments.settings_locked',
+                                          default: 'These settings can no longer be changed once registrations ' \
+                                                   'are locked')])
+    end
+
     if @tournament.update(tournament_params)
       respond_to do |format|
         format.html do
@@ -282,15 +301,7 @@ class TournamentsController < ApplicationController
         format.json { render json: { ok: true, message: t('tournaments.updated', default: 'Tournament updated') } }
       end
     else
-      respond_to do |format|
-        format.html do
-          redirect_to tournament_path(@tournament, tab: admin_tab_index),
-                      alert: @tournament.errors.full_messages.join(', ')
-        end
-        format.json do
-          render json: { ok: false, errors: @tournament.errors.full_messages }, status: :unprocessable_content
-        end
-      end
+      respond_with_update_error(admin_tab_index, @tournament.errors.full_messages)
     end
   end
 
@@ -314,6 +325,22 @@ class TournamentsController < ApplicationController
     )
   end
 
+  def respond_with_update_error(admin_tab_index, messages)
+    respond_to do |format|
+      format.html do
+        redirect_to tournament_path(@tournament, tab: admin_tab_index), alert: messages.join(', ')
+      end
+      format.json { render json: { ok: false, errors: messages }, status: :unprocessable_content }
+    end
+  end
+
+  def locked_settings_submitted?
+    return false if @tournament.registration_settings_editable?
+
+    submitted = params.fetch(:tournament, {}).keys.map(&:to_s)
+    submitted.intersect?(PRE_LOCK_SETTINGS)
+  end
+
   def tournament_params
     params.require(:tournament).permit(
       :name,
@@ -335,7 +362,8 @@ class TournamentsController < ApplicationController
       :online,
       :max_players,
       :score_for_bye,
-      :championship_level
+      :championship_level,
+      :require_registration_validation
     )
   end
 

@@ -34,6 +34,12 @@ export default class extends Controller {
     })
 
     if (response.ok) {
+      // Some settings change what the page offers (format reveals the rounds
+      // field, hand validation reveals the confirmation column), so reload.
+      if (element.dataset.reload === "true") {
+        window.location.reload()
+        return
+      }
       this.updateExplanation(field, value)
       this.showFlash(this.savedTextValue, "notice")
     } else {

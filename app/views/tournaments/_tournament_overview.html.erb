@@ -109,6 +109,13 @@
         <strong><%= t('tournaments.new.require_army_list_for_check_in') %>:</strong>
         <%= tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %>
       </div>
+      <% if tournament.requires_registration_validation? %>
+        <div class="card-date" style="font-style:normal;">
+          <strong><%= t('tournaments.new.require_registration_validation', default: 'Validate registrations by hand') %>:</strong>
+          <%= t('yes', default: 'Yes') %>
+          <span><%= t('tournaments.show.validation.overview_hint', default: 'the organizer confirms each registration; only confirmed players count towards the max players and can check in') %></span>
+        </div>
+      <% end %>
       <% if tournament.swiss? %>
         <div class="card-date" style="font-style:normal;">
           <strong><%= t('tournaments.new.score_for_bye', default: 'Score for bye') %>:</strong>
