@@ -239,5 +239,25 @@ module Tournament
       assert_equal 'pending', @reg_p2.reload.status
       assert_equal I18n.t('tournaments.validation_required_before_check_in'), flash[:alert]
     end
+
+    test 'organizer cannot confirm one more registration after lowering the cap' do
+      @t.update!(require_registration_validation: true, max_players: 2)
+      @reg_creator.update!(validated: true)
+      @reg_p2.update!(validated: true)
+      third = User.create!(username: 'third', email: 'third@example.com', password: 'password')
+      reg_third = @t.registrations.create!(user: third)
+      sign_out @p2
+      sign_in @creator
+
+      # Lowering the cap keeps the confirmations already given but closes the door
+      @t.update!(max_players: 1)
+      patch tournament_tournament_registration_path(@t, reg_third, locale: I18n.locale), params: {
+        tournament_registration: { validated: '1' }, tab: 2
+      }
+
+      assert_not reg_third.reload.validated?
+      assert_equal 2, @t.reload.confirmed_registrations_count
+      assert_equal I18n.t('tournaments.confirmed_full'), flash[:alert]
+    end
   end
 end
