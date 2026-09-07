@@ -56,8 +56,25 @@
             <% end %>
           </div>
           <div class="participant-actions card-date">
+            <% if tournament.requires_registration_validation? %>
+              <% if r.validated? %>
+                <span title="<%= t('tournaments.show.validation.confirmed_hint', default: 'Registration confirmed by the organizer') %>" style="color:#15803d; font-weight:600;">✅ <%= t('tournaments.show.validation.confirmed', default: 'Confirmed') %></span>
+              <% else %>
+                <span title="<%= t('tournaments.show.validation.awaiting_hint', default: 'Waiting for the organizer to confirm this registration') %>" style="color:#b45309; font-weight:600;">⏳ <%= t('tournaments.show.validation.awaiting', default: 'Awaiting confirmation') %></span>
+              <% end %>
+              <% if Current.user && Current.user.id == tournament.creator_id && tournament.registration_settings_editable? %>
+                <%= form_with(model: r,
+                              url: tournament_tournament_registration_path(tournament, r),
+                              method: :patch,
+                              scope: :tournament_registration) do |f| %>
+                  <%= f.hidden_field :validated, value: r.validated? ? '0' : '1' %>
+                  <%= hidden_field_tag :tab, 2 %>
+                  <%= f.submit(r.validated? ? t('tournaments.show.validation.revoke', default: 'Revoke') : t('tournaments.show.validation.confirm', default: 'Confirm'), class: 'btn') %>
+                <% end %>
+              <% end %>
+            <% end %>
             <span><%= r.status %></span>
-            <% if Current.user && Current.user.id == tournament.creator_id %>
+            <% if Current.user && Current.user.id == tournament.creator_id && (r.confirmed? || r.status == 'checked_in') %>
               <% new_status = r.status == 'checked_in' ? 'pending' : 'checked_in' %>
               <%= form_with(model: r,
                             url: tournament_tournament_registration_path(tournament, r),

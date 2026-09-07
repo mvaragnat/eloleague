@@ -1745,4 +1745,92 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
                        'First round should not pair two players from the same affiliation'
     end
   end
+
+  test 'registrations exceed max_players when the organizer validates them by hand' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Validated Cap', description: 'X', game_system_id: game_systems(:chess).id,
+        format: 'open', max_players: 1, require_registration_validation: true
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+
+    post register_tournament_path(t, locale: I18n.locale)
+    sign_out @user
+    sign_in users(:player_two)
+    post register_tournament_path(t, locale: I18n.locale)
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 2)
+    assert_equal 2, t.reload.registrations.count
+    assert_equal 0, t.confirmed_registrations_count
+  end
+
+  test 'check-in is blocked until the organizer validates the registration' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Validated Check-in', description: 'X', game_system_id: game_systems(:chess).id,
+        format: 'open', require_registration_validation: true
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+
+    post register_tournament_path(t, locale: I18n.locale)
+    reg = t.registrations.find_by(user: @user)
+    reg.update!(faction: Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'F-val'))
+
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_equal 'pending', reg.reload.status
+
+    reg.update!(validated: true)
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_equal 'checked_in', reg.reload.status
+  end
+
+  test 'organizer changes format, max players and validation flag while registrations are open' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Editable', description: 'X', game_system_id: game_systems(:chess).id, format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { format: 'swiss' } }
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { rounds_count: 3 } }
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { max_players: 12 } }
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { require_registration_validation: '1' } }
+
+    t.reload
+    assert_equal 'swiss', t.format
+    assert_equal 3, t.rounds_count
+    assert_equal 12, t.max_players
+    assert t.require_registration_validation
+  end
+
+  test 'format, max players and validation flag are locked once registrations are locked' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: 'Frozen', description: 'X', game_system_id: game_systems(:chess).id,
+        format: 'open', max_players: 8
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'running')
+
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { format: 'swiss' } }
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { max_players: 99 } }
+
+    t.reload
+    assert_equal 'open', t.format
+    assert_equal 8, t.max_players
+
+    # Other settings stay editable
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { description: 'Updated' } }
+    assert_equal 'Updated', t.reload.description
+  end
 end

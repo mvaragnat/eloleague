@@ -40,8 +40,8 @@ fr:
     shared:
       cancel: "Annuler"
       save: "Enregistrer"
-  yes: "Oui"
-  no: "Non"
+  "yes": "Oui"
+  "no": "Non"
   footer:
     made_by_html: "Fait par %{name} avec %{heart}. Un bug, une suggestion, un nouveau jeu à ajouter ?"
     contact_title: "Un bug, une suggestion, un nouveau jeu à ajouter ?"
@@ -150,6 +150,8 @@ fr:
       ends_at: "Fin"
       datetime_placeholder: "AAAA-MM-JJ HH:MM"
       require_army_list_for_check_in: "Exiger une liste d'armée au check-in"
+      require_registration_validation: "Valider les inscriptions à la main"
+      require_registration_validation_hint: "Les joueurs s'inscrivent en pré-inscription ; seules les inscriptions que vous validez (par exemple une fois le paiement reçu) comptent dans le nombre max de joueurs et peuvent faire le check-in"
       non_competitive: "Non-compétitif (sans impact Elo)"
       non_competitive_checkbox_text: "Format inhabituel, partie d'initiation ou avec des règles maison. Cette partie ne doit pas être comptée dans les statistiques"
       score_for_bye: "Score pour exempt"
@@ -202,6 +204,22 @@ fr:
         faction: "Faction"
         affiliation: "Affiliation"
         status: "Statut"
+      validation:
+        confirmed: "Validée"
+        confirmed_label: "validés"
+        confirmed_hint: "Inscription validée par l'organisateur"
+        awaiting: "En attente de validation"
+        awaiting_hint: "En attente de validation par l'organisateur"
+        confirm: "Valider"
+        revoke: "Annuler la validation"
+        confirmed_count: "Inscriptions validées"
+        pending_count:
+          one: "%{count} en attente de validation"
+          other: "%{count} en attente de validation"
+        registered_total:
+          one: "%{count} inscrit au total"
+          other: "%{count} inscrits au total"
+        overview_hint: "l'organisateur valide chaque inscription ; seuls les joueurs validés comptent dans le nombre max de joueurs et peuvent faire le check-in"
       army_list_label: "Votre liste d'armée"
       no_army_list: "Aucune liste d'armée fournie"
       standings:
@@ -270,6 +288,7 @@ fr:
         actions: "Actions"
         strategies: "Stratégies"
         slug_warning: "Note : Modifier le nom du tournoi ne changera pas l'URL"
+        locked_after_lock: "verrouillé une fois les inscriptions fermées"
       tabs:
         overview: "Vue d'ensemble"
         bracket: "Arbre"
@@ -313,6 +332,13 @@ fr:
     faction_required_to_check_in: "Veuillez sélectionner votre faction avant l'enregistrement"
     army_list_required_hint: "La liste d'armée est requise pour le check-in"
     army_list_required_to_check_in: "Veuillez fournir votre liste d'armée avant le check-in"
+    awaiting_validation_hint: "Votre inscription est en attente de validation par l'organisateur. Vous pourrez faire le check-in une fois qu'elle sera validée."
+    validation_needed_hint: "L'organisateur valide les inscriptions à la main ; vous pourrez faire le check-in une fois la vôtre validée."
+    waiting_list_hint: "Toutes les places validées sont prises : vous pouvez tout de même vous pré-inscrire, l'organisateur vous placera en liste d'attente."
+    validation_required_to_check_in: "Votre inscription doit être validée par l'organisateur avant le check-in"
+    validation_required_before_check_in: "Cette inscription doit être validée avant le check-in"
+    confirmed_full: "Le nombre maximum de joueurs validés est atteint ; augmentez d'abord la limite"
+    settings_locked: "Ces réglages ne peuvent plus être modifiés une fois les inscriptions fermées"
     army_list_locked_hint: "Les listes d'armée sont verrouillées une fois le tournoi commencé."
     registration_updated: "Inscription mise à jour"
     errors:

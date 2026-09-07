@@ -1,19 +1,28 @@
 <div style="margin:1rem 0; display:flex; flex-direction:column; gap:0.5rem;">
   <% if is_registered %>
     <% if tournament.registrations_open? && my_registration && my_registration.status != 'checked_in' %>
-      <% if my_registration.faction_id.blank? %>
-        <p class="card-date" style="color:#b45309;"><%= t('tournaments.faction_required_hint') %></p>
+      <% if my_registration.awaiting_validation? %>
+        <p class="card-date" style="color:#b45309;"><%= t('tournaments.awaiting_validation_hint', default: 'Your registration is waiting for the organizer to confirm it. You will be able to check in once it is confirmed.') %></p>
+      <% else %>
+        <% if my_registration.faction_id.blank? %>
+          <p class="card-date" style="color:#b45309;"><%= t('tournaments.faction_required_hint') %></p>
+        <% end %>
+        <% if tournament.require_army_list_for_check_in && my_registration.army_list.blank? %>
+          <p class="card-date" style="color:#b45309;"><%= t('tournaments.army_list_required_hint', default: 'Army list is required to check in') %></p>
+        <% end %>
+        <%= button_to t('tournaments.show.check_in'), check_in_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
       <% end %>
-      <% if tournament.require_army_list_for_check_in && my_registration.army_list.blank? %>
-        <p class="card-date" style="color:#b45309;"><%= t('tournaments.army_list_required_hint', default: 'Army list is required to check in') %></p>
-      <% end %>
-      <%= button_to t('tournaments.show.check_in'), check_in_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
     <% end %>
     <%= button_to t('tournaments.show.unregister'), unregister_tournament_path(tournament), method: :delete, class: 'btn' %>
   <% elsif tournament.registrations_open? %>
     <% if tournament.registration_full? %>
       <p class="card-date" style="color:#b45309;"><%= t('tournaments.full', default: 'Tournament is full') %></p>
     <% else %>
+    <% if tournament.requires_registration_validation? %>
+      <p class="card-date" style="color:#b45309;">
+        <%= tournament.confirmed_registrations_full? ? t('tournaments.waiting_list_hint', default: 'All confirmed seats are taken: you can still sign up and the organizer will put you on the waiting list.') : t('tournaments.validation_needed_hint', default: 'The organizer confirms registrations by hand; you will be able to check in once yours is confirmed.') %>
+      </p>
+    <% end %>
     <% if authenticated? %>
       <%= button_to t('tournaments.show.register'), register_tournament_path(tournament), method: :post, class: 'btn btn-primary' %>
     <% else %>

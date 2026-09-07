@@ -26,6 +26,7 @@ module Avo
 
         field :seed, as: :number
         field :status, as: :select, enum: ::Tournament::Registration::STATUSES
+        field :validated, as: :boolean
         field :army_list, as: :textarea
         field :created_at, as: :date_time, readonly: true
         field :updated_at, as: :date_time, readonly: true

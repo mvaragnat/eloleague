@@ -20,7 +20,7 @@
           <%- card_meta = [(l(t.starts_at, format: :card) if t.starts_at.present?), (t.online ? I18n.t('tournaments.show.online_label') : t.location.presence)].compact %>
           <% if card_meta.any? %><p class="card-date"><%= card_meta.join(' · ') %></p><% end %>
           <p class="card-date">
-            <% pc = t.participants_count %>
+            <% pc = t.participants_count_for_display %>
             <% if t.show_max_players? %>
               <%= "#{pc} / #{t.max_players}" %> <%= I18n.t('tournaments.show.participants_label', count: pc) %>
             <% else %>
@@ -78,7 +78,7 @@
           <%- card_meta = [(l(t.starts_at, format: :card) if t.starts_at.present?), (t.online ? I18n.t('tournaments.show.online_label') : t.location.presence)].compact %>
           <% if card_meta.any? %><p class="card-date"><%= card_meta.join(' · ') %></p><% end %>
           <p class="card-date">
-            <% pc = t.participants_count %>
+            <% pc = t.participants_count_for_display %>
             <% if t.show_max_players? %>
               <%= "#{pc} / #{t.max_players}" %> <%= I18n.t('tournaments.show.participants_label', count: pc) %>
             <% else %>

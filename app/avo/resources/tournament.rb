@@ -27,6 +27,7 @@ module Avo
         field :state, as: :select, options: ::Tournament::Tournament.states.keys
         field :slug, as: :text
         field :require_army_list_for_check_in, as: :boolean
+        field :require_registration_validation, as: :boolean
         field :non_competitive, as: :boolean
         field :online, as: :boolean
         field :location, as: :text
@@ -42,6 +43,10 @@ module Avo
                                    help: 'Championship level (from config/championship.yml)'
         field :settings, as: :code, language: 'json'
 
+        association_fields
+      end
+
+      def association_fields
         field :tournament_registrations_count, as: :number, name: I18n.t('tournaments.show.registrations')
 
         field :registrations, as: :has_many, resource: Avo::Resources::TournamentRegistration

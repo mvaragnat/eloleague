@@ -23,7 +23,12 @@ module Tournament
                              alert: t('tournaments.unauthorized', default: 'Not authorized'))
       end
 
-      if registration.update(registration_params)
+      attrs = registration_params
+      if (blocker = validation_blocker(registration, attrs))
+        return redirect_to tournament_path(@tournament, tab: params[:tab].presence || 2), alert: blocker
+      end
+
+      if registration.update(attrs)
         redirect_to tournament_path(@tournament, tab: params[:tab].presence || 2),
                     notice: t('tournaments.registration_updated', default: 'Registration updated')
       else
@@ -64,10 +69,37 @@ module Tournament
     end
 
     def registration_params
-      permitted = params.expect(tournament_registration: %i[faction_id army_list status affiliation_name])
+      permitted = params.expect(tournament_registration: %i[faction_id army_list status affiliation_name validated])
       permitted.delete(:army_list) unless army_list_editable?
       permitted.delete(:affiliation_name) unless @tournament.affiliation_editable?
+      # Only the organizer validates registrations, and only while they are open.
+      permitted.delete(:validated) unless organizer? && @tournament.registration_settings_editable?
       permitted
+    end
+
+    def organizer?
+      @tournament.creator_id == Current.user&.id
+    end
+
+    # Returns an error message when the requested change conflicts with the
+    # organizer validation workflow, nil otherwise.
+    def validation_blocker(registration, attrs)
+      return nil unless @tournament.requires_registration_validation?
+
+      if validating?(attrs) && !registration.validated? && @tournament.confirmed_registrations_full?
+        return t('tournaments.confirmed_full',
+                 default: 'The maximum number of confirmed players is reached; raise the cap first')
+      end
+
+      return nil unless attrs[:status].to_s == 'checked_in'
+      return nil if registration.validated? || validating?(attrs)
+
+      t('tournaments.validation_required_before_check_in',
+        default: 'This registration must be validated before check-in')
+    end
+
+    def validating?(attrs)
+      ActiveModel::Type::Boolean.new.cast(attrs[:validated]).present?
     end
   end
 end

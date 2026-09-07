@@ -49,6 +49,8 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Associations: `has_many :registrations` (participants), `has_many :rounds`, `has_many :matches`.
   - New optional fields: `location` (string) and `online` (boolean, default false). If `online` is true, the address field is hidden and the Overview tab shows an "Online tournament" badge. When `location` is present and `online` is false, the Overview tab displays the address and a small Google Maps embed.
   - New optional `max_players` (integer). When set, registrations are blocked once the number of registrations reaches this cap; UI shows a "Tournament is full" message and the register button is hidden.
+  - New optional `require_registration_validation` (boolean, default false). When true, sign-ups are pre-registrations: the organizer validates each one from the Participants tab (`Tournament::Registration#validated`), only validated registrations can check in, and `max_players` caps validated registrations instead of blocking sign-ups (pre-registrations act as a waiting list).
+  - `format`, `rounds_count`, `max_players` and `require_registration_validation` stay editable by the creator while the tournament is in `draft` or `registration` state (`registration_settings_editable?`); the update action rejects them afterwards.
   - `slug` (string, unique): URL-friendly identifier generated automatically from the tournament name at creation. Normalizes to lowercase, replaces spaces with underscores, removes special characters, and replaces accents. Once set, the slug never changes even if the tournament name is updated. Tournament routes use slug instead of ID for better SEO. The admin form shows a warning that changing the name won't update the slug.
 - `Tournament::Registration`
   - Join between a `Tournament::Tournament` and a `User` with optional `seed` (Elo snapshot), `status` (`pending|checked_in|cancelled`), and optional `faction_id`.
@@ -57,7 +59,8 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - Unique per (tournament, user).
   - When a tournament starts (lock registration), pending registrations are automatically set to `cancelled`. Only checked-in players participate.
   - Cancelled registrations are excluded from Swiss/Open pairings, standings, and championship scoring.
-  - Scopes: `active` (excludes cancelled), `cancelled` (only cancelled).
+  - Scopes: `active` (excludes cancelled), `cancelled` (only cancelled), `validated`, `awaiting_validation`.
+  - `validated` (boolean) records the organizer's manual validation; `confirmed?` is true when the tournament does not require validation or when the registration is validated.
 - `Affiliation`
   - Simple named entity (club, team, store, ...) shared across tournaments.
   - `has_many :registrations` (`Tournament::Registration`, nullified on destroy) and `has_many :users, through: :registrations`.

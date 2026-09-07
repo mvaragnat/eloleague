@@ -55,10 +55,37 @@ module Tournament
       state.in?(%w[draft registration])
     end
 
+    # Structural settings (format, cap, validation flag) stay editable as long as
+    # registrations have not been locked.
+    def registration_settings_editable?
+      state.in?(%w[draft registration])
+    end
+
+    def requires_registration_validation?
+      require_registration_validation
+    end
+
+    # Number of players counting towards the cap: everyone when the organizer
+    # validates registrations by hand, only the validated ones otherwise.
+    def confirmed_registrations_count
+      scope = registrations.active
+      scope = scope.validated if requires_registration_validation?
+      scope.count
+    end
+
+    # When the organizer validates registrations by hand, sign-ups are a waiting
+    # list: the cap only applies to validated registrations.
     def registration_full?
       return false if max_players.blank?
+      return false if requires_registration_validation?
 
-      registrations.count >= max_players
+      registrations.active.count >= max_players
+    end
+
+    def confirmed_registrations_full?
+      return false if max_players.blank?
+
+      confirmed_registrations_count >= max_players
     end
 
     def affiliation_editable?
@@ -79,6 +106,10 @@ module Tournament
 
     def show_max_players?
       max_players.present? && state.in?(%w[draft registration])
+    end
+
+    def participants_count_for_display
+      requires_registration_validation? ? confirmed_registrations_count : participants_count
     end
 
     def pairing_key

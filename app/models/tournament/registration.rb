@@ -13,6 +13,8 @@ module Tournament
 
     scope :active, -> { where.not(status: 'cancelled') }
     scope :cancelled, -> { where(status: 'cancelled') }
+    scope :validated, -> { where(validated: true) }
+    scope :awaiting_validation, -> { where(validated: false) }
 
     validates :user_id, uniqueness: { scope: :tournament_id }
     validates :status, inclusion: { in: STATUSES.keys.map(&:to_s) }
@@ -25,6 +27,18 @@ module Tournament
 
     def affiliation_name
       affiliation&.name
+    end
+
+    # A registration counts as confirmed when the tournament does not require the
+    # organizer to validate sign-ups, or when the organizer has validated it.
+    def confirmed?
+      return true unless tournament&.requires_registration_validation?
+
+      validated?
+    end
+
+    def awaiting_validation?
+      !confirmed?
     end
 
     def registration_label

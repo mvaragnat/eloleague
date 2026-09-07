@@ -189,5 +189,55 @@ module Tournament
       get tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale)
       assert_response :success
     end
+
+    test 'organizer validates a registration and the player can then check in' do
+      @t.update!(require_registration_validation: true)
+      sign_out @p2
+      sign_in @creator
+
+      patch tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale), params: {
+        tournament_registration: { validated: '1' }, tab: 2
+      }
+
+      assert @reg_p2.reload.validated?
+      assert @reg_p2.confirmed?
+    end
+
+    test 'a player cannot validate their own registration' do
+      @t.update!(require_registration_validation: true)
+
+      patch tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale), params: {
+        tournament_registration: { validated: '1' }, tab: 2
+      }
+
+      assert_not @reg_p2.reload.validated?
+    end
+
+    test 'organizer cannot validate beyond max_players' do
+      @t.update!(require_registration_validation: true, max_players: 1)
+      @reg_creator.update!(validated: true)
+      sign_out @p2
+      sign_in @creator
+
+      patch tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale), params: {
+        tournament_registration: { validated: '1' }, tab: 2
+      }
+
+      assert_not @reg_p2.reload.validated?
+      assert_equal I18n.t('tournaments.confirmed_full'), flash[:alert]
+    end
+
+    test 'organizer cannot check in a registration that is not validated' do
+      @t.update!(require_registration_validation: true)
+      sign_out @p2
+      sign_in @creator
+
+      patch tournament_tournament_registration_path(@t, @reg_p2, locale: I18n.locale), params: {
+        tournament_registration: { status: 'checked_in' }, tab: 2
+      }
+
+      assert_equal 'pending', @reg_p2.reload.status
+      assert_equal I18n.t('tournaments.validation_required_before_check_in'), flash[:alert]
+    end
   end
 end
