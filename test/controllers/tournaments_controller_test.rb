@@ -1833,4 +1833,115 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     patch tournament_path(t, locale: I18n.locale), params: { tournament: { description: 'Updated' } }
     assert_equal 'Updated', t.reload.description
   end
+
+  test 'check-in stays blocked for a pre-registration once the confirmed cap is full' do
+    t = capped_validated_tournament(max_players: 1)
+    first, second = capped_players(t)
+
+    sign_in @user
+    patch tournament_tournament_registration_path(t, t.registrations.find_by(user: first),
+                                                  locale: I18n.locale),
+          params: { tournament_registration: { validated: '1' }, tab: 2 }
+    assert t.reload.confirmed_registrations_full?
+
+    # The cap is full, so the second player is still a pre-registration and cannot check in
+    sign_out @user
+    sign_in second
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_equal 'pending', t.registrations.find_by(user: second).reload.status
+
+    # ... while the confirmed one goes through
+    sign_out second
+    sign_in first
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_equal 'checked_in', t.registrations.find_by(user: first).reload.status
+  end
+
+  test 'a confirmed player still checks in after the organizer lowers the cap' do
+    t = capped_validated_tournament(max_players: 2)
+    first, second = capped_players(t)
+
+    sign_in @user
+    [first, second].each do |user|
+      patch tournament_tournament_registration_path(t, t.registrations.find_by(user: user),
+                                                    locale: I18n.locale),
+            params: { tournament_registration: { validated: '1' }, tab: 2 }
+    end
+    assert_equal 2, t.reload.confirmed_registrations_count
+
+    # Lowering the cap does not revoke the confirmations already given
+    patch tournament_path(t, locale: I18n.locale), params: { tournament: { max_players: 1 } }
+    assert_equal 1, t.reload.max_players
+    assert_equal 2, t.confirmed_registrations_count
+
+    sign_out @user
+    sign_in second
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_equal 'checked_in', t.registrations.find_by(user: second).reload.status
+  end
+
+  test 'enabling hand validation blocks check-in until existing registrations are validated' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: { name: 'Late Validation', description: 'X', game_system_id: game_systems(:chess).id,
+                    format: 'open' }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+    player = capped_players(t).first
+
+    # The option is turned on after the player registered: they are not confirmed yet
+    sign_in @user
+    patch tournament_path(t, locale: I18n.locale),
+          params: { tournament: { require_registration_validation: '1' } }
+    assert t.reload.require_registration_validation
+
+    sign_out @user
+    sign_in player
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_equal 'pending', t.registrations.find_by(user: player).reload.status
+
+    sign_out player
+    sign_in @user
+    patch tournament_tournament_registration_path(t, t.registrations.find_by(user: player),
+                                                  locale: I18n.locale),
+          params: { tournament_registration: { validated: '1' }, tab: 2 }
+
+    sign_out @user
+    sign_in player
+    post check_in_tournament_path(t, locale: I18n.locale)
+    assert_equal 'checked_in', t.registrations.find_by(user: player).reload.status
+  end
+
+  private
+
+  # Open tournament with hand-validated registrations, created by @user.
+  def capped_validated_tournament(max_players:)
+    sign_in @user
+    post tournaments_path(locale: I18n.locale), params: {
+      tournament: {
+        name: "Cap #{max_players} #{SecureRandom.hex(4)}", description: 'X',
+        game_system_id: game_systems(:chess).id, format: 'open',
+        max_players: max_players, require_registration_validation: true
+      }
+    }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+    sign_out @user
+    t
+  end
+
+  # Registers two fresh players with a faction so they only miss the validation to check in.
+  def capped_players(tournament)
+    faction = Game::Faction.find_or_create_by!(game_system: tournament.game_system, name: 'CapF')
+    (1..2).map do |i|
+      user = User.create!(username: "cap_#{SecureRandom.hex(4)}_#{i}",
+                          email: "cap_#{SecureRandom.hex(4)}_#{i}@example.com", password: 'password')
+      sign_in user
+      post register_tournament_path(tournament, locale: I18n.locale)
+      tournament.registrations.find_by(user: user).update!(faction: faction)
+      sign_out user
+      user
+    end
+  end
 end
