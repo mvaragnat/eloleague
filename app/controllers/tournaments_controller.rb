@@ -244,7 +244,12 @@ class TournamentsController < ApplicationController
                          alert: t('.blank_fields', default: 'Subject and message cannot be blank')
     end
 
-    recipients = @tournament.registrations.includes(:user).map(&:user).uniq
+    recipients = email_recipients
+    if recipients.empty?
+      return redirect_to tournament_path(@tournament, tab: admin_tab_index),
+                         alert: t('.no_recipient', default: 'No player matches the selected recipient')
+    end
+
     recipients.each do |user|
       TournamentOrganizerMailer.with(
         tournament: @tournament,
@@ -323,6 +328,16 @@ class TournamentsController < ApplicationController
       fallback_location: tournament_path(@tournament),
       alert: t('tournaments.unauthorized', default: 'Not authorized')
     )
+  end
+
+  # Players targeted by the organizer email: every active registration, or a single one
+  # when a user id is given. Always scoped to this tournament's registrations so an
+  # organizer cannot reach users outside of it.
+  def email_recipients
+    registrations = @tournament.registrations.active.includes(:user)
+    recipient = params[:recipient].presence || 'all'
+    registrations = registrations.where(user_id: recipient) unless recipient == 'all'
+    registrations.map(&:user).uniq
   end
 
   def respond_with_update_error(admin_tab_index, messages)
