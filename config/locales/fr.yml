@@ -301,17 +301,21 @@ fr:
       actions:
         toggle_status_to_checked_in: "Valider le check-in"
         toggle_status_to_pending: "Marquer en attente"
+        email_player: "Envoyer un email à ce joueur"
       type: "Tournoi"
       settings: "Paramètres"
       online_label: "Tournoi en ligne"
     email_players:
       title: "Envoyer un email aux joueurs"
-      description: "Envoyer un message à tous les joueurs inscrits. Votre email (%{organizer_email}) sera indiqué dans l'email pour que les joueurs puissent vous répondre directement."
+      description: "Envoyer un message à tous les joueurs inscrits ou à un seul d'entre eux. Votre email (%{organizer_email}) sera indiqué dans l'email pour que les joueurs puissent vous répondre directement."
       subject: "Objet"
       subject_placeholder: "Saisissez l'objet"
       body: "Message"
       body_placeholder: "Rédigez votre message ici..."
-      submit: "Envoyer à tous les joueurs"
+      submit: "Envoyer"
+      recipient: "Destinataire"
+      all_players: "Tous les joueurs (%{count})"
+      no_recipient: "Aucun joueur ne correspond au destinataire choisi"
       sent:
         one: "1 email envoyé"
         other: "%{count} emails envoyés"
