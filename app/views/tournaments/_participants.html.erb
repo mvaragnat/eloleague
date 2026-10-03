@@ -104,6 +104,12 @@
                       <%= f.submit(new_status == 'checked_in' ? t('tournaments.show.actions.toggle_status_to_checked_in') : t('tournaments.show.actions.toggle_status_to_pending'), class: 'btn btn-sm') %>
                     <% end %>
                   <% end %>
+                  <% if is_organizer && r.status != 'cancelled' %>
+                    <%= link_to '✉',
+                                tournament_path(tournament, tab: (tournament.elimination? ? 3 : 4), email_to: r.user_id, anchor: 'email-players'),
+                                class: 'btn btn-sm',
+                                title: t('tournaments.show.actions.email_player', default: 'Email this player') %>
+                  <% end %>
                 </div>
               </td>
               <td class="ranking-td" style="text-align:right;">

@@ -334,6 +334,7 @@ en:
       actions:
         toggle_status_to_checked_in: "Check-in"
         toggle_status_to_pending: "Mark pending"
+        email_player: "Email this player"
       player_a: "Player A"
       player_b: "Player B"
       type: "Tournament"
@@ -341,12 +342,15 @@ en:
       online_label: "Online tournament"
     email_players:
       title: "Email players"
-      description: "Send a message to all registered players. Your email (%{organizer_email}) will be shown in the email so players can reply directly."
+      description: "Send a message to all registered players or to a single one. Your email (%{organizer_email}) will be shown in the email so players can reply directly."
       subject: "Subject"
       subject_placeholder: "Enter subject"
       body: "Message"
       body_placeholder: "Write your message here..."
-      submit: "Send to all players"
+      submit: "Send"
+      recipient: "Recipient"
+      all_players: "All players (%{count})"
+      no_recipient: "No player matches the selected recipient"
       sent:
         one: "1 email sent"
         other: "%{count} emails sent"

@@ -1459,6 +1459,89 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'email_players to all skips cancelled registrations' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Cup Cancelled',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+    t.registrations.create!(user: users(:player_two))
+    t.registrations.create!(user: @user, status: 'cancelled')
+
+    assert_enqueued_emails 1 do
+      post email_players_tournament_path(t, locale: I18n.locale),
+           params: { recipient: 'all', email_subject: 'Hello', email_body: 'See you soon!' }
+    end
+  end
+
+  test 'email_players can target a single registered player' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Cup Single',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+    target = users(:player_two)
+    t.registrations.create!(user: target)
+    t.registrations.create!(user: @user)
+
+    assert_enqueued_email_with TournamentOrganizerMailer, :message_players,
+                               params: { tournament: t, user: target, subject: 'Hi', body: 'Just you' } do
+      post email_players_tournament_path(t, locale: I18n.locale),
+           params: { recipient: target.id, email_subject: 'Hi', email_body: 'Just you' }
+    end
+    assert_enqueued_emails 1
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
+  end
+
+  test 'email_players refuses a recipient who is not registered' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Cup Outsider',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+    t.registrations.create!(user: @user)
+
+    assert_no_enqueued_emails do
+      post email_players_tournament_path(t, locale: I18n.locale),
+           params: { recipient: users(:player_two).id, email_subject: 'Hi', email_body: 'Not for you' }
+    end
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
+    assert_not_nil flash[:alert]
+  end
+
+  test 'show preselects the player given in email_to' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Email Cup Preselect',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+    target = users(:player_two)
+    t.registrations.create!(user: target)
+
+    get tournament_path(t, locale: I18n.locale, tab: 4, email_to: target.id)
+
+    assert_response :success
+    assert_select "select#email_recipient option[selected][value='#{target.id}']"
+  end
+
   test 'email_players is blocked for non-organizer' do
     sign_in users(:player_two)
     t = ::Tournament::Tournament.create!(
