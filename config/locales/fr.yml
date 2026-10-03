@@ -205,6 +205,10 @@ fr:
         affiliation: "Affiliation"
         validation: "Validation"
         status: "Statut"
+      participant_status:
+        pending: "En attente"
+        checked_in: "Présent"
+        cancelled: "Annulé"
       validation:
         confirmed_hint: "Inscription validée par l'organisateur"
         awaiting_hint: "En attente de validation par l'organisateur"

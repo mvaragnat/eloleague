@@ -180,28 +180,27 @@ input:focus, select:focus, textarea:focus {
   .tabs-nav .btn { padding: 0.5rem 0.875rem; font-size: 0.9rem; }
 }
 
-/* Participants responsive grid */
-.participants-list { display: flex; flex-direction: column; }
-.participant-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr minmax(260px, 2fr);
-  column-gap: 1rem;
-  align-items: center;
-  padding: 0.375rem 0;
-  border-bottom: 1px solid var(--gray-300);
-}
-/* Keep the columns aligned from one row to the next whatever their content */
-.participant-row > * { min-width: 0; }
-.participant-row:last-child { border-bottom: none; }
-.participant-header { font-style: normal; font-weight: 600; }
-.participant-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; align-items: center; }
-/* Extra column when the organizer validates registrations by hand */
-.participants-list--validation .participant-row { grid-template-columns: 1.1fr 1fr 1fr auto minmax(420px, 1.4fr); }
-.participant-validation { display: flex; align-items: center; gap: 0.5rem; }
-.participant-validation .btn { padding: 0.25rem 0.625rem; font-size: 0.85rem; }
-.validation-mark { font-size: 1.1rem; line-height: 1; }
+/* Participants table (shares the ranking table look) */
+.participants-table .ranking-th,
+.participants-table .ranking-td { vertical-align: middle; }
+.participants-td--field { min-width: 12rem; }
+.participants-table select,
+.participants-table input[type="text"] { padding: 0.3rem 0.6rem; font-size: 0.875rem; border-radius: 0.375rem; }
+.participants-table select { background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%; padding-right: 1.75rem; }
+.participants-inline-form { display: flex; align-items: center; gap: 0.375rem; }
+.participants-inline-form .affiliation-field { flex: 1; min-width: 0; }
+.participants-cell-actions { display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
+.validation-mark { font-size: 1rem; line-height: 1; }
 .validation-mark--ok { color: #15803d; font-weight: 700; }
 .validation-mark--waiting { color: #b45309; }
+
+.btn-sm { padding: 0.25rem 0.625rem; font-size: 0.8125rem; background: var(--gray-100); border-color: var(--gray-300); color: var(--text-strong); }
+.btn-sm:hover, .btn-sm:focus { background: var(--gray-300); }
+
+.status-badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+.status-badge--pending { background: #fef3c7; color: #92400e; }
+.status-badge--checked_in { background: #dcfce7; color: #166534; }
+.status-badge--cancelled { background: var(--gray-300); color: var(--text-muted); }
 
 /* Affiliation autocomplete */
 .affiliation-field { position: relative; }
@@ -220,18 +219,10 @@ input:focus, select:focus, textarea:focus {
 .affiliation-option { padding: 0.375rem 0.5rem; cursor: pointer; }
 .affiliation-option:hover { background: var(--gray-100); }
 
+/* Scroll sideways only on phones, so the autocomplete dropdown is not clipped on desktop */
 @media (max-width: 640px) {
-  .participant-row,
-  .participants-list--validation .participant-row {
-    grid-template-columns: 1fr 1fr;
-    row-gap: 0.375rem;
-  }
-  .participant-header { display: none; }
-  .participant-actions {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
-    padding-bottom: 0.375rem;
-  }
+  .participants-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .participants-td--field { min-width: 9rem; }
 }
 
 /* Overflow utility (used by ranking table) */

@@ -858,7 +858,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
-    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
+    first_row = body.split('<table class="ranking-table">')[1].split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
     assert_includes first_row, match.a_user.username
   end
 
@@ -901,7 +901,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
-    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
+    first_row = body.split('<table class="ranking-table">')[1].split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
     assert_includes first_row, users(:player_one).username
   end
 
@@ -968,7 +968,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
-    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
+    first_row = body.split('<table class="ranking-table">')[1].split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
     assert_includes first_row, b.username
   end
 
@@ -1226,7 +1226,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     get tournament_path(t, locale: I18n.locale, tab: 2)
     assert_response :success
     body = @response.body
-    first_row = body.split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
+    first_row = body.split('<table class="ranking-table">')[1].split('<tbody>')[1].split('</tbody>')[0].split(/<tr[^>]*>/)[1]
     assert_includes first_row, match.a_user.username
   end
 
