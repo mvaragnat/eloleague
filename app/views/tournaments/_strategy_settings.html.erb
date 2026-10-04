@@ -20,7 +20,7 @@
   data-strategy-explain-primary-value="<%= primary_explanations.to_json %>"
 >
   <div style="display:flex; flex-direction:column; gap:0.75rem;">
-    <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+    <div class="settings-row settings-row--3col">
       <div><%= t('tournaments.show.strategies.primary', default: 'Primary') %></div>
       <div>
         <%= select_tag 'tournament[primary_strategy_key]',
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+    <div class="settings-row settings-row--3col">
       <div><%= t('tournaments.show.strategies.tiebreak1', default: 'Tie-break #1') %></div>
       <div>
         <%= select_tag 'tournament[tiebreak1_strategy_key]',
@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+    <div class="settings-row settings-row--3col">
       <div><%= t('tournaments.show.strategies.tiebreak2', default: 'Tie-break #2') %></div>
       <div>
         <%= select_tag 'tournament[tiebreak2_strategy_key]',
@@ -60,7 +60,7 @@
     </div>
 
     <% if show_first_round_pairing %>
-      <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+      <div class="settings-row settings-row--3col">
         <div><%= t('tournaments.show.strategies.first_round_pairing_strategy', default: 'Pairing strategy for the first round') %></div>
         <div>
           <%= select_tag 'tournament[first_round_pairing_strategy_key]',
@@ -75,7 +75,7 @@
     <% end %>
 
     <% if show_pairing %>
-      <div style="display:grid; grid-template-columns: 180px minmax(220px, 1fr) 1.2fr; gap:0.5rem; align-items:center;">
+      <div class="settings-row settings-row--3col">
         <div><%= t('tournaments.show.strategies.pairing_strategy', default: 'Pairing strategy for other rounds') %></div>
         <div>
           <%= select_tag 'tournament[pairing_strategy_key]',
