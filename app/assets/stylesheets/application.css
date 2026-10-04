@@ -475,3 +475,25 @@ input:focus, select:focus, textarea:focus {
   color: var(--text-muted);
   font-weight: 500;
 }
+
+/***** Admin settings rows *****/
+.settings-row {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: center;
+}
+.settings-row--top { align-items: start; }
+.settings-row--3col {
+  grid-template-columns: 180px minmax(220px, 1fr) 1.2fr;
+}
+.settings-row > * { min-width: 0; }
+
+@media (max-width: 640px) {
+  .settings-row,
+  .settings-row--3col {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+}

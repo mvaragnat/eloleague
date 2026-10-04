@@ -117,7 +117,7 @@
         <div data-controller="strategy"
              data-strategy-update-url-value="<%= tournament_path(@tournament, tab: (@tournament.elimination? ? 3 : 4), locale: I18n.locale) %>"
              data-strategy-saved-text-value="<%= t('tournaments.show.strategies.saved', default: 'Settings saved') %>">
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+          <div class="settings-row">
             <div class="card-date" style="font-style:normal;">
               <%= t('tournaments.new.name') %>
             </div>
@@ -139,7 +139,7 @@
           data-strategy-update-url-value="<%= tournament_path(@tournament, tab: (@tournament.elimination? ? 3 : 4), locale: I18n.locale) %>"
           data-strategy-saved-text-value="<%= t('tournaments.show.strategies.saved', default: 'Settings saved') %>"
         >
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+          <div class="settings-row">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.format', default: 'Format') %></div>
             <% if @tournament.registration_settings_editable? %>
               <select data-action="change->strategy#changed"
@@ -155,7 +155,7 @@
             <% end %>
           </div>
           <% if @tournament.swiss? %>
-            <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="settings-row">
               <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.rounds_count', default: 'Rounds') %></div>
               <% if @tournament.registration_settings_editable? %>
                 <input type="number"
@@ -169,7 +169,7 @@
               <% end %>
             </div>
           <% end %>
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+          <div class="settings-row">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.require_army_list_for_check_in', default: 'Require army list at check-in') %></div>
             <label style="display:inline-flex; align-items:center; gap:0.5rem;">
               <input type="checkbox"
@@ -179,7 +179,7 @@
               <span><%= @tournament.require_army_list_for_check_in ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
             </label>
           </div>
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:start;">
+          <div class="settings-row settings-row--top">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.require_registration_validation', default: 'Validate registrations by hand') %></div>
             <div>
               <% if @tournament.registration_settings_editable? %>
@@ -199,7 +199,7 @@
               </p>
             </div>
           </div>
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+          <div class="settings-row">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.non_competitive_checkbox_text') %></div>
             <label style="display:inline-flex; align-items:center; gap:0.5rem;">
               <input type="checkbox"
@@ -209,7 +209,7 @@
               <span><%= @tournament.non_competitive ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
             </label>
           </div>
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+          <div class="settings-row">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.online', default: 'Online tournament') %></div>
             <label style="display:inline-flex; align-items:center; gap:0.5rem;">
               <input type="checkbox"
@@ -219,7 +219,7 @@
               <span><%= @tournament.online ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
             </label>
           </div>
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center; <%= @tournament.online ? 'display:none;' : '' %>">
+          <div class="settings-row" style="<%= @tournament.online ? 'display:none;' : '' %>">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.location', default: 'Location') %></div>
             <input type="text"
                    value="<%= @tournament.location %>"
@@ -228,7 +228,7 @@
                    placeholder="<%= t('tournaments.new.location_placeholder', default: 'Enter address') %>"
                    style="width:100%;" />
           </div>
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+          <div class="settings-row">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.max_players', default: 'Max players') %></div>
             <% if @tournament.registration_settings_editable? %>
               <input type="number"
@@ -243,7 +243,7 @@
             <% end %>
           </div>
           <% if @tournament.requires_registration_validation? %>
-            <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="settings-row">
               <div class="card-date" style="font-style:normal;"><%= t('tournaments.show.validation.confirmed_count', default: 'Confirmed registrations') %></div>
               <span><%= @tournament.max_players.present? ? "#{@tournament.confirmed_registrations_count} / #{@tournament.max_players}" : @tournament.confirmed_registrations_count %>
                 <span class="card-date">(<%= t('tournaments.show.validation.pending_count', count: @tournament.registrations.active.awaiting_validation.count, default: { one: '%{count} awaiting confirmation', other: '%{count} awaiting confirmation' }) %>)</span>
@@ -251,7 +251,7 @@
             </div>
           <% end %>
           <% if @tournament.swiss? %>
-            <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+            <div class="settings-row">
               <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.score_for_bye', default: 'Score for bye') %></div>
               <input type="number"
                      value="<%= @tournament.score_for_bye %>"
@@ -262,7 +262,7 @@
                      style="width:100%; max-width: 220px;" />
             </div>
           <% end %>
-          <div style="display:grid; grid-template-columns: 260px auto; gap:0.5rem; align-items:center;">
+          <div class="settings-row">
             <div class="card-date" style="font-style:normal;"><%= t('tournaments.new.championship_level', default: 'Championship level') %></div>
             <% if @championship_levels.present? %>
               <select data-action="change->strategy#changed"
