@@ -234,6 +234,10 @@ en:
         affiliation: "Affiliation"
         validation: "Validation"
         status: "Status"
+      participant_status:
+        pending: "Pending"
+        checked_in: "Checked in"
+        cancelled: "Cancelled"
       validation:
         confirmed_hint: "Registration confirmed by the organizer"
         awaiting_hint: "Waiting for the organizer to confirm this registration"

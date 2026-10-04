@@ -1,118 +1,135 @@
 <div class="card">
   <div class="card-body">
-    <div class="participants-list<%= ' participants-list--validation' if tournament.requires_registration_validation? %>">
-      <div class="participant-row participant-header card-date">
-        <div><%= t('tournaments.show.participant_columns.player', default: 'Player') %></div>
-        <div><%= t('tournaments.show.participant_columns.faction', default: 'Faction') %></div>
-        <div><%= t('tournaments.show.participant_columns.affiliation', default: 'Affiliation') %></div>
-        <% if tournament.requires_registration_validation? %>
-          <div><%= t('tournaments.show.participant_columns.validation', default: 'Validation') %></div>
-        <% end %>
-        <div class="participant-actions"><%= t('tournaments.show.participant_columns.status', default: 'Status') %></div>
-      </div>
-      <% registrations.each do |r| %>
-        <div class="participant-row">
-          <% can_edit = (Current.user && (Current.user.id == r.user_id || Current.user.id == tournament.creator_id)) %>
-          <div><%= link_to r.user.username, user_path(r.user) %></div>
-          <div>
-            <% if can_edit %>
-              <%= form_with(model: r, url: tournament_tournament_registration_path(tournament, r), method: :patch, scope: :tournament_registration) do |f| %>
-                <%= hidden_field_tag :tab, 2 %>
-                <%= f.select :faction_id,
-                             Game::Faction.where(game_system_id: tournament.game_system_id)
-                               .to_a
-                               .sort_by { |fa| fa.localized_name(I18n.locale) }
-                               .map { |fa| [fa.localized_name(I18n.locale), fa.id] },
-                             { include_blank: t('tournaments.show.select_faction', default: 'Select faction') },
-                             { onchange: 'this.form.submit()' } %>
-              <% end %>
-            <% else %>
-              <span class="card-date"><%= r.faction&.localized_name || t('tournaments.show.no_faction', default: 'No faction') %></span>
+    <% is_organizer = Current.user && Current.user.id == tournament.creator_id %>
+    <div class="participants-scroll">
+      <table class="ranking-table participants-table">
+        <thead>
+          <tr>
+            <th class="ranking-th ranking-th--left"><%= t('tournaments.show.participant_columns.player', default: 'Player') %></th>
+            <th class="ranking-th ranking-th--left"><%= t('tournaments.show.participant_columns.faction', default: 'Faction') %></th>
+            <th class="ranking-th ranking-th--left"><%= t('tournaments.show.participant_columns.affiliation', default: 'Affiliation') %></th>
+            <% if tournament.requires_registration_validation? %>
+              <th class="ranking-th ranking-th--left"><%= t('tournaments.show.participant_columns.validation', default: 'Validation') %></th>
             <% end %>
-          </div>
-          <div>
-            <% can_edit_affiliation = can_edit && tournament.affiliation_editable? %>
-            <% if can_edit_affiliation %>
-              <%= form_with(model: r,
-                            url: tournament_tournament_registration_path(tournament, r),
-                            method: :patch,
-                            scope: :tournament_registration,
-                            data: { controller: 'affiliation-search',
-                                    affiliation_search_search_url_value: affiliations_search_path(locale: I18n.locale),
-                                    affiliation_search_current_value: r.affiliation_name.to_s }) do |f| %>
-                <%= hidden_field_tag :tab, 2 %>
-                <div class="affiliation-field">
-                  <%= f.text_field :affiliation_name,
-                                   value: r.affiliation_name,
-                                   autocomplete: 'off',
-                                   placeholder: t('tournaments.show.affiliation_placeholder', default: 'Affiliation'),
-                                   data: { affiliation_search_target: 'input',
-                                           action: 'input->affiliation-search#search blur->affiliation-search#blur' } %>
-                  <div class="affiliation-options" data-affiliation-search-target="results" style="display:none;"></div>
-                </div>
-                <%= f.submit t('tournaments.show.affiliation_save', default: 'Save'),
-                             class: 'btn',
-                             data: { affiliation_search_target: 'save' } %>
-              <% end %>
-            <% else %>
-              <span class="card-date"><%= r.affiliation_name.presence || t('tournaments.show.no_affiliation', default: 'No affiliation') %></span>
-            <% end %>
-          </div>
-          <% if tournament.requires_registration_validation? %>
-            <div class="participant-validation">
-              <% if r.validated? %>
-                <span class="validation-mark validation-mark--ok" title="<%= t('tournaments.show.validation.confirmed_hint', default: 'Registration confirmed by the organizer') %>">✓</span>
-              <% else %>
-                <span class="validation-mark validation-mark--waiting" title="<%= t('tournaments.show.validation.awaiting_hint', default: 'Waiting for the organizer to confirm this registration') %>">⏳</span>
-              <% end %>
-              <% if Current.user && Current.user.id == tournament.creator_id && tournament.registration_settings_editable? %>
-                <%= form_with(model: r,
-                              url: tournament_tournament_registration_path(tournament, r),
-                              method: :patch,
-                              scope: :tournament_registration) do |f| %>
-                  <%= f.hidden_field :validated, value: r.validated? ? '0' : '1' %>
-                  <%= hidden_field_tag :tab, 2 %>
-                  <%= f.submit(r.validated? ? t('tournaments.show.validation.revoke', default: 'Revoke') : t('tournaments.show.validation.confirm', default: 'Confirm'), class: 'btn') %>
+            <th class="ranking-th ranking-th--left"><%= t('tournaments.show.participant_columns.status', default: 'Status') %></th>
+            <th class="ranking-th"><%= t('tournaments.show.standings.army_list', default: 'List') %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% registrations.each do |r| %>
+            <% can_edit = (Current.user && (Current.user.id == r.user_id || is_organizer)) %>
+            <tr>
+              <td class="ranking-td ranking-td--player"><%= link_to r.user.username, user_path(r.user) %></td>
+              <td class="ranking-td participants-td--field">
+                <% if can_edit %>
+                  <%= form_with(model: r, url: tournament_tournament_registration_path(tournament, r), method: :patch, scope: :tournament_registration) do |f| %>
+                    <%= hidden_field_tag :tab, 2 %>
+                    <%= f.select :faction_id,
+                                 Game::Faction.where(game_system_id: tournament.game_system_id)
+                                   .to_a
+                                   .sort_by { |fa| fa.localized_name(I18n.locale) }
+                                   .map { |fa| [fa.localized_name(I18n.locale), fa.id] },
+                                 { include_blank: t('tournaments.show.select_faction', default: 'Select faction') },
+                                 { onchange: 'this.form.submit()' } %>
+                  <% end %>
+                <% elsif r.faction %>
+                  <%= r.faction.localized_name %>
+                <% else %>
+                  <span class="ranking-faction">—</span>
                 <% end %>
+              </td>
+              <td class="ranking-td participants-td--field">
+                <% can_edit_affiliation = can_edit && tournament.affiliation_editable? %>
+                <% if can_edit_affiliation %>
+                  <%= form_with(model: r,
+                                url: tournament_tournament_registration_path(tournament, r),
+                                method: :patch,
+                                scope: :tournament_registration,
+                                class: 'participants-inline-form',
+                                data: { controller: 'affiliation-search',
+                                        affiliation_search_search_url_value: affiliations_search_path(locale: I18n.locale),
+                                        affiliation_search_current_value: r.affiliation_name.to_s }) do |f| %>
+                    <%= hidden_field_tag :tab, 2 %>
+                    <div class="affiliation-field">
+                      <%= f.text_field :affiliation_name,
+                                       value: r.affiliation_name,
+                                       autocomplete: 'off',
+                                       placeholder: t('tournaments.show.affiliation_placeholder', default: 'Affiliation'),
+                                       data: { affiliation_search_target: 'input',
+                                               action: 'input->affiliation-search#search blur->affiliation-search#blur' } %>
+                      <div class="affiliation-options" data-affiliation-search-target="results" style="display:none;"></div>
+                    </div>
+                    <%= f.submit t('tournaments.show.affiliation_save', default: 'Save'),
+                                 class: 'btn btn-sm',
+                                 data: { affiliation_search_target: 'save' } %>
+                  <% end %>
+                <% elsif r.affiliation_name.present? %>
+                  <%= r.affiliation_name %>
+                <% else %>
+                  <span class="ranking-faction">—</span>
+                <% end %>
+              </td>
+              <% if tournament.requires_registration_validation? %>
+                <td class="ranking-td">
+                  <div class="participants-cell-actions">
+                    <% if r.validated? %>
+                      <span class="validation-mark validation-mark--ok" title="<%= t('tournaments.show.validation.confirmed_hint', default: 'Registration confirmed by the organizer') %>">✓</span>
+                    <% else %>
+                      <span class="validation-mark validation-mark--waiting" title="<%= t('tournaments.show.validation.awaiting_hint', default: 'Waiting for the organizer to confirm this registration') %>">⏳</span>
+                    <% end %>
+                    <% if is_organizer && tournament.registration_settings_editable? %>
+                      <%= form_with(model: r,
+                                    url: tournament_tournament_registration_path(tournament, r),
+                                    method: :patch,
+                                    scope: :tournament_registration) do |f| %>
+                        <%= f.hidden_field :validated, value: r.validated? ? '0' : '1' %>
+                        <%= hidden_field_tag :tab, 2 %>
+                        <%= f.submit(r.validated? ? t('tournaments.show.validation.revoke', default: 'Revoke') : t('tournaments.show.validation.confirm', default: 'Confirm'), class: 'btn btn-sm') %>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </td>
               <% end %>
-            </div>
+              <td class="ranking-td">
+                <div class="participants-cell-actions">
+                  <span class="status-badge status-badge--<%= r.status %>"><%= t("tournaments.show.participant_status.#{r.status}", default: r.status.humanize) %></span>
+                  <% if is_organizer && (r.confirmed? || r.status == 'checked_in') %>
+                    <% new_status = r.status == 'checked_in' ? 'pending' : 'checked_in' %>
+                    <%= form_with(model: r,
+                                  url: tournament_tournament_registration_path(tournament, r),
+                                  method: :patch,
+                                  scope: :tournament_registration) do |f| %>
+                      <%= f.hidden_field :status, value: new_status %>
+                      <%= hidden_field_tag :tab, 2 %>
+                      <%= f.submit(new_status == 'checked_in' ? t('tournaments.show.actions.toggle_status_to_checked_in') : t('tournaments.show.actions.toggle_status_to_pending'), class: 'btn btn-sm') %>
+                    <% end %>
+                  <% end %>
+                  <% if is_organizer && r.status != 'cancelled' %>
+                    <%= link_to '✉',
+                                tournament_path(tournament, tab: (tournament.elimination? ? 3 : 4), email_to: r.user_id, anchor: 'email-players'),
+                                class: 'btn btn-sm',
+                                title: t('tournaments.show.actions.email_player', default: 'Email this player') %>
+                  <% end %>
+                </div>
+              </td>
+              <td class="ranking-td" style="text-align:right;">
+                <% can_view_list = (tournament.running? || tournament.completed?) && r.army_list.present? %>
+                <% if can_view_list %>
+                  <%= link_to t('tournaments.show.view_army_list', default: 'Army list'),
+                              tournament_tournament_registration_path(tournament, r),
+                              target: '_blank',
+                              rel: 'noopener' %>
+                <% elsif Current.user && (is_organizer || (Current.user.id == r.user_id && !tournament.army_list_locked?)) %>
+                  <%= link_to t('tournaments.show.edit_army_list', default: 'Edit list'),
+                              tournament_tournament_registration_path(tournament, r),
+                              target: '_blank',
+                              rel: 'noopener' %>
+                <% end %>
+              </td>
+            </tr>
           <% end %>
-          <div class="participant-actions card-date">
-            <span><%= r.status %></span>
-            <% if Current.user && Current.user.id == tournament.creator_id && (r.confirmed? || r.status == 'checked_in') %>
-              <% new_status = r.status == 'checked_in' ? 'pending' : 'checked_in' %>
-              <%= form_with(model: r,
-                            url: tournament_tournament_registration_path(tournament, r),
-                            method: :patch,
-                            scope: :tournament_registration) do |f| %>
-                <%= f.hidden_field :status, value: new_status %>
-                <%= hidden_field_tag :tab, 2 %>
-                <%= f.submit(new_status == 'checked_in' ? t('tournaments.show.actions.toggle_status_to_checked_in') : t('tournaments.show.actions.toggle_status_to_pending'), class: 'btn') %>
-              <% end %>
-            <% end %>
-            <% if Current.user && Current.user.id == tournament.creator_id && r.status != 'cancelled' %>
-              <%= link_to '✉',
-                          tournament_path(tournament, tab: (tournament.elimination? ? 3 : 4), email_to: r.user_id, anchor: 'email-players'),
-                          class: 'btn',
-                          title: t('tournaments.show.actions.email_player', default: 'Email this player') %>
-            <% end %>
-            <% can_view_list = (tournament.running? || tournament.completed?) && r.army_list.present? %>
-            <% if can_view_list %>
-              <%= link_to t('tournaments.show.view_army_list', default: 'Army list').html_safe,
-                          tournament_tournament_registration_path(tournament, r),
-                          class: 'btn',
-                          target: '_blank',
-                          rel: 'noopener' %>
-            <% elsif Current.user && (Current.user.id == tournament.creator_id || (Current.user.id == r.user_id && !tournament.army_list_locked?)) %>
-              <%= link_to t('tournaments.show.edit_army_list', default: 'Edit list').html_safe,
-                          tournament_tournament_registration_path(tournament, r),
-                          class: 'btn',
-                          target: '_blank',
-                          rel: 'noopener' %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
