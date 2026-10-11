@@ -11,13 +11,13 @@
     <meta property="og:site_name" content="<%= t('app.name', default: 'Eloleague') %>">
     <meta property="og:title" content="<%= content_for(:title) || t('app.name', default: 'Eloleague') %>">
     <meta property="og:description" content="<%= t('app.description') %>">
-    <meta property="og:image" content="<%= "#{request.base_url}/og-image.png" %>">
+    <meta property="og:image" content="<%= game_site_og_image_url %>">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<%= content_for(:title) || t('app.name', default: 'Eloleague') %>">
     <meta name="twitter:description" content="<%= t('app.description') %>">
-    <meta name="twitter:image" content="<%= "#{request.base_url}/og-image.png" %>">
+    <meta name="twitter:image" content="<%= game_site_og_image_url %>">
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -27,16 +27,23 @@
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <% if current_game_site&.icon %>
+      <link rel="icon" href="<%= game_site_icon_path %>">
+    <% else %>
+      <link rel="icon" href="/icon.png" type="image/png">
+      <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <% end %>
+    <link rel="apple-touch-icon" href="<%= game_site_icon_path %>">
 
     <%= stylesheet_link_tag :application, "data-turbo-track": "reload" %>
+    <% if current_game_site&.theme %>
+      <%= stylesheet_link_tag "themes/#{current_game_site.theme}", "data-turbo-track": "reload" %>
+    <% end %>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body <%= tag.attributes(data: { game_site: current_game_site&.key }) %>>
     <nav class="site-nav">
       <% if user_signed_in? %>
         <%= link_to t('home.link'), dashboard_path, class: "brand" %>

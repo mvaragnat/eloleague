@@ -1,0 +1,25 @@
+/*
+ * Theme for the Epic Armageddon - FERC game site (config/game_sites.yml).
+ * Loaded after application.css: override the :root tokens declared there.
+ * Site images live in public/sites/epic_ferc/ and are referenced with absolute paths.
+ */
+:root {
+  --blue-500: #9f1d20;
+  --blue-600: #7a1517;
+  --gray-100: #f4f1ea;
+  --gray-300: #d9d0bf;
+  --text-strong: #1c1a17;
+  --text-muted: #6b6255;
+
+  --surface: #fffdf8;
+  --surface-muted: #f7f2e7;
+  --surface-hover: #f9f5ec;
+  --focus-ring: rgba(159, 29, 32, 0.2);
+  --accent-soft: #f8ebe6;
+  --accent-border: #e6c3b6;
+  --accent-border-strong: #c98e7c;
+  --accent-hover: #b25a48;
+
+  --font-heading: Georgia, "Times New Roman", serif;
+  /* --hero-image: url('/sites/epic_ferc/wallpaper.jpg'); */
+}

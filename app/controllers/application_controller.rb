@@ -6,6 +6,8 @@ class ApplicationController < ActionController::Base
   # MUST BE THE FIRST IN THE BEFORE_ACTION STACK
   protect_from_forgery with: :exception
 
+  include GameSiteScoped
+
   # Must run before Devise's authenticate_user! so we can remember where to go back
   before_action :store_user_location!, if: :storable_location?
 

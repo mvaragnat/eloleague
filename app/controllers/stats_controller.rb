@@ -4,27 +4,27 @@ class StatsController < ApplicationController
   TOURNAMENT_ONLY_CAST = ActiveModel::Type::Boolean.new
 
   def index
-    @systems = Game::System.order(:name)
-    @default_system = Game::System.find_by(id: 1) || Game::System.order(:id).first
+    @systems = available_game_systems
+    @default_system = Current.game_system || Game::System.find_by(id: 1) || Game::System.order(:id).first
   end
 
   # JSON: factions win rates table for a system
   def factions
-    system = Game::System.find(params[:game_system_id])
+    system = scope_to_game_site(Game::System, column: :id).find(params[:game_system_id])
     stats = Stats::FactionWinRates.new(game_system: system, tournament_only: tournament_only?).call
     render json: { ok: true, rows: stats }
   end
 
   # JSON: versus table for a given faction within its system
   def faction_vs
-    faction = Game::Faction.find(params[:faction_id])
+    faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
     rows = Stats::FactionVersus.new(faction: faction, tournament_only: tournament_only?).call
     render json: { ok: true, rows: rows }
   end
 
   # JSON: time series of winrate for a faction
   def faction_winrate_series
-    faction = Game::Faction.find(params[:faction_id])
+    faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
     series = Stats::FactionWinrateSeries.new(faction: faction, tournament_only: tournament_only?).call
     render json: { ok: true, series: series }
   end
@@ -32,7 +32,7 @@ class StatsController < ApplicationController
   TOP_PLAYERS_LIMIT = 5
 
   def faction_top_players
-    faction = Game::Faction.find(params[:faction_id])
+    faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
 
     scope = Game::Participation
             .joins(:game_event)
@@ -55,7 +55,7 @@ class StatsController < ApplicationController
   FACTION_GAMES_PER_PAGE = 10
 
   def faction_games
-    @faction = Game::Faction.find(params[:faction_id])
+    @faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
     @page = [params.fetch(:page, 1).to_i, 1].max
 
     filter = Game::Event

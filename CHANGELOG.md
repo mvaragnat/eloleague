@@ -1,3 +1,12 @@
+## 2026-10-11
+
+- Feature — Game sites: serve the application on dedicated domains, each locked on one game system:
+  - Domains are bound to sites with the `GAME_SITES` environment variable; sites are described in `config/game_sites.yml`.
+  - Per-site texts (translation overrides under `game_sites.<key>`), theme stylesheet, favicon and sharing image.
+  - No game system selector on a game site, and every other game system is hidden (lists filtered, other records answer 404, new records forced to the site's system).
+  - First site: Epic Armageddon - FERC (`epic_ferc`), with a starter theme.
+  - Base CSS colors, fonts and the home wallpaper are now `:root` tokens that themes can override.
+
 ## 2026-09-07
 
 - Feature — Organizer-validated registrations (optional at tournament creation):

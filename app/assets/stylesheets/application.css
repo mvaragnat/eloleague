@@ -19,6 +19,21 @@
   --gray-300: #e5e7eb;
   --text-strong: #111827;
   --text-muted: #6b7280;
+
+  /* Theme tokens: game sites override these in app/assets/stylesheets/themes/<theme>.css */
+  --surface: #ffffff;
+  --surface-muted: #fafafa;
+  --surface-hover: #f9fafb;
+  --on-primary: #ffffff;
+  --focus-ring: rgba(37, 99, 235, 0.2);
+  --accent-soft: #eff6ff;
+  --accent-border: #bfdbfe;
+  --accent-border-strong: #93c5fd;
+  --accent-hover: #60a5fa;
+  --font-body: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-heading: var(--font-body);
+  --hero-bg: #000;
+  --hero-image: url('/ork-wallpaper.jpg');
 }
 
 /***** Base Typography *****/
@@ -26,7 +41,7 @@ html { font-size: 16px; }
 body {
   background: var(--gray-100);
   color: var(--text-strong);
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: var(--font-body);
   line-height: 1.5;
   margin: 0;
   min-height: 100vh;
@@ -39,7 +54,7 @@ body {
 a { color: inherit; text-decoration: underline; }
 a:hover, a:focus { text-decoration-thickness: from-font; }
 
-h1, h2, h3 { color: var(--text-strong); margin: 0 0 0.5rem 0; }
+h1, h2, h3 { color: var(--text-strong); font-family: var(--font-heading); margin: 0 0 0.5rem 0; }
 h1 { font-size: 2.25rem; font-weight: 700; }
 h2 { font-size: 1.5rem; font-weight: 700; }
 h3 { font-size: 1.25rem; font-weight: 600; }
@@ -56,7 +71,7 @@ main { flex: 1 0 auto; }
   gap: 1rem;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--gray-300);
-  background: #fff;
+  background: var(--surface);
 }
 .site-nav .brand {
   font-weight: 800;
@@ -87,7 +102,7 @@ main { flex: 1 0 auto; }
 input[type="text"], input[type="email"], input[type="password"], input[type="number"], select, textarea {
   width: 100%;
   appearance: none;
-  background: #fff;
+  background: var(--surface);
   color: var(--text-strong);
   border: 1px solid var(--gray-300);
   border-radius: 0.5rem;
@@ -100,7 +115,7 @@ select { background-image: linear-gradient(45deg, transparent 50%, var(--text-mu
 
 input:focus, select:focus, textarea:focus {
   border-color: var(--blue-500);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .input-error {
@@ -128,7 +143,7 @@ input:focus, select:focus, textarea:focus {
 
 .btn-primary {
   background: var(--blue-500);
-  color: #ffffff;
+  color: var(--on-primary);
   border-color: var(--blue-500);
 }
 
@@ -139,14 +154,14 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-inverse {
-  background: #ffffff;
+  background: var(--surface);
   color: var(--blue-500);
   border-color: var(--blue-500);
 }
 
 .btn-inverse:hover,
 .btn-inverse:focus {
-  color: #ffffff;
+  color: var(--on-primary);
   background: var(--blue-600);
   border-color: var(--blue-600);
 }
@@ -210,7 +225,7 @@ input:focus, select:focus, textarea:focus {
   z-index: 20;
   left: 0;
   right: 0;
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--gray-300);
   border-radius: 0.375rem;
   max-height: 200px;
@@ -236,13 +251,13 @@ input:focus, select:focus, textarea:focus {
   place-items: center;
   padding: 2rem 1rem;
   overflow: hidden;
-  background: #000;
+  background: var(--hero-bg);
 }
 .hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: url('/ork-wallpaper.jpg');
+  background-image: var(--hero-image);
   background-size: cover;
   background-position: center;
   opacity: 0.35;
@@ -261,7 +276,7 @@ input:focus, select:focus, textarea:focus {
 .button-row { display: inline-flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
 
 /***** Cards *****/
-.card { background: #ffffff; border: 3px solid var(--gray-300); border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
+.card { background: var(--surface); border: 3px solid var(--gray-300); border-radius: 0.5rem; padding: 1.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.04); margin-bottom: 1.5rem; }
 .card--win { border-color: var(--green-500); }
 .card--loss { border-color: var(--red-500); }
 .card--draw { border-color: var(--blue-500); }
@@ -278,7 +293,7 @@ input:focus, select:focus, textarea:focus {
 
 /***** Flash *****/
 .flash-container { width: 100%; max-width: 720px; margin: 0.75rem auto 0; padding: 0 1rem; }
-.flash { display: flex; align-items: center; gap: 0.75rem; border-radius: 0.5rem; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.flash { display: flex; align-items: center; gap: 0.75rem; border-radius: 0.5rem; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); background: var(--surface); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
 .flash .flash-icon { font-size: 1.25rem; }
 .flash--notice { border-left: 4px solid var(--green-500); }
 .flash--alert  { border-left: 4px solid var(--red-500); }
@@ -289,7 +304,7 @@ input:focus, select:focus, textarea:focus {
 
 /***** Modal *****/ 
 .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 9999; overscroll-behavior: contain; }
-.modal-card { background: #ffffff; border-radius: 0.75rem; padding: 2rem; width: 100%; max-width: 520px; max-height: 90vh; max-height: 90dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+.modal-card { background: var(--surface); border-radius: 0.75rem; padding: 2rem; width: 100%; max-width: 520px; max-height: 90vh; max-height: 90dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
 
 /***** Army list page *****/
 .army-list-page { width: 100%; max-width: 760px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
@@ -308,7 +323,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 /***** Footer *****/
-.site-footer { margin-top: 2rem; padding: 1rem; border-top: 1px solid var(--gray-300); background: #fff; }
+.site-footer { margin-top: 2rem; padding: 1rem; border-top: 1px solid var(--gray-300); background: var(--surface); }
 .footer-content { width: 100%; max-width: 960px; margin: 0 auto; padding: 0 1rem; text-align: center; color: var(--text-muted); }
 .footer-link { margin-left: 0.25rem; font-weight: 600; color: var(--blue-500); text-decoration: none; }
 .footer-link:hover, .footer-link:focus { text-decoration: underline; }
@@ -326,8 +341,8 @@ input:focus, select:focus, textarea:focus {
 /* Table styles shared by Stats */
 .table { width: 100%; border-collapse: collapse; }
 .table th, .table td { padding: 0.5rem 0.5rem; border-bottom: 1px solid var(--gray-300); white-space: nowrap; }
-.table thead th { font-weight: 700; text-align: left; background: #fafafa; position: sticky; top: 0; z-index: 1; }
-.table tbody tr:hover { background: #f9fafb; }
+.table thead th { font-weight: 700; text-align: left; background: var(--surface-muted); position: sticky; top: 0; z-index: 1; }
+.table tbody tr:hover { background: var(--surface-hover); }
 .table td:last-child, .table th:last-child { text-align: right; }
 
 /* Red text for outlier differentials */
@@ -345,8 +360,8 @@ input:focus, select:focus, textarea:focus {
 /* Dashboard welcome card */
 .dashboard-layout { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
 .dashboard-welcome-card {
-  border: 2px solid #93c5fd;
-  background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+  border: 2px solid var(--accent-border-strong);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--accent-soft) 100%);
   box-shadow: 0 12px 28px rgba(30, 64, 175, 0.12);
   margin-bottom: 1rem;
 }
@@ -375,8 +390,8 @@ input:focus, select:focus, textarea:focus {
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  background: #ffffff;
-  border: 2px solid #bfdbfe;
+  background: var(--surface);
+  border: 2px solid var(--accent-border);
   border-radius: 0.6rem;
   padding: 0.8rem 0.9rem;
   font-weight: 700;
@@ -387,8 +402,8 @@ input:focus, select:focus, textarea:focus {
 }
 .dashboard-action:hover,
 .dashboard-action:focus {
-  border-color: #60a5fa;
-  background: #eff6ff;
+  border-color: var(--accent-hover);
+  background: var(--accent-soft);
 }
 .dashboard-action__emoji {
   font-size: 1.15rem;
@@ -438,7 +453,7 @@ input:focus, select:focus, textarea:focus {
 .ranking-td--player { white-space: nowrap; }
 .ranking-td--num { text-align: right; }
 .ranking-faction { color: var(--text-muted); }
-.ranking-table tbody tr:hover { background: #f9fafb; }
+.ranking-table tbody tr:hover { background: var(--surface-hover); }
 
 @media (max-width: 640px) {
   .ranking-table { font-size: 0.75rem; }

@@ -6,7 +6,7 @@ class ChampionshipsController < ApplicationController
   def index
     Current.user = current_user
 
-    @systems = Game::System.all.sort_by(&:localized_name)
+    @systems = available_game_systems
     @system = selected_system
     @levels = @system ? Championship::Config.levels_for(@system.name) : []
     @best_of = @system ? Championship::Config.best_of_for(@system.name) : nil
@@ -31,7 +31,7 @@ class ChampionshipsController < ApplicationController
   private
 
   def selected_system
-    return @systems.first if params[:game_system_id].blank?
+    return @systems.first if game_site? || params[:game_system_id].blank?
 
     Game::System.find(params[:game_system_id])
   end
