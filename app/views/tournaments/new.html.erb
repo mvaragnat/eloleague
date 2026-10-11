@@ -25,9 +25,9 @@
           <%= f.label :description, t('tournaments.new.description') %>
           <%= f.text_area :description, rows: 3 %>
         </div>
-        <div>
+        <div <%= 'hidden' if game_site? %>>
           <%= f.label :game_system_id, t('tournaments.new.game_system') %>
-          <%= f.collection_select :game_system_id, Game::System.all.sort_by(&:localized_name), :id, :localized_name, include_blank: t('games.new.select_system') %>
+          <%= f.collection_select :game_system_id, available_game_systems, :id, :localized_name, include_blank: (t('games.new.select_system') unless game_site?) %>
         </div>
         <div data-tournament-form-target="scoringWrapper" style="display:none;">
           <%= f.label :scoring_system_id, t('tournaments.scoring.select_label', default: 'Scoring system') %>

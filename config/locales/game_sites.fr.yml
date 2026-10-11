@@ -1,0 +1,17 @@
+# Text overrides for game sites (config/game_sites.yml).
+# Any key of the base locale can be overridden under game_sites.<site key>.
+fr:
+  game_sites:
+    epic_ferc:
+      app:
+        name: "Epic League"
+        description: "Tournois, classements et statistiques de la communauté Epic Armageddon francophone."
+      auth:
+        signup_subtitle: "Créez votre compte Epic League"
+      welcome: "Bienvenue sur Epic League"
+      home:
+        subtitle: "Tournois et statistiques Epic Armageddon - FERC"
+      dashboard:
+        welcome_box:
+          title: "Bienvenue sur Epic League 👋"
+          paragraph_1: "Sur Epic League, vous pouvez conserver l'historique de vos parties d'Epic Armageddon, et participer à des tournois."

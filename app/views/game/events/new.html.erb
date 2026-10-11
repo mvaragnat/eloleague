@@ -7,11 +7,11 @@
       <% error_flags = game_event_error_flags(@game) %>
       <%= form_with(model: @game, url: game_events_path, scope: :game_event, data: { controller: "game-form form-errors", action: "submit->game-form#validate player-selected->game-form#onPlayerSelected player-removed->game-form#onPlayerRemoved", game_form_factions_url_value: game_factions_path(locale: I18n.locale), game_form_scoring_systems_url_value: game_scoring_systems_path(locale: I18n.locale), game_form_two_players_value: true, game_form_exactly_two_players_message_value: t('games.errors.exactly_two_players'), game_form_both_scores_required_message_value: t('games.errors.both_scores_required'), game_form_both_factions_required_message_value: t('games.errors.both_factions_required'), game_form_score_exceeds_max_message_value: t('games.errors.score_exceeds_max', max: '%{max}'), game_form_total_must_equal_message_value: t('games.errors.total_must_equal', total: '%{total}') }) do |form| %>
 
-        <div class="form-group">
+        <div class="form-group" <%= 'hidden' if game_site? %>>
           <%= form.label :game_system_id, t('games.new.system'), class: "form-label" %>
           <%= form.collection_select :game_system_id,
-              Game::System.all.sort_by(&:localized_name), :id, :localized_name,
-              { prompt: t('games.new.select_system') },
+              available_game_systems, :id, :localized_name,
+              { prompt: (t('games.new.select_system') unless game_site?) },
               { class: "form-select #{'input-error' if error_flags[:system]}", data: { action: 'change->game-form#loadFactions' }, aria: { invalid: error_flags[:system] } } %>
         </div>
 

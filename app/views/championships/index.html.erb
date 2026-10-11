@@ -52,7 +52,7 @@
     </div>
   </div>
 
-  <div class="card">
+  <div class="card" <%= 'hidden' if game_site? %>>
     <div class="card-body">
       <h3><%= t('championship.game_system') %></h3>
       <%= form_with url: championships_path, method: :get, local: true do %>

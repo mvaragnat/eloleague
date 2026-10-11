@@ -268,6 +268,15 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - English and French translations available
 - Language selection via UI
 
+### Game Sites (dedicated domains)
+- The same application can be served on extra domains, each locked on a single game system with its own texts and look. The base domain is unchanged.
+- `GAME_SITES` environment variable binds domains to site keys: `GAME_SITES="epic.example.com=epic_ferc,other.example.com=other"`. Unset or empty means no game site.
+- `config/game_sites.yml` describes each site: `game_system` (name of the `Game::System`), optional `theme`, `icon`, `og_image`. `GameSite.for_host` resolves the request host; `GameSiteScoped` (included in `ApplicationController`) sets `Current.game_site` / `Current.game_system`.
+- Texts: any translation key used in views can be overridden per site under `game_sites.<site key>.<key>` (see `config/locales/game_sites.*.yml`); missing keys fall back to the base text (`GameSiteHelper#translate`). Controller flash messages and mails are not overridden.
+- Look: `app/assets/stylesheets/themes/<theme>.css` is loaded after `application.css` and overrides the `:root` tokens (colors, fonts, `--hero-image`...). `<body>` carries `data-game-site="<key>"`. Site images go in `public/sites/<key>/`.
+- Other game systems do not exist on a game site: game system selectors are hidden (forms keep a hidden single-option select), tournaments, games, stats, championships and profiles are filtered on the site's system, and records of other systems answer 404 (`scope_to_game_site`). New tournaments and casual games are forced to the site's system server side.
+- Sessions and locale cookies are per domain (players sign in again on each domain; accounts are shared). Mails keep linking to the base domain (`APP_HOST`). API and Avo are not scoped.
+
 ### Technical Features
 - Modern Rails 8.0.1 application
 - RuboCop code style enforcement

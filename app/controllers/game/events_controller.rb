@@ -7,11 +7,11 @@ module Game
     def show
       # Allow guests to view event details (including army lists)
       Current.user = current_user
-      @game = Event.includes(game_participations: :user).find(params[:id])
+      @game = scope_to_game_site(Event).includes(game_participations: :user).find(params[:id])
     end
 
     def new
-      @game = Event.new
+      @game = Event.new(game_system: Current.game_system)
       # Build two participations; preselect current user for the first slot
       @game.game_participations.build(user: Current.user)
       @game.game_participations.build
@@ -19,6 +19,7 @@ module Game
 
     def create
       @game = Event.new(game_params.merge(played_at: Time.current))
+      @game.game_system = Current.game_system if game_site?
 
       respond_to do |format|
         @game.save ? respond_with_create_success(format) : respond_with_create_failure(format)
