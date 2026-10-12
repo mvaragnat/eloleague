@@ -79,8 +79,8 @@ export default class extends Controller {
     const factionId = this.factionTarget.value
     if (!factionId) return
 
+    // The rating chart uses every competitive game and ignores the tournament-only filter
     await Promise.all([
-      this._loadFactionSeries(factionId),
       this._loadTopPlayers(factionId),
       this._loadVersusTable(factionId),
       this._loadFactionGames(factionId)
@@ -98,6 +98,7 @@ export default class extends Controller {
     this._renderRows(this.factionsTableTarget, this._factionsData, row => `
       <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
         <td>${this._e(row.faction_name)}</td>
+        ${this._ratingCell(row)}
         <td>${row.total_games}</td>
         <td>${row.unique_players}</td>
         <td>${row.wins}</td>
@@ -130,7 +131,7 @@ export default class extends Controller {
   }
 
   async _loadFactionSeries(factionId) {
-    const url = this._url(this._withStatsFilters(`/stats/faction_winrate_series?faction_id=${encodeURIComponent(factionId)}`))
+    const url = this._url(`/stats/faction_rating_series?faction_id=${encodeURIComponent(factionId)}`)
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
     const series = data.series || []
@@ -246,6 +247,7 @@ export default class extends Controller {
         return `
           <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
             <td>${this._e(row.faction_name)}</td>
+            ${this._ratingCell(row)}
             <td>${row.total_games}</td>
             <td>${row.unique_players}</td>
             <td>${row.wins}</td>
@@ -339,6 +341,18 @@ export default class extends Controller {
     const cls = abs > 15 ? ' class="text-red"' : ''
     const sign = val > 0 ? '+' : ''
     return `<td${cls}>${sign}${val}%</td>`
+  }
+
+  _ratingCell(row) {
+    if (row.rating == null) return '<td></td>'
+    const badge = row.provisional
+      ? ` <span class="status-badge status-badge--provisional">${this._e(this._provisionalLabel())}</span>`
+      : ''
+    return `<td>${row.rating} ± ${row.rating_deviation}${badge}</td>`
+  }
+
+  _provisionalLabel() {
+    return this.element.dataset.provisionalLabel || 'Provisional'
   }
 
   _setHidden(el, hidden) { if (el) el.hidden = hidden }

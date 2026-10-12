@@ -361,6 +361,8 @@ fr:
       select_prompt: "Sélectionnez un système de score"
       about: "Système de score"
   elo:
+    provisional: "Provisoire"
+    deviation_hint: "Classement ± incertitude (RD). L'incertitude diminue à chaque partie et remonte après une longue absence ; le classement est provisoire tant qu'elle dépasse 100."
     title: "Classements ELO"
     game_systems: "Jeu"
     my_current_rankings: "Mes classements ELO actuels"
@@ -385,6 +387,9 @@ fr:
       long: "Le %d/%m/%Y à %Hh%M"
       card: "%d/%m/%Y"
   stats:
+    rating_chart_hint: "Évolution du classement de la faction. La zone ombrée représente ± l'incertitude (RD) ; les barres jaunes marquent les patchs d'équilibrage."
+    rating: "Classement"
+    rating_hint: "Classement de la faction ± incertitude (RD), calculé sur toutes les parties compétitives indépendamment du niveau des joueurs."
     title: "Statistiques"
     system_label: "Système de jeu"
     select_system: "Sélectionnez un système de jeu"

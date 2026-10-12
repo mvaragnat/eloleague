@@ -22,10 +22,11 @@ class StatsController < ApplicationController
     render json: { ok: true, rows: rows }
   end
 
-  # JSON: time series of winrate for a faction
-  def faction_winrate_series
+  # JSON: rating history (R ± RD) of a faction, with balance-patch resets.
+  # Ratings use every competitive game, so the tournament-only filter does not apply.
+  def faction_rating_series
     faction = Game::Faction.find(params[:faction_id])
-    series = Stats::FactionWinrateSeries.new(faction: faction, tournament_only: tournament_only?).call
+    series = Stats::FactionRatingSeries.new(faction: faction).call
     render json: { ok: true, series: series }
   end
 

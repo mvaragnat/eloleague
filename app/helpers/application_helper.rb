@@ -287,7 +287,7 @@ module ApplicationHelper
     users = tournament.participants.to_a
     system = tournament.game_system
     seeded = users.map do |u|
-      rating = EloRating.find_by(user: u, game_system: system)&.rating || EloRating::START_RATING
+      rating = EloRating.conservative_for(u, system)
       [u.id, rating]
     end
     seeded.sort_by! { |(_id, rating)| -rating }

@@ -394,6 +394,8 @@ en:
       select_prompt: "Select a scoring system"
       about: "Scoring system"
   elo:
+    provisional: "Provisional"
+    deviation_hint: "Rating ± uncertainty (RD). The uncertainty shrinks with every game and grows back after a long break; ratings are provisional while it stays above 100."
     title: "ELO Rankings"
     game_systems: "Game"
     my_current_rankings: "My current ELO rankings"
@@ -418,6 +420,9 @@ en:
       long: "%d/%m/%Y at %H:%M"
       card: "%d/%m/%Y"
   stats:
+    rating_chart_hint: "Faction rating over time. The shaded area shows ± uncertainty (RD); yellow bars mark balance patches."
+    rating: "Rating"
+    rating_hint: "Faction rating ± uncertainty (RD), computed from all competitive games independently of the players' level."
     title: "Stats"
     system_label: "Game system"
     select_system: "Select a game system"

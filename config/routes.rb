@@ -28,7 +28,7 @@ Rails.application.routes.draw do
     get 'stats', to: 'stats#index', as: :stats
     get 'stats/factions', to: 'stats#factions', as: :stats_factions
     get 'stats/faction_vs', to: 'stats#faction_vs', as: :stats_faction_vs
-    get 'stats/faction_winrate_series', to: 'stats#faction_winrate_series', as: :stats_faction_winrate_series
+    get 'stats/faction_rating_series', to: 'stats#faction_rating_series', as: :stats_faction_rating_series
     get 'stats/faction_top_players', to: 'stats#faction_top_players', as: :stats_faction_top_players
     get 'stats/faction_games', to: 'stats#faction_games', as: :stats_faction_games
 

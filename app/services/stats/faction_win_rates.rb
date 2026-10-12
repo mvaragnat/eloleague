@@ -6,6 +6,7 @@ module Stats
   class FactionWinRates
     ResultRow = Struct.new(:faction_id, :faction_name, :total_games, :unique_players,
                            :wins, :losses, :draws, :win_percent, :loss_percent, :draw_percent, :warnings,
+                           :rating, :rating_deviation, :provisional,
                            keyword_init: true)
 
     def initialize(game_system:, tournament_only: false)
@@ -15,6 +16,7 @@ module Stats
 
     def call
       parts, parts_by_event = preload_parts
+      @ratings = FactionRating.where(game_system: @system).index_by(&:faction_id)
       rows = @system.factions.map do |f|
         build_row_for_faction(f, parts, parts_by_event)
       end
@@ -36,6 +38,7 @@ module Stats
       faction_parts = parts.select { |p| p.faction_id == faction.id }
       totals = totals_for(faction_parts, parts_by_event)
       warnings = warnings_for(faction_parts)
+      rating = @ratings[faction.id]
 
       ResultRow.new(
         faction_id: faction.id,
@@ -48,7 +51,10 @@ module Stats
         win_percent: totals[:win_percent],
         loss_percent: totals[:loss_percent],
         draw_percent: totals[:draw_percent],
-        warnings: warnings
+        warnings: warnings,
+        rating: rating&.rating || FactionRating::START_RATING,
+        rating_deviation: rating&.rating_deviation || FactionRating::START_DEVIATION,
+        provisional: rating ? rating.provisional? : true
       ).to_h
     end
 

@@ -28,7 +28,12 @@ end %>
       <div class="player">
         <%= left_username %>
         <% if my&.faction %>
-          <div class="card-date"><%= my.faction.localized_name %></div>
+          <div class="card-date">
+            <%= my.faction.localized_name %>
+            <% if my_change&.faction_rating_after && my_change.faction_rating_after != my_change.faction_rating_before %>
+              (<%= my_change.faction_rating_before %> → <%= my_change.faction_rating_after %>)
+            <% end %>
+          </div>
         <% end %>
         <% if my_change %>
           <div class="card-date">(<%= my_change.rating_before %> → <%= my_change.rating_after %>)</div>
@@ -45,7 +50,12 @@ end %>
       <div class="player" style="text-align: right;">
         <%= opp&.user&.username %>
         <% if opp&.faction %>
-          <div class="card-date"><%= opp.faction.localized_name %></div>
+          <div class="card-date">
+            <%= opp.faction.localized_name %>
+            <% if opp_change&.faction_rating_after && opp_change.faction_rating_after != opp_change.faction_rating_before %>
+              (<%= opp_change.faction_rating_before %> → <%= opp_change.faction_rating_after %>)
+            <% end %>
+          </div>
         <% end %>
         <% if opp_change %>
           <div class="card-date">(<%= opp_change.rating_before %> → <%= opp_change.rating_after %>)</div>
