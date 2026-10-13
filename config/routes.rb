@@ -60,6 +60,7 @@ Rails.application.routes.draw do
         post :next_round
         post :finalize
         post :email_players
+        post :export_members
       end
 
       namespace :tournament do

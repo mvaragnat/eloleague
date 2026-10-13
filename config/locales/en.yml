@@ -340,6 +340,20 @@ en:
       type: "Tournament"
       settings: "Settings"
       online_label: "Online tournament"
+    export_members:
+      sent: "Export sent to %{email}"
+    members_export:
+      title: "Export players"
+      description: "Receive an Excel file listing registered players (username, email, status, confirmed) at %{email}."
+      submit: "Email me the export"
+      sheet_name: "Players"
+      "yes": "Yes"
+      "no": "No"
+      columns:
+        username: "Username"
+        email: "Email"
+        status: "Status"
+        confirmed: "Confirmed"
     email_players:
       title: "Email players"
       description: "Send a message to all registered players or to a single one. Your email (%{organizer_email}) will be shown in the email so players can reply directly."
@@ -463,6 +477,9 @@ en:
       player_match_share: "One player represents more than %{percent}% of games"
   mailers:
     tournament_organizer:
+      members_export:
+        subject: "[%{tournament}] Player export"
+        body_html: "Please find attached the list of players registered for <strong>%{tournament}</strong>."
       message_players:
         subject: "[%{tournament}] %{subject}"
         from_organizer_html: "Message from the organizer of <strong>%{tournament}</strong>, %{organizer}:"
