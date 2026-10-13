@@ -137,12 +137,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 ### Stats
 - All authenticated users can access a `Stats` page (`/stats`) to explore per-system and per-faction performance.
-- Selecting a game system reveals a sortable table of all factions with: faction rating (`R − 2·RD`, "High uncertainty" badge), concentration (Herfindahl index in %, "High concentration" badge), total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by Win% (descending) by default.
+- Selecting a game system reveals a sortable table of all factions with: faction rating (`R − 2·RD`, "High uncertainty" badge), concentration (Herfindahl index in %, "High concentration" badge), total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by displayed rating (`R − 2·RD`, descending) by default.
 - Selecting a faction shows:
   - A "Top players" table listing the 5 players with the most games on that faction (with profile links).
   - A rating-over-time graph: the faction rating with a shaded `± RD` band, and a vertical yellow bar at each balance-patch reset. It uses all competitive games (the tournament-only filter does not apply).
   - A sortable versus table against all factions in the system, with mirror games shown only as a count.
-- Two client-side toggles (default OFF) hide factions with the "High concentration" and/or "High uncertainty" badge.
+- Two client-side toggles (default ON) hide factions with the "High concentration" and/or "High uncertainty" badge.
 - The versus table displays all rows and keeps a `Warning` column for low-reliability matchups (insufficient players or games, one player over-represented); it is not filtered.
 - A second toggle recalculates the whole page using tournament games only (global table win rates, versus table, top players and games feed; ratings are unaffected).
 - Non-competitive games are excluded from all Stats computations (tables and time series), including when tournament-only mode is enabled.

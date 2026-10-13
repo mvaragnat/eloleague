@@ -20,7 +20,8 @@ export default class extends Controller {
   ]
 
   connect() {
-    this._factionsSort = { key: "win_percent", dir: "desc" }
+    // Factions default to the displayed rating (R - 2·RD), best first
+    this._factionsSort = { key: "conservative_rating", dir: "desc" }
     this._vsSort = { key: "games", dir: "desc" }
     this._factionOptions = []
     this._lastTournamentOnly = this._tournamentOnlyEnabled()
@@ -101,7 +102,8 @@ export default class extends Controller {
     const url = this._url(this._withStatsFilters(`/stats/factions?game_system_id=${encodeURIComponent(systemId)}`))
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
-    this._factionsData = this._normalizeRows(data.rows || [])
+    this._factionsData = this._sortData(this._normalizeRows(data.rows || []), this._factionsSort)
+    this._markSortedHeader(this.factionsTableTarget, this._factionsSort)
     this._renderRows(this.factionsTableTarget, this._factionsData, row => this._factionRow(row))
     // Show both wrapper and table
     const wrapper = this.factionsTableTarget.closest('#factions-table')
@@ -245,22 +247,8 @@ export default class extends Controller {
       state.key = key
       state.dir = 'asc'
     }
-    // Update header visual states
-    tableEl.querySelectorAll('th.sortable').forEach(h => { h.classList.remove('is-sorted'); h.removeAttribute('aria-sort') })
-    th.classList.add('is-sorted')
-    th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending')
-    const data = this[dataKey] || []
-    data.sort((a, b) => {
-      const va = a[key]
-      const vb = b[key]
-      if (va == null && vb != null) return 1
-      if (va != null && vb == null) return -1
-      if (va == null && vb == null) return 0
-      if (typeof va === 'string') {
-        return state.dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-      }
-      return state.dir === 'asc' ? (va - vb) : (vb - va)
-    })
+    this._markSortedHeader(tableEl, state)
+    const data = this._sortData(this[dataKey] || [], state)
     this._renderRows(tableEl, data, row => {
       if (dataKey === '_factionsData') return this._factionRow(row)
       return `
@@ -279,6 +267,32 @@ export default class extends Controller {
           <td>${this._e(row.warning_text)}</td>
         </tr>
       `
+    })
+  }
+
+  _sortData(data, { key, dir }) {
+    return data.sort((a, b) => {
+      const va = a[key]
+      const vb = b[key]
+      if (va == null && vb != null) return 1
+      if (va != null && vb == null) return -1
+      if (va == null && vb == null) return 0
+      if (typeof va === 'string') {
+        return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
+      }
+      return dir === 'asc' ? (va - vb) : (vb - va)
+    })
+  }
+
+  _markSortedHeader(tableEl, { key, dir }) {
+    tableEl.querySelectorAll('th.sortable').forEach(h => {
+      const sorted = h.dataset.key === key
+      h.classList.toggle('is-sorted', sorted)
+      if (sorted) {
+        h.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : 'descending')
+      } else {
+        h.removeAttribute('aria-sort')
+      }
     })
   }
 

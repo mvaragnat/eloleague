@@ -21,8 +21,8 @@ module Stats
       rows = @system.factions.map do |f|
         build_row_for_faction(f, parts, parts_by_event)
       end
-      # Default sort: highest win% first
-      rows.sort_by { |r| -r[:win_percent].to_f }
+      # Default sort: highest displayed rating (R - 2·RD) first
+      rows.sort_by { |r| -r[:conservative_rating] }
     end
 
     private

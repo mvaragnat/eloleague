@@ -37,13 +37,12 @@ module Stats
       assert_includes f2_row[:warnings], I18n.t('stats.warnings.insufficient_games')
     end
 
-    test 'global winrates are sorted by win_percent desc by default' do
-      create_competitive_series(11)
+    test 'global winrates are sorted by displayed rating desc by default' do
+      FactionRating.create!(faction: @f1, game_system: @system, rating: 1400, rating_deviation: 100) # 1200
+      FactionRating.create!(faction: @f2, game_system: @system, rating: 1500, rating_deviation: 50)  # 1400
       rows = Stats::FactionWinRates.new(game_system: @system).call
-      assert rows.size >= 2, 'Expected at least two factions in results'
-      # F1 wins all games in setup, should be first
-      assert_equal @f1.id, rows.first[:faction_id]
-      assert rows.first[:win_percent] >= rows.second[:win_percent]
+
+      assert_equal [@f2.id, @f1.id], rows.pluck(:faction_id)
     end
 
     test 'global winrates expose the faction concentration and its badge' do

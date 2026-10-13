@@ -21,7 +21,7 @@ Rails.application.config.x.rating.tap do |rating|
   rating.provisional_deviation = ENV.fetch('RATING_PROVISIONAL_RD', '100').to_i
   # A faction's concentration (Herfindahl index of its games among players, 0..1) is
   # flagged as too high above this value. 0.5 = fewer than 2 "effective" players.
-  rating.high_concentration = ENV.fetch('RATING_HIGH_CONCENTRATION', '0.5').to_f
+  rating.high_concentration = ENV.fetch('RATING_HIGH_CONCENTRATION', '0.3').to_f
   # Displayed and seeding rating: R - conservative_factor * RD
   rating.conservative_factor = ENV.fetch('RATING_CONSERVATIVE_FACTOR', '2').to_f
   # Window over which a faction's player concentration is measured
