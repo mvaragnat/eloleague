@@ -18,22 +18,25 @@ module Elo
   # All maths run in floats; results are rounded to integers for storage.
   class Calculator
     Q = Math.log(10) / 400.0
-    START_RATING = 1500
-    START_DEVIATION = 350
-    RD_MIN = 30
-    RD_MAX = 350
+
+    # Tunable parameters, see config/initializers/rating.rb
+    SETTINGS = Rails.application.config.x.rating
+    START_RATING = SETTINGS.player_start_rating
+    START_DEVIATION = SETTINGS.player_start_deviation
+    RD_MIN = SETTINGS.min_deviation
+    RD_MAX = START_DEVIATION
     # Factions start (and are capped) with a smaller uncertainty than players: the
-    # prior is that faction balance matters less than player skill. Since the change
-    # is split in proportion to RD², two newcomers split it 350² : FACTION_RD_MAX².
-    FACTION_START_DEVIATION = 150
-    FACTION_RD_MAX = 150
-    # Deviation regained per month of player inactivity.
-    INACTIVITY_C = 34.6
-    SECONDS_PER_MONTH = 30.4375 * 24 * 3600
+    # prior is that faction balance matters less than player skill.
+    FACTION_START_RATING = SETTINGS.faction_start_rating
+    FACTION_START_DEVIATION = SETTINGS.faction_start_deviation
+    FACTION_RD_MAX = FACTION_START_DEVIATION
     # Above this deviation a rating is shown as provisional.
-    PROVISIONAL_RD = 100
-    # Seeding uses R - CONSERVATIVE_FACTOR * RD.
-    CONSERVATIVE_FACTOR = 2
+    PROVISIONAL_RD = SETTINGS.provisional_deviation
+    # Displayed and seeding rating: R - CONSERVATIVE_FACTOR * RD.
+    CONSERVATIVE_FACTOR = SETTINGS.conservative_factor
+    DIVERSITY_WINDOW_MONTHS = SETTINGS.diversity_window_months
+    # Above this concentration (Herfindahl index) a faction rating is flagged.
+    HIGH_CONCENTRATION = SETTINGS.high_concentration
 
     Side = Struct.new(:player_rating, :player_rd, :faction_rating, :faction_rd, :faction_diversity,
                       keyword_init: true) do
@@ -45,19 +48,17 @@ module Elo
     Result = Struct.new(:expected, :player_rating, :player_rd, :faction_rating, :faction_rd, keyword_init: true)
 
     class << self
+      def high_concentration?(concentration)
+        concentration.present? && concentration > HIGH_CONCENTRATION
+      end
+
       def provisional?(deviation)
         deviation.to_i > PROVISIONAL_RD
       end
 
+      # Lower bound shown everywhere in the UI and used for seeding.
       def conservative(rating, deviation)
-        rating - (CONSERVATIVE_FACTOR * deviation)
-      end
-
-      # Raises a player's deviation after `months` without playing.
-      def inflate_deviation(deviation, months)
-        return deviation unless months.to_f.positive?
-
-        [Math.sqrt((deviation**2) + ((INACTIVITY_C**2) * months)), RD_MAX].min.round
+        (rating - (CONSERVATIVE_FACTOR * deviation)).round
       end
 
       # Concentration of a faction's games among its players.
@@ -70,12 +71,6 @@ module Elo
 
         effective = 1.0 / counts.sum { |n| (n / total)**2 }
         Diversity.new(effective_players: effective, players: counts.size, factor: effective / counts.size)
-      end
-
-      def months_between(from, to)
-        return 0.0 unless from && to
-
-        [(to - from) / SECONDS_PER_MONTH, 0.0].max
       end
     end
 

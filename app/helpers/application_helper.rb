@@ -1,6 +1,17 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  # Tooltip behind a displayed rating (R - 2·RD): the underlying R ± RD and how to read it.
+  def rating_tooltip(rating, deviation)
+    t('elo.rating_tooltip', rating: rating, deviation: deviation, factor: rating_factor,
+                            provisional: Elo::Calculator::PROVISIONAL_RD)
+  end
+
+  # The k of the displayed lower bound R - k·RD, e.g. "2"
+  def rating_factor
+    format('%g', Elo::Calculator::CONSERVATIVE_FACTOR)
+  end
+
   def game_event_error_flags(event)
     return {} unless event&.errors&.any?
 

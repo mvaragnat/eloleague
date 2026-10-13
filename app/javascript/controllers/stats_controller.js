@@ -11,7 +11,8 @@ export default class extends Controller {
     "topPlayers",
     "topPlayersTable",
     "chart",
-    "hideWarnings",
+    "hideHighConcentration",
+    "hideHighUncertainty",
     "tournamentOnly",
     "factionGames",
     "playersRanking",
@@ -70,7 +71,7 @@ export default class extends Controller {
   }
 
   async onFiltersChange() {
-    this._applyHideWarningsToAllTables()
+    this._applyFactionFilters()
 
     const tournamentOnly = this._tournamentOnlyEnabled()
     const tournamentOnlyChanged = tournamentOnly !== this._lastTournamentOnly
@@ -101,23 +102,7 @@ export default class extends Controller {
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
     this._factionsData = this._normalizeRows(data.rows || [])
-    this._renderRows(this.factionsTableTarget, this._factionsData, row => `
-      <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
-        <td>${this._e(row.faction_name)}</td>
-        ${this._ratingCell(row)}
-        ${this._effectivePlayersCell(row)}
-        <td>${row.total_games}</td>
-        <td>${row.unique_players}</td>
-        <td>${row.wins}</td>
-        <td>${row.losses}</td>
-        <td>${row.draws}</td>
-        <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
-        <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
-        <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
-        ${this._diffCell(row.win_loss_diff)}
-        <td>${this._e(row.warning_text)}</td>
-      </tr>
-    `)
+    this._renderRows(this.factionsTableTarget, this._factionsData, row => this._factionRow(row))
     // Show both wrapper and table
     const wrapper = this.factionsTableTarget.closest('#factions-table')
     this._setHidden(wrapper, false)
@@ -130,6 +115,25 @@ export default class extends Controller {
     const res = await fetch(url, { headers: { 'Accept': 'text/html' } })
     this.playersRankingBodyTarget.innerHTML = await res.text()
     this._setHidden(this.playersRankingTarget, false)
+  }
+
+  _factionRow(row) {
+    return `
+      <tr data-faction-id="${row.faction_id}" data-high-concentration="${row.high_concentration}" data-high-uncertainty="${row.provisional}">
+        <td>${this._e(row.faction_name)}</td>
+        ${this._ratingCell(row)}
+        ${this._concentrationCell(row)}
+        <td>${row.total_games}</td>
+        <td>${row.unique_players}</td>
+        <td>${row.wins}</td>
+        <td>${row.losses}</td>
+        <td>${row.draws}</td>
+        <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
+        <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
+        <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
+        ${this._diffCell(row.win_loss_diff)}
+      </tr>
+    `
   }
 
   async _loadFactionOptions(systemId) {
@@ -228,7 +232,7 @@ export default class extends Controller {
   _renderRows(tableEl, rows, templateFn) {
     const tbody = tableEl.querySelector('tbody')
     tbody.innerHTML = rows.map(templateFn).join('')
-    this._applyHideWarnings(tableEl)
+    if (tableEl === this.factionsTableTarget) this._applyFactionFilters()
   }
 
   _sortTable(ev, tableEl, dataKey, state) {
@@ -258,25 +262,7 @@ export default class extends Controller {
       return state.dir === 'asc' ? (va - vb) : (vb - va)
     })
     this._renderRows(tableEl, data, row => {
-      if (dataKey === '_factionsData') {
-        return `
-          <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
-            <td>${this._e(row.faction_name)}</td>
-            ${this._ratingCell(row)}
-            ${this._effectivePlayersCell(row)}
-            <td>${row.total_games}</td>
-            <td>${row.unique_players}</td>
-            <td>${row.wins}</td>
-            <td>${row.losses}</td>
-            <td>${row.draws}</td>
-            <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
-            <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
-            <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
-            ${this._diffCell(row.win_loss_diff)}
-            <td>${this._e(row.warning_text)}</td>
-          </tr>
-        `
-      }
+      if (dataKey === '_factionsData') return this._factionRow(row)
       return `
         <tr data-has-warning="${row.has_warning}">
           <td>${this._e(row.opponent_faction_name)}</td>
@@ -316,18 +302,14 @@ export default class extends Controller {
     })
   }
 
-  _applyHideWarnings(tableEl) {
-    const hide = this.hideWarningsTarget ? this.hideWarningsTarget.checked : true
-    tableEl.querySelectorAll('tbody tr').forEach(row => {
-      const hasWarning = row.dataset.hasWarning === 'true'
-      row.hidden = hide && hasWarning
+  // Hide factions flagged with the "high concentration" and/or "high uncertainty" badges
+  _applyFactionFilters() {
+    const hideConcentration = this.hasHideHighConcentrationTarget && this.hideHighConcentrationTarget.checked
+    const hideUncertainty = this.hasHideHighUncertaintyTarget && this.hideHighUncertaintyTarget.checked
+    this.factionsTableTarget.querySelectorAll('tbody tr').forEach(row => {
+      row.hidden = (hideConcentration && row.dataset.highConcentration === 'true') ||
+        (hideUncertainty && row.dataset.highUncertainty === 'true')
     })
-  }
-
-  _applyHideWarningsToAllTables() {
-    this._applyHideWarnings(this.factionsTableTarget)
-    this._applyHideWarnings(this.versusTableTarget)
-    this._updateVersusVisibility()
   }
 
   _updateVersusVisibility() {
@@ -361,17 +343,23 @@ export default class extends Controller {
 
   _ratingCell(row) {
     if (row.rating == null) return '<td></td>'
-    const badge = row.provisional
-      ? ` <span class="status-badge status-badge--provisional">${this._e(this._provisionalLabel())}</span>`
-      : ''
-    return `<td>${row.rating} ± ${row.rating_deviation}${badge}</td>`
+    const badge = row.provisional ? ` ${this._badge(this._provisionalLabel())}` : ''
+    // Displayed rating is the lower bound R - 2·RD; R ± RD stays in the tooltip
+    const tooltip = `R ${row.rating} ± ${row.rating_deviation}`
+    return `<td title="${this._e(tooltip)}">${row.conservative_rating}${badge}</td>`
   }
 
-  // Effective vs actual contributors over the last 6 months (diversity of the faction rating)
-  _effectivePlayersCell(row) {
-    if (row.effective_players == null) return '<td></td>'
-    const effective = Number(row.effective_players).toFixed(1)
-    return `<td>${effective} / ${row.distinct_players}</td>`
+  // Concentration of the faction's recent games among players (Herfindahl index)
+  _concentrationCell(row) {
+    if (row.concentration == null) return '<td></td>'
+    const badge = row.high_concentration
+      ? ` ${this._badge(this.element.dataset.highConcentrationLabel, 'concentration')}`
+      : ''
+    return `<td>${Math.round(row.concentration * 100)}%${badge}</td>`
+  }
+
+  _badge(label, kind = 'provisional') {
+    return `<span class="status-badge status-badge--${kind}">${this._e(label)}</span>`
   }
 
   _provisionalLabel() {

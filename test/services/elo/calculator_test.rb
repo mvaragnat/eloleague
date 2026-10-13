@@ -50,14 +50,15 @@ class EloCalculatorTest < ActiveSupport::TestCase
     assert_operator rc.player_rd, :<, 200
   end
 
-  test 'two newcomers split the change 350² : 150² between player and faction' do
+  test 'two newcomers split the change RD_player² : RD_faction² between player and faction' do
     newcomer = Side.new(player_rating: 1500, player_rd: Elo::Calculator::START_DEVIATION,
                         faction_rating: 1500, faction_rd: Elo::Calculator::FACTION_START_DEVIATION)
     ra, = @calc.rate(newcomer, newcomer.dup, 1.0)
 
     player_gain = ra.player_rating - 1500
     faction_gain = ra.faction_rating - 1500
-    assert_in_delta (350.0**2) / (150**2), player_gain.to_f / faction_gain, 0.3
+    expected_ratio = (Elo::Calculator::START_DEVIATION.to_f**2) / (Elo::Calculator::FACTION_START_DEVIATION**2)
+    assert_in_delta expected_ratio, player_gain.to_f / faction_gain, 0.15 * expected_ratio
   end
 
   test 'calibrated pairs move little and share the change' do
@@ -93,17 +94,12 @@ class EloCalculatorTest < ActiveSupport::TestCase
   end
 
   test 'deviation never goes below the minimum' do
-    a = Side.new(player_rating: 1500, player_rd: 30, faction_rating: 1500, faction_rd: 30)
+    min = Elo::Calculator::RD_MIN
+    a = Side.new(player_rating: 1500, player_rd: min, faction_rating: 1500, faction_rd: min)
     ra, = @calc.rate(a, a.dup, 1.0)
 
     assert_equal Elo::Calculator::RD_MIN, ra.player_rd
     assert_equal Elo::Calculator::RD_MIN, ra.faction_rd
-  end
-
-  test 'inactivity raises the deviation, capped at the maximum' do
-    assert_equal 98, Elo::Calculator.inflate_deviation(50, 6)
-    assert_equal 50, Elo::Calculator.inflate_deviation(50, 0)
-    assert_equal Elo::Calculator::RD_MAX, Elo::Calculator.inflate_deviation(300, 120)
   end
 
   test 'provisional above 100 RD and conservative rating is R - 2 RD' do

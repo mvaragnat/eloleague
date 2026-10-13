@@ -5,7 +5,7 @@ module Elo
   class Updater
     Context = Struct.new(:event, :system)
     # Sliding window over which a faction's player concentration is measured.
-    DIVERSITY_WINDOW = 6.months
+    DIVERSITY_WINDOW = Calculator::DIVERSITY_WINDOW_MONTHS.months
 
     def initialize(calculator: Calculator.new)
       @calculator = calculator
@@ -33,7 +33,7 @@ module Elo
       players, factions, faction_rows = load_and_lock_ratings(p1, p2, ctx)
       diversities = factions.to_h { |row| [row.faction_id, faction_diversity(row.faction_id, event.played_at)] }
       sides = players.zip(faction_rows).map do |player, faction|
-        side_for(player, faction, diversities[faction.faction_id], event.played_at)
+        side_for(player, faction, diversities[faction.faction_id])
       end
 
       score = score_from_event(p1, p2)
@@ -73,22 +73,17 @@ module Elo
     end
 
     def find_or_create_faction_rating(faction, system)
-      FactionRating.find_or_create_by!(faction: faction) do |row|
-        row.game_system = system
-        row.rating_deviation = Calculator::FACTION_START_DEVIATION
-      end
+      FactionRating.find_or_create_by!(faction: faction) { |row| row.game_system = system }
     end
 
     def lock_in_order(rows)
       rows.sort_by { |row| [row.class.name, row.id] }.each(&:lock!)
     end
 
-    # The player's deviation grows back with inactivity before the game is rated.
-    def side_for(player, faction, diversity, played_at)
-      months = Calculator.months_between(player.last_played_at, played_at)
+    def side_for(player, faction, diversity)
       Calculator::Side.new(
         player_rating: player.rating,
-        player_rd: Calculator.inflate_deviation(player.rating_deviation, months),
+        player_rd: player.rating_deviation,
         faction_rating: faction.rating,
         faction_rd: faction.rating_deviation,
         faction_diversity: diversity.factor

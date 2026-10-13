@@ -1,6 +1,6 @@
 <% content_for :title, t('stats.title', default: 'Stats') %>
 
-<div class="stats-container" data-controller="stats" data-provisional-label="<%= t('elo.provisional') %>">
+<div class="stats-container" data-controller="stats" data-provisional-label="<%= t('elo.provisional') %>" data-high-concentration-label="<%= t('stats.high_concentration') %>">
   <div class="page-header">
     <h1><%= t('stats.title', default: 'Stats') %></h1>
   </div>
@@ -8,8 +8,12 @@
   <div class="card">
     <div class="flex flex-col gap-2 mb-3 sm:flex-row sm:items-center sm:gap-6">
       <label class="inline-flex items-center gap-2">
-        <input type="checkbox" class="h-4 w-4" checked data-stats-target="hideWarnings" data-action="change->stats#onFiltersChange">
-        <span><%= t('stats.hide_non_representative', default: 'Hide non-representative rows') %></span>
+        <input type="checkbox" class="h-4 w-4" data-stats-target="hideHighConcentration" data-action="change->stats#onFiltersChange">
+        <span><%= t('stats.hide_high_concentration') %></span>
+      </label>
+      <label class="inline-flex items-center gap-2">
+        <input type="checkbox" class="h-4 w-4" data-stats-target="hideHighUncertainty" data-action="change->stats#onFiltersChange">
+        <span><%= t('stats.hide_high_uncertainty') %></span>
       </label>
       <label class="inline-flex items-center gap-2">
         <input type="checkbox" class="h-4 w-4" data-stats-target="tournamentOnly" data-action="change->stats#onFiltersChange">
@@ -17,7 +21,9 @@
       </label>
     </div>
     <div class="hint text-sm text-gray-600 mb-3">
-      <%= t('stats.warning_hint', default: 'All rows are displayed. Warnings flag rows with low confidence data. Non-competitive games are excluded.') %>
+      <%= t('stats.badges_hint', concentration: (Elo::Calculator::HIGH_CONCENTRATION * 100).round,
+                              players: format('%g', (1 / Elo::Calculator::HIGH_CONCENTRATION).round(1)),
+                              deviation: Elo::Calculator::PROVISIONAL_RD) %>
     </div>
     <label for="system-select"><%= t('stats.system_label', default: 'Game system') %></label>
     <select id="system-select" class="input" data-stats-target="system" data-action="change->stats#onSystemChange">
@@ -36,8 +42,8 @@
           <thead>
             <tr>
               <th class="sortable" data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
-              <th class="sortable" data-action="click->stats#sort" data-key="rating" title="<%= t('stats.rating_hint') %>"><%= t('stats.rating') %></th>
-              <th class="sortable" data-action="click->stats#sort" data-key="effective_players" title="<%= t('stats.effective_players_hint') %>"><%= t('stats.effective_players') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="conservative_rating" title="<%= t('stats.rating_hint', factor: rating_factor) %>"><%= t('stats.rating') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="concentration" title="<%= t('stats.concentration_hint', months: Elo::Calculator::DIVERSITY_WINDOW_MONTHS) %>"><%= t('stats.concentration') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="total_games"><%= t('stats.total_games', default: 'Games') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
@@ -47,7 +53,6 @@
               <th class="sortable" data-action="click->stats#sort" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="win_loss_diff"><%= t('stats.win_loss_diff', default: 'W-L Diff') %></th>
-              <th class="sortable" data-action="click->stats#sort" data-key="warning_text"><%= t('stats.warning', default: 'Warning') %></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -75,7 +80,7 @@
     <div class="card-body">
       <div id="faction-graph" class="mt-2 chart-wrapper" hidden data-stats-target="chart" data-controller="elo-chart" data-elo-chart-series-value="[]">
         <svg data-elo-chart-target="chart" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;"></svg>
-        <div class="hint text-sm text-gray-500"><%= t('stats.rating_chart_hint') %></div>
+        <div class="hint text-sm text-gray-500"><%= t('stats.rating_chart_hint', factor: rating_factor) %></div>
       </div>
     </div>
 

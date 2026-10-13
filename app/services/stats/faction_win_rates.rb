@@ -5,8 +5,9 @@ module Stats
   # Mirrors: include in total games count but exclude from W/L/D and Win%.
   class FactionWinRates
     ResultRow = Struct.new(:faction_id, :faction_name, :total_games, :unique_players,
-                           :wins, :losses, :draws, :win_percent, :loss_percent, :draw_percent, :warnings,
-                           :rating, :rating_deviation, :provisional, :effective_players, :distinct_players,
+                           :wins, :losses, :draws, :win_percent, :loss_percent, :draw_percent,
+                           :rating, :rating_deviation, :conservative_rating, :provisional,
+                           :concentration, :high_concentration,
                            keyword_init: true)
 
     def initialize(game_system:, tournament_only: false)
@@ -37,8 +38,7 @@ module Stats
     def build_row_for_faction(faction, parts, parts_by_event)
       faction_parts = parts.select { |p| p.faction_id == faction.id }
       totals = totals_for(faction_parts, parts_by_event)
-      warnings = warnings_for(faction_parts)
-      rating = @ratings[faction.id]
+      rating = @ratings[faction.id] || FactionRating.new
 
       ResultRow.new(
         faction_id: faction.id,
@@ -51,47 +51,13 @@ module Stats
         win_percent: totals[:win_percent],
         loss_percent: totals[:loss_percent],
         draw_percent: totals[:draw_percent],
-        warnings: warnings,
-        rating: rating&.rating || FactionRating::START_RATING,
-        rating_deviation: rating&.rating_deviation || FactionRating::START_DEVIATION,
-        provisional: rating ? rating.provisional? : true,
-        effective_players: rating&.effective_players,
-        distinct_players: rating&.distinct_players
+        rating: rating.rating,
+        rating_deviation: rating.rating_deviation,
+        conservative_rating: rating.conservative_rating,
+        provisional: rating.provisional?,
+        concentration: rating.concentration&.round(3),
+        high_concentration: rating.high_concentration?
       ).to_h
-    end
-
-    def thresholds
-      Rails.application.config.x.stats
-    end
-
-    def warnings_for(faction_parts)
-      total_games = faction_parts.size
-      unique_players = faction_parts.map(&:user_id).uniq.size
-      warnings = []
-
-      if unique_players < thresholds.min_players
-        warnings << I18n.t('stats.warnings.insufficient_players',
-                           default: 'Number of players is insufficient')
-      end
-      if total_games < thresholds.min_games
-        warnings << I18n.t('stats.warnings.insufficient_games',
-                           default: 'Number of games is insufficient')
-      end
-
-      max_share = max_player_match_share(faction_parts, total_games)
-      return warnings unless max_share > thresholds.max_player_match_share_percent
-
-      warnings << I18n.t('stats.warnings.player_match_share',
-                         default: 'One player represents more than %<percent>s% of games',
-                         percent: thresholds.max_player_match_share_percent)
-      warnings
-    end
-
-    def max_player_match_share(faction_parts, total_games)
-      return 0.0 if total_games.zero?
-
-      max_games_by_player = faction_parts.group_by(&:user_id).values.map(&:size).max.to_i
-      (max_games_by_player.to_f * 100.0 / total_games).round(2)
     end
 
     def totals_for(faction_parts, parts_by_event)

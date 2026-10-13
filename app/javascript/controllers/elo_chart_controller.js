@@ -2,8 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 
 // A lightweight SVG chart renderer for ratings over time.
 // Expects data via data-elo-chart-series-value: an array of
-// [{ id, name, points: [{ t: epoch_ms, r: rating, rd: deviation }, ...], resets: [{ t: epoch_ms }, ...] }]
-// When points carry `rd`, a shaded band is drawn between r - rd and r + rd.
+// [{ id, name, band_factor, points: [{ t: epoch_ms, r: rating, rd: deviation }, ...], resets: [{ t: epoch_ms }, ...] }]
+// When points carry `rd`, a shaded band is drawn between r - k·rd and r + k·rd (k = band_factor, default 1).
 // Each reset (balance patch) is drawn as a vertical yellow bar.
 
 const SVG_NS = "http://www.w3.org/2000/svg"
@@ -25,7 +25,7 @@ export default class extends Controller {
     if (!series.length) return
 
     // Flatten points to compute domains
-    const allPoints = series.flatMap(s => s.points || [])
+    const allPoints = series.flatMap(s => (s.points || []).map(p => ({ ...p, band: (p.rd || 0) * (s.band_factor || 1) })))
     const allResets = series.flatMap(s => s.resets || [])
     if (!allPoints.length) return
     const allTimes = allPoints.map(p => p.t).concat(allResets.map(r => r.t))
@@ -33,8 +33,8 @@ export default class extends Controller {
     let maxT = Math.max(...allTimes)
     const now = Date.now()
     if (now > maxT) maxT = now
-    const minR = Math.min(...allPoints.map(p => p.r - (p.rd || 0)))
-    const maxR = Math.max(...allPoints.map(p => p.r + (p.rd || 0)))
+    const minR = Math.min(...allPoints.map(p => p.r - p.band))
+    const maxR = Math.max(...allPoints.map(p => p.r + p.band))
 
     const padding = { left: 40, right: 10, top: 10, bottom: 20 }
     const W = 800, H = 300
@@ -100,10 +100,11 @@ export default class extends Controller {
       if (!points.length) return
       const color = colors[idx % colors.length]
 
-      // Uncertainty band: r - rd .. r + rd
+      // Uncertainty band: r - k·rd .. r + k·rd
+      const k = s.band_factor || 1
       if (points.every(p => p.rd != null)) {
-        const upper = points.map(p => `${sx(p.t)} ${sy(p.r + p.rd)}`)
-        const lower = points.slice().reverse().map(p => `${sx(p.t)} ${sy(p.r - p.rd)}`)
+        const upper = points.map(p => `${sx(p.t)} ${sy(p.r + k * p.rd)}`)
+        const lower = points.slice().reverse().map(p => `${sx(p.t)} ${sy(p.r - k * p.rd)}`)
         const band = document.createElementNS(SVG_NS, "path")
         band.setAttribute("d", `M ${upper.join(" L ")} L ${lower.join(" L ")} Z`)
         band.setAttribute("fill", color)

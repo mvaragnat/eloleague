@@ -4,6 +4,7 @@ module Stats
   # Rating history of a faction for the chart: one point per rated game
   # ({ t: ms, r: rating, rd: deviation }) plus balance-patch resets, which both
   # add a point (the deviation jumps back up) and are listed for the chart to mark.
+  # `band_factor` sets the shaded band (R ± factor·RD): its lower edge is the displayed rating.
   class FactionRatingSeries
     def initialize(faction:)
       @faction = faction
@@ -16,6 +17,7 @@ module Stats
       [{
         id: @faction.id,
         name: @faction.localized_name,
+        band_factor: Elo::Calculator::CONSERVATIVE_FACTOR,
         points: build_points(changes, resets),
         resets: resets.map { |reset| { t: ms(reset.reset_at) } }
       }]

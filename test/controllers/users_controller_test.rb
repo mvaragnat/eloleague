@@ -20,7 +20,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   test 'player profile shows ratings and games' do
     # Ensure there is at least one rating and one change/event
     system = game_systems(:chess)
-    EloRating.create!(user: @user, game_system: system, rating: 1300, games_played: 2)
+    EloRating.create!(user: @user, game_system: system, rating: 1300, rating_deviation: 350, games_played: 2)
     event = game_events(:chess_game)
     EloChange.create!(user: @user, game_system: system, game_event: event,
                       rating_before: 1200, rating_after: 1210, rd_before: 350, rd_after: 300,
@@ -30,7 +30,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match(/#{@user.username}/, @response.body)
     assert_match(/#{system.name}/, @response.body)
-    assert_match(/1300 ± 350/, @response.body)
+    # Displayed rating is the lower bound R - 2·RD; R ± RD is in the tooltip
+    assert_match(/ELO :\s*600|ELO:\s*600/, @response.body)
+    assert_match(/R 1300 ± 350/, @response.body)
   end
 
   test 'should not include current user in search results' do
