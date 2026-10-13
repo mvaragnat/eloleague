@@ -34,9 +34,9 @@ class AvoEloRatingsAccessTest < ActionDispatch::IntegrationTest
   test 'reset action raises the deviation and records the reset' do
     faction = Game::Faction.create!(game_system: game_systems(:chess), name: 'Patched')
     rating = FactionRating.create!(faction: faction, game_system: faction.game_system, rating_deviation: 60)
-    Avo::Actions::ResetFactionRatingDeviation.new.handle(query: [faction], fields: { rating_deviation: '200' })
+    Avo::Actions::ResetFactionRatingDeviation.new.handle(query: [faction], fields: { rating_deviation: '150' })
 
-    assert_equal 200, rating.reload.rating_deviation
+    assert_equal 150, rating.reload.rating_deviation
     assert_equal 1, faction.faction_rating_resets.count
   end
 end

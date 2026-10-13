@@ -387,6 +387,14 @@ fr:
       long: "Le %d/%m/%Y à %Hh%M"
       card: "%d/%m/%Y"
   stats:
+    players_ranking:
+      title: "Classement des joueurs"
+      hint: "Tableau temporaire. Trié par défaut sur R − 2·RD, une estimation prudente qui place plus bas les joueurs avec peu de parties (incertitude élevée)."
+      conservative: "R − 2·RD"
+      conservative_hint: "Classement moins deux fois l'incertitude : le niveau que le joueur a très probablement au minimum. Utilisé pour le seeding."
+      empty: "Aucun joueur classé pour ce système de jeu."
+    effective_players: "Joueurs effectifs"
+    effective_players_hint: "Nombre effectif / réel de joueurs derrière le classement de cette faction sur les 6 derniers mois (indice de Herfindahl). Un ratio faible signifie que le classement reflète surtout un joueur : ses parties comptent moins pour la faction."
     rating_chart_hint: "Évolution du classement de la faction. La zone ombrée représente ± l'incertitude (RD) ; les barres jaunes marquent les patchs d'équilibrage."
     rating: "Classement"
     rating_hint: "Classement de la faction ± incertitude (RD), calculé sur toutes les parties compétitives indépendamment du niveau des joueurs."

@@ -34,12 +34,12 @@ class EloRebuildTaskTest < ActiveSupport::TestCase
   test 'elo:rebuild reproduces online results, including balance-patch resets' do
     play(3.months.ago, 20, 15)
     play(2.months.ago, 21, 15)
-    @f1.reset_rating_deviation!(340, at: 6.weeks.ago)
+    @f1.reset_rating_deviation!(150, at: 6.weeks.ago)
     play(1.month.ago, 10, 15)
-    @f2.reset_rating_deviation!(340, at: 1.week.ago) # after the last game
+    @f2.reset_rating_deviation!(150, at: 1.week.ago) # after the last game
 
     online = snapshot
-    assert_equal 340, FactionRating.find_by!(faction: @f2).rating_deviation
+    assert_equal 150, FactionRating.find_by!(faction: @f2).rating_deviation
 
     Rake::Task['elo:rebuild'].invoke
 

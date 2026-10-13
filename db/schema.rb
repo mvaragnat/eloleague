@@ -63,6 +63,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_12_090000) do
     t.integer "faction_rating_after"
     t.integer "faction_rd_before"
     t.integer "faction_rd_after"
+    t.float "faction_diversity"
     t.index ["faction_id"], name: "index_elo_changes_on_faction_id"
     t.index ["game_event_id", "user_id"], name: "index_elo_changes_on_game_event_id_and_user_id", unique: true
     t.index ["game_event_id"], name: "index_elo_changes_on_game_event_id"
@@ -98,8 +99,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_12_090000) do
     t.bigint "faction_id", null: false
     t.bigint "game_system_id", null: false
     t.integer "rating", default: 1500, null: false
-    t.integer "rating_deviation", default: 350, null: false
+    t.integer "rating_deviation", default: 150, null: false
     t.integer "games_played", default: 0, null: false
+    t.float "effective_players"
+    t.integer "distinct_players"
+    t.float "diversity"
     t.datetime "last_reset_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -6,7 +6,7 @@ module Stats
   class FactionWinRates
     ResultRow = Struct.new(:faction_id, :faction_name, :total_games, :unique_players,
                            :wins, :losses, :draws, :win_percent, :loss_percent, :draw_percent, :warnings,
-                           :rating, :rating_deviation, :provisional,
+                           :rating, :rating_deviation, :provisional, :effective_players, :distinct_players,
                            keyword_init: true)
 
     def initialize(game_system:, tournament_only: false)
@@ -54,7 +54,9 @@ module Stats
         warnings: warnings,
         rating: rating&.rating || FactionRating::START_RATING,
         rating_deviation: rating&.rating_deviation || FactionRating::START_DEVIATION,
-        provisional: rating ? rating.provisional? : true
+        provisional: rating ? rating.provisional? : true,
+        effective_players: rating&.effective_players,
+        distinct_players: rating&.distinct_players
       ).to_h
     end
 

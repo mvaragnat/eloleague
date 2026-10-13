@@ -4,6 +4,8 @@ module Elo
   # Applies a game's result to both players' and both factions' ratings.
   class Updater
     Context = Struct.new(:event, :system)
+    # Sliding window over which a faction's player concentration is measured.
+    DIVERSITY_WINDOW = 6.months
 
     def initialize(calculator: Calculator.new)
       @calculator = calculator
@@ -29,7 +31,10 @@ module Elo
       mirror = p1.faction_id == p2.faction_id
 
       players, factions, faction_rows = load_and_lock_ratings(p1, p2, ctx)
-      sides = players.zip(faction_rows).map { |player, faction| side_for(player, faction, event.played_at) }
+      diversities = factions.to_h { |row| [row.faction_id, faction_diversity(row.faction_id, event.played_at)] }
+      sides = players.zip(faction_rows).map do |player, faction|
+        side_for(player, faction, diversities[faction.faction_id], event.played_at)
+      end
 
       score = score_from_event(p1, p2)
       results = @calculator.rate(sides[0], sides[1], score, mirror: mirror)
@@ -38,7 +43,7 @@ module Elo
         persist_change(ctx, participation, sides[i], results[i], actual)
         persist_player(players[i], results[i], event.played_at)
       end
-      persist_factions(factions, faction_rows, results, mirror)
+      persist_factions(factions, faction_rows, results, mirror, diversities)
 
       event.update!(elo_applied: true)
     end
@@ -68,7 +73,10 @@ module Elo
     end
 
     def find_or_create_faction_rating(faction, system)
-      FactionRating.find_or_create_by!(faction: faction) { |row| row.game_system = system }
+      FactionRating.find_or_create_by!(faction: faction) do |row|
+        row.game_system = system
+        row.rating_deviation = Calculator::FACTION_START_DEVIATION
+      end
     end
 
     def lock_in_order(rows)
@@ -76,14 +84,27 @@ module Elo
     end
 
     # The player's deviation grows back with inactivity before the game is rated.
-    def side_for(player, faction, played_at)
+    def side_for(player, faction, diversity, played_at)
       months = Calculator.months_between(player.last_played_at, played_at)
       Calculator::Side.new(
         player_rating: player.rating,
         player_rd: Calculator.inflate_deviation(player.rating_deviation, months),
         faction_rating: faction.rating,
-        faction_rd: faction.rating_deviation
+        faction_rd: faction.rating_deviation,
+        faction_diversity: diversity.factor
       )
+    end
+
+    # Games per player with the faction over the window ending with this game (included).
+    # Based on played_at only, so a rebuild sees the same window as the live update.
+    def faction_diversity(faction_id, played_at)
+      counts = Game::Participation.joins(:game_event)
+                                  .where(faction_id: faction_id)
+                                  .where(game_events: { non_competitive: false,
+                                                        played_at: (played_at - DIVERSITY_WINDOW)..played_at })
+                                  .group(:user_id)
+                                  .count
+      Calculator.diversity(counts.values)
     end
 
     def score_from_event(participation1, participation2)
@@ -115,9 +136,10 @@ module Elo
     end
 
     # A mirror updates nothing on the faction; otherwise each faction takes its side's result.
-    def persist_factions(factions, faction_rows, results, mirror)
+    def persist_factions(factions, faction_rows, results, mirror, diversities)
+      factions.each { |row| row.assign_attributes(diversity_attributes(diversities[row.faction_id])) }
       if mirror
-        factions.each(&:save!) # persists a pending reset, if any
+        factions.each(&:save!) # persists a pending reset and the diversity
         return
       end
 
@@ -125,6 +147,11 @@ module Elo
         row.update!(rating: result.faction_rating, rating_deviation: result.faction_rd,
                     games_played: row.games_played + 1)
       end
+    end
+
+    def diversity_attributes(diversity)
+      { effective_players: diversity.effective_players.round(2), distinct_players: diversity.players,
+        diversity: diversity.factor.round(3) }
     end
 
     def persist_change(ctx, participation, side, result, actual)
@@ -141,6 +168,7 @@ module Elo
         faction_rating_after: result.faction_rating,
         faction_rd_before: side.faction_rd,
         faction_rd_after: result.faction_rd,
+        faction_diversity: side.diversity.round(3),
         expected_score: result.expected.round(3),
         actual_score: actual
       )

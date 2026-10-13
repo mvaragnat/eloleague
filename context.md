@@ -23,12 +23,13 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Required for all game participations
 
 ### Ratings (player + faction, Glicko-style)
-- Each player has one `EloRating` per game system and each faction one `FactionRating`: a rating `R` (start 1500) and a rating deviation `RD` (uncertainty, start 350, bounded to 30..350). All values are stored as integers; maths run in floats in `Elo::Calculator`.
+- Each player has one `EloRating` per game system and each faction one `FactionRating`: a rating `R` (start 1500) and a rating deviation `RD` (uncertainty). Players start at RD 350 (bounded to 30..350); factions start at RD 150 (bounded to 30..150, `Elo::Calculator::FACTION_START_DEVIATION` / `FACTION_RD_MAX`): the prior is that faction balance weighs less than player skill, so a new player and a new faction split a game's change about 84/16 instead of 50/50. All values are stored as integers; maths run in floats in `Elo::Calculator`.
 - A game rates the combined pair of each side: `R = R_player + R_faction`, `RD = sqrt(RD_player² + RD_faction²)`, then a standard Glicko update. The combined change is split between player and faction in proportion to `RD²` (Kalman filter): the most uncertain component absorbs most of the change, and each deviation shrinks as `RD'² = RD² · (1 − RD² / (RD_comb² + v))`.
 - Mirror matches (same faction on both sides) only update the players: the faction is left out of the combined uncertainty and its rating does not move.
 - A player's RD grows back with inactivity (`sqrt(RD² + 34.6² · months)`, capped at 350), computed from `played_at` (`EloRating#last_played_at`) so rebuilds are deterministic.
-- Factions have no time-based inflation. Admins record a balance patch with the Avo action "Reset rating deviation" on Game Factions (default RD 200): it creates a `FactionRatingReset` (history) and raises the current RD (never lowers it). Resets are replayed by `elo:rebuild`.
+- Factions have no time-based inflation. Admins record a balance patch with the Avo action "Reset rating deviation" on Game Factions (default RD 150, the faction maximum): it creates a `FactionRatingReset` (history) and raises the current RD (never lowers it). Resets are replayed by `elo:rebuild`.
 - `EloChange` stores, per event and player, the player and faction rating/RD before and after.
+- Player concentration per faction: over a 6-month window of competitive games ending with the rated game (included), `N_eff = 1 / Σ(share²)` (Herfindahl) and diversity `d = N_eff / N` (N = distinct players). The faction's share of the change becomes `weight_faction × d` (the player takes the rest), and the faction deviation uses the observation variance `v / d`, so it shrinks more slowly. `FactionRating` keeps the last `effective_players`, `distinct_players` and `diversity`; `EloChange#faction_diversity` keeps the factor used. A faction played by a single player has `d = 1` (not identifiable): the Stats "Effective players" column (`N_eff / N`) is the reliability signal.
 - A rating is "provisional" while `RD > 100` (badge on profiles and Stats). Elimination seeding sorts players by `R − 2·RD`.
 - `rails elo:rebuild` recomputes everything chronologically (optionally for one game system).
 
@@ -134,7 +135,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 ### Stats
 - All authenticated users can access a `Stats` page (`/stats`) to explore per-system and per-faction performance.
-- Selecting a game system reveals a sortable table of all factions with: faction rating (`R ± RD`, provisional badge), total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by Win% (descending) by default.
+- Selecting a game system reveals a sortable table of all factions with: faction rating (`R ± RD`, provisional badge), effective players over the last 6 months (`N_eff / N`), total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by Win% (descending) by default.
 - Selecting a faction shows:
   - A "Top players" table listing the 5 players with the most games on that faction (with profile links).
   - A rating-over-time graph: the faction rating with a shaded `± RD` band, and a vertical yellow bar at each balance-patch reset. It uses all competitive games (the tournament-only filter does not apply).
@@ -321,7 +322,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Elo Ratings resource:
   - Avo sidebar now includes Elo Rankings (EloRating) with RD and last played date. Index is filterable by Game System.
   - Faction Ratings (FactionRating) and Faction Rating Resets resources; faction ratings are filterable by Game System.
-  - Game Factions have a "Reset rating deviation (balance patch)" action (RD field, default 200) and list their resets.
+  - Game Factions have a "Reset rating deviation (balance patch)" action (RD field, default 150) and list their resets.
   - Game Events, Tournaments, Tournament Matches, and Tournament Registrations are also filterable by Game System in Avo. Matches and Registrations filter via the related Tournament’s Game System.
 
 ### API

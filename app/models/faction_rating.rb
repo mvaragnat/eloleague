@@ -2,7 +2,7 @@
 
 class FactionRating < ApplicationRecord
   START_RATING = Elo::Calculator::START_RATING
-  START_DEVIATION = Elo::Calculator::START_DEVIATION
+  START_DEVIATION = Elo::Calculator::FACTION_START_DEVIATION
 
   belongs_to :faction, class_name: 'Game::Faction'
   belongs_to :game_system, class_name: 'Game::System'
@@ -22,7 +22,7 @@ class FactionRating < ApplicationRecord
     reset = scope.order(:reset_at).last
     return unless reset
 
-    self.rating_deviation = [rating_deviation, reset.rating_deviation].max
+    self.rating_deviation = reset.rating_deviation.clamp(rating_deviation, Elo::Calculator::FACTION_RD_MAX)
     self.last_reset_at = reset.reset_at
   end
 end

@@ -45,13 +45,13 @@ module Elo
       assert_equal 1, f1.games_played
     end
 
-    test 'new player and new faction share the change equally' do
+    test 'a new player absorbs most of the change, a new faction a smaller share' do
       @updater.update_for_event(create_event(score1: 21, score2: 18))
 
-      r1 = rating(@user1)
-      f1 = @f1.reload.faction_rating
-      assert_equal r1.rating, f1.rating
-      assert_equal r1.rating_deviation, f1.rating_deviation
+      player_gain = rating(@user1).rating - 1500
+      faction_gain = @f1.reload.faction_rating.rating - 1500
+      assert_operator faction_gain, :positive?
+      assert_operator player_gain, :>, 4 * faction_gain
     end
 
     test 'records the change for each participant' do
@@ -62,7 +62,7 @@ module Elo
       assert_equal [1500, 350], [change.rating_before, change.rd_before]
       assert_equal rating(@user1).rating, change.rating_after
       assert_equal @f1.id, change.faction_id
-      assert_equal [1500, 350], [change.faction_rating_before, change.faction_rd_before]
+      assert_equal [1500, 150], [change.faction_rating_before, change.faction_rd_before]
       assert_equal @f1.reload.faction_rating.rating, change.faction_rating_after
       assert_in_delta 0.5, change.expected_score.to_f, 0.001
       assert_in_delta 1.0, change.actual_score.to_f, 0.001
@@ -81,7 +81,7 @@ module Elo
 
       assert_operator rating(@user1).rating, :>, 1500
       f1 = @f1.reload.faction_rating
-      assert_equal [1500, 350, 0], [f1.rating, f1.rating_deviation, f1.games_played]
+      assert_equal [1500, 150, 0], [f1.rating, f1.rating_deviation, f1.games_played]
     end
 
     test 'inactivity raises the player deviation before the next game' do
@@ -98,14 +98,14 @@ module Elo
     test 'a balance-patch reset raises the faction deviation for later games only' do
       3.times { |i| @updater.update_for_event(create_event(score1: 21, score2: 18, played_at: (10 - i).days.ago)) }
       calibrated = @f1.reload.faction_rating.rating_deviation
-      assert_operator calibrated, :<, 340
+      assert_operator calibrated, :<, 150
 
-      @f1.reset_rating_deviation!(340, at: 5.days.ago)
-      assert_equal 340, @f1.faction_rating.reload.rating_deviation
+      @f1.reset_rating_deviation!(150, at: 5.days.ago)
+      assert_equal 150, @f1.faction_rating.reload.rating_deviation
 
       event = create_event(score1: 21, score2: 18, played_at: 1.day.ago)
       @updater.update_for_event(event)
-      assert_equal 340, EloChange.find_by!(game_event: event, user: @user1).faction_rd_before
+      assert_equal 150, EloChange.find_by!(game_event: event, user: @user1).faction_rd_before
     end
 
     test 'a reset never lowers the deviation' do
@@ -142,6 +142,28 @@ module Elo
       assert_nil @f1.reload.faction_rating
       assert_equal 0, EloChange.where(game_event: event).count
       assert event.reload.elo_applied
+    end
+
+    test 'faction diversity is measured over the last six months, current game included' do
+      Game::Event.destroy_all # fixture games use the same faction
+      user3 = User.create!(username: 'third', email: 'third@example.com', password: 'password')
+      # user1 plays White 3 times; user3 once; an old game falls outside the window
+      [8.months.ago, 3.days.ago, 2.days.ago].each do |at|
+        @updater.update_for_event(create_event(score1: 21, score2: 18, played_at: at))
+      end
+      other = Game::Event.new(game_system: @system, played_at: 1.day.ago)
+      other.game_participations.build(user: user3, score: 21, faction: @f1)
+      other.game_participations.build(user: @user2, score: 18, faction: @f2)
+      other.save!
+      event = create_event(score1: 21, score2: 18, played_at: Time.current)
+      @updater.update_for_event(event)
+
+      # Window: user1 x3 (incl. current game), user3 x1 -> H = 0.625, N_eff = 1.6, d = 0.8
+      f1 = @f1.reload.faction_rating
+      assert_in_delta 1.6, f1.effective_players, 0.01
+      assert_equal 2, f1.distinct_players
+      assert_in_delta 0.8, f1.diversity, 0.001
+      assert_in_delta 0.8, EloChange.find_by!(game_event: event, user: @user1).faction_diversity, 0.001
     end
   end
 end

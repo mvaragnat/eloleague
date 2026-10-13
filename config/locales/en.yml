@@ -420,6 +420,14 @@ en:
       long: "%d/%m/%Y at %H:%M"
       card: "%d/%m/%Y"
   stats:
+    players_ranking:
+      title: "Player ranking"
+      hint: "Temporary table. Sorted by default on R − 2·RD, a cautious estimate that puts players with few games (high uncertainty) lower."
+      conservative: "R − 2·RD"
+      conservative_hint: "Rating minus twice the uncertainty: the level the player very likely has at least. Used for seeding."
+      empty: "No rated player for this game system yet."
+    effective_players: "Effective players"
+    effective_players_hint: "Effective / actual number of players behind this faction's rating over the last 6 months (Herfindahl index). A low ratio means the rating mostly reflects one player: its games count less for the faction."
     rating_chart_hint: "Faction rating over time. The shaded area shows ± uncertainty (RD); yellow bars mark balance patches."
     rating: "Rating"
     rating_hint: "Faction rating ± uncertainty (RD), computed from all competitive games independently of the players' level."

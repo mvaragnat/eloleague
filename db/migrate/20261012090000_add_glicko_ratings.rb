@@ -21,6 +21,7 @@ class AddGlickoRatings < ActiveRecord::Migration[8.0]
       t.integer :faction_rating_after
       t.integer :faction_rd_before
       t.integer :faction_rd_after
+      t.float :faction_diversity
     end
 
     create_faction_tables
@@ -33,6 +34,7 @@ class AddGlickoRatings < ActiveRecord::Migration[8.0]
     reset_ratings
 
     change_table :elo_changes, bulk: true do |t|
+      t.remove :faction_diversity, type: :float
       t.remove :faction_rd_after, :faction_rd_before, :faction_rating_after, :faction_rating_before,
                type: :integer
       t.remove_references :faction, foreign_key: { to_table: :game_factions }
@@ -55,8 +57,12 @@ class AddGlickoRatings < ActiveRecord::Migration[8.0]
                              foreign_key: { to_table: :game_factions, on_delete: :cascade }
       t.references :game_system, null: false, foreign_key: { to_table: :game_systems }
       t.integer :rating, null: false, default: 1500
-      t.integer :rating_deviation, null: false, default: 350
+      t.integer :rating_deviation, null: false, default: 150
       t.integer :games_played, null: false, default: 0
+      # Concentration of the faction's recent games among players (see Elo::Calculator.diversity)
+      t.float :effective_players
+      t.integer :distinct_players
+      t.float :diversity
       t.datetime :last_reset_at
       t.timestamps
     end

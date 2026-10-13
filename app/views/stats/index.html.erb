@@ -37,6 +37,7 @@
             <tr>
               <th class="sortable" data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="rating" title="<%= t('stats.rating_hint') %>"><%= t('stats.rating') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="effective_players" title="<%= t('stats.effective_players_hint') %>"><%= t('stats.effective_players') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="total_games"><%= t('stats.total_games', default: 'Games') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
@@ -52,6 +53,13 @@
           <tbody></tbody>
         </table>
       </div>
+    </div>
+
+    <%# Temporary: player ranking to check the rating parameters %>
+    <div id="players-ranking" class="mt-6" hidden data-stats-target="playersRanking">
+      <h3 class="mb-2"><%= t('stats.players_ranking.title') %></h3>
+      <div class="hint text-sm text-gray-500"><%= t('stats.players_ranking.hint') %></div>
+      <div data-stats-target="playersRankingBody"></div>
     </div>
   </div>
 

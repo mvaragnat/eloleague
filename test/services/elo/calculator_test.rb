@@ -38,7 +38,26 @@ class EloCalculatorTest < ActiveSupport::TestCase
     a, = @calc.rate(@veteran, @newcomer, 1.0)
 
     assert_equal 50, a.player_rd # 49.8, rounded
-    assert_equal 261, a.faction_rd
+    # 261 by the spec maths, then capped at the faction maximum
+    assert_equal Elo::Calculator::FACTION_RD_MAX, a.faction_rd
+  end
+
+  test 'faction deviation shrinks below its cap' do
+    c = Side.new(player_rating: 1700, player_rd: 200, faction_rating: 1550, faction_rd: 120)
+    rc, = @calc.rate(c, c.dup, 1.0)
+
+    assert_operator rc.faction_rd, :<, 120
+    assert_operator rc.player_rd, :<, 200
+  end
+
+  test 'two newcomers split the change 350² : 150² between player and faction' do
+    newcomer = Side.new(player_rating: 1500, player_rd: Elo::Calculator::START_DEVIATION,
+                        faction_rating: 1500, faction_rd: Elo::Calculator::FACTION_START_DEVIATION)
+    ra, = @calc.rate(newcomer, newcomer.dup, 1.0)
+
+    player_gain = ra.player_rating - 1500
+    faction_gain = ra.faction_rating - 1500
+    assert_in_delta (350.0**2) / (150**2), player_gain.to_f / faction_gain, 0.3
   end
 
   test 'calibrated pairs move little and share the change' do
@@ -91,5 +110,35 @@ class EloCalculatorTest < ActiveSupport::TestCase
     assert Elo::Calculator.provisional?(101)
     assert_not Elo::Calculator.provisional?(100)
     assert_equal 1400, Elo::Calculator.conservative(1600, 100)
+  end
+
+  test 'diversity follows the Herfindahl index (spec example 5.4)' do
+    # 18 + 1 + 1 + 1 = 21 games (the spec divides by 20, which gives N_eff 1.22 and d 0.30)
+    d = Elo::Calculator.diversity([18, 1, 1, 1])
+
+    assert_in_delta 1.349, d.effective_players, 0.001 # H = 0.7415
+    assert_equal 4, d.players
+    assert_in_delta 0.337, d.factor, 0.001
+  end
+
+  test 'diversity is neutral without data and for evenly shared factions' do
+    assert_in_delta 1.0, Elo::Calculator.diversity([]).factor, 1e-9
+    assert_in_delta 1.0, Elo::Calculator.diversity([5, 5, 5]).factor, 1e-9
+  end
+
+  test 'a concentrated faction moves less and the player absorbs the rest' do
+    full = @calc.rate(@veteran, @newcomer, 1.0).first
+    concentrated = @calc.rate(Side.new(**@veteran.to_h, faction_diversity: 0.3), @newcomer, 1.0).first
+    known = Side.new(**@veteran.to_h, faction_rd: 120)
+    known_full = @calc.rate(known, @newcomer, 1.0).first
+    known_concentrated = @calc.rate(Side.new(**known.to_h, faction_diversity: 0.3), @newcomer, 1.0).first
+
+    # Same combined change (87.2), faction weight 0.973 * 0.3
+    assert_equal 1500 + (84.8 * 0.3).round, concentrated.faction_rating
+    assert_equal 1800 + (87.2 - (84.8 * 0.3)).round, concentrated.player_rating
+    assert_operator full.faction_rating, :>, concentrated.faction_rating
+    # v / d: the faction deviation shrinks more slowly
+    assert_operator known_concentrated.faction_rd, :>, known_full.faction_rd
+    assert_operator known_concentrated.faction_rd, :<, 120
   end
 end

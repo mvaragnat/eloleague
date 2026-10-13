@@ -13,7 +13,9 @@ export default class extends Controller {
     "chart",
     "hideWarnings",
     "tournamentOnly",
-    "factionGames"
+    "factionGames",
+    "playersRanking",
+    "playersRankingBody"
   ]
 
   connect() {
@@ -38,12 +40,16 @@ export default class extends Controller {
     this._setHidden(this.versusTableTarget.closest('#versus-table'), true)
     this._setHidden(this.topPlayersTarget, true)
     this._setHidden(this.factionGamesTarget, true)
+    this._setHidden(this.playersRankingTarget, true)
     // Ensure inner elements are not stuck hidden from a previous state
     this.factionsTableTarget.hidden = false
     if (this.chartTarget) this.chartTarget.hidden = false
     if (!systemId) return
 
-    await this._loadFactionsTable(systemId)
+    await Promise.all([
+      this._loadFactionsTable(systemId),
+      this._loadPlayersRanking(systemId)
+    ])
     await this._loadFactionOptions(systemId)
   }
 
@@ -99,6 +105,7 @@ export default class extends Controller {
       <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
         <td>${this._e(row.faction_name)}</td>
         ${this._ratingCell(row)}
+        ${this._effectivePlayersCell(row)}
         <td>${row.total_games}</td>
         <td>${row.unique_players}</td>
         <td>${row.wins}</td>
@@ -115,6 +122,14 @@ export default class extends Controller {
     const wrapper = this.factionsTableTarget.closest('#factions-table')
     this._setHidden(wrapper, false)
     this.factionsTableTarget.hidden = false
+  }
+
+  // Temporary: player ranking by R - 2·RD (server-rendered, sorted client-side by table-sort)
+  async _loadPlayersRanking(systemId) {
+    const url = this._url(`/stats/players?game_system_id=${encodeURIComponent(systemId)}`)
+    const res = await fetch(url, { headers: { 'Accept': 'text/html' } })
+    this.playersRankingBodyTarget.innerHTML = await res.text()
+    this._setHidden(this.playersRankingTarget, false)
   }
 
   async _loadFactionOptions(systemId) {
@@ -248,6 +263,7 @@ export default class extends Controller {
           <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
             <td>${this._e(row.faction_name)}</td>
             ${this._ratingCell(row)}
+            ${this._effectivePlayersCell(row)}
             <td>${row.total_games}</td>
             <td>${row.unique_players}</td>
             <td>${row.wins}</td>
@@ -349,6 +365,13 @@ export default class extends Controller {
       ? ` <span class="status-badge status-badge--provisional">${this._e(this._provisionalLabel())}</span>`
       : ''
     return `<td>${row.rating} ± ${row.rating_deviation}${badge}</td>`
+  }
+
+  // Effective vs actual contributors over the last 6 months (diversity of the faction rating)
+  _effectivePlayersCell(row) {
+    if (row.effective_players == null) return '<td></td>'
+    const effective = Number(row.effective_players).toFixed(1)
+    return `<td>${effective} / ${row.distinct_players}</td>`
   }
 
   _provisionalLabel() {
