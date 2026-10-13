@@ -77,4 +77,4 @@ group :test do
 end
 gem 'avo', '>= 3.2'
 
-gem "caxlsx", "~> 4.5"
+gem 'caxlsx', '~> 4.5'
