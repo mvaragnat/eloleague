@@ -1,0 +1,7 @@
+<p><%= t('mailers.user_notifications.hello', username: @user.username) %>,</p>
+
+<p><%= t('mailers.tournament_organizer.members_export.body_html', tournament: @tournament.name) %></p>
+
+<p>
+  <a href="<%= @tournament_url %>"><%= @tournament.name %></a>
+</p>
