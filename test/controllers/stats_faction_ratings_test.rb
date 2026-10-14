@@ -52,9 +52,9 @@ class StatsFactionRatingsTest < ActionDispatch::IntegrationTest
     assert row['high_concentration']
   end
 
-  test 'players ranking is sorted by R - 2 RD and requires authentication' do
+  test 'players ranking page is sorted by R - 2 RD and requires authentication' do
     system = game_systems(:chess)
-    get stats_players_path, params: { game_system_id: system.id }
+    get stats_players_ranking_path, params: { game_system_id: system.id }
     assert_response :redirect
 
     user = User.create!(username: 'ranker', email: 'ranker@example.com', password: 'password123',
@@ -64,10 +64,18 @@ class StatsFactionRatingsTest < ActionDispatch::IntegrationTest
     EloRating.create!(user: newcomer, game_system: system, rating: 1900, rating_deviation: 250) # 1400
     EloRating.create!(user: user, game_system: system, rating: 1700, rating_deviation: 60)      # 1580
 
-    get stats_players_path, params: { game_system_id: system.id }
+    get stats_players_ranking_path, params: { game_system_id: system.id }
     assert_response :success
+    assert_select 'h1', I18n.t('stats.players_ranking.title')
     assert_operator response.body.index('ranker'), :<, response.body.index('lucky')
     assert_includes response.body, '1580'
     assert_includes response.body, 'status-badge--provisional'
+  end
+
+  test 'stats page no longer shows the players ranking' do
+    sign_in users(:player_one), scope: :user
+    get stats_path
+    assert_response :success
+    assert_not_includes response.body, I18n.t('stats.players_ranking.title')
   end
 end

@@ -14,9 +14,7 @@ export default class extends Controller {
     "hideHighConcentration",
     "hideHighUncertainty",
     "tournamentOnly",
-    "factionGames",
-    "playersRanking",
-    "playersRankingBody"
+    "factionGames"
   ]
 
   connect() {
@@ -42,16 +40,12 @@ export default class extends Controller {
     this._setHidden(this.versusTableTarget.closest('#versus-table'), true)
     this._setHidden(this.topPlayersTarget, true)
     this._setHidden(this.factionGamesTarget, true)
-    this._setHidden(this.playersRankingTarget, true)
     // Ensure inner elements are not stuck hidden from a previous state
     this.factionsTableTarget.hidden = false
     if (this.chartTarget) this.chartTarget.hidden = false
     if (!systemId) return
 
-    await Promise.all([
-      this._loadFactionsTable(systemId),
-      this._loadPlayersRanking(systemId)
-    ])
+    await this._loadFactionsTable(systemId)
     await this._loadFactionOptions(systemId)
   }
 
@@ -109,14 +103,6 @@ export default class extends Controller {
     const wrapper = this.factionsTableTarget.closest('#factions-table')
     this._setHidden(wrapper, false)
     this.factionsTableTarget.hidden = false
-  }
-
-  // Temporary: player ranking by R - 2·RD (server-rendered, sorted client-side by table-sort)
-  async _loadPlayersRanking(systemId) {
-    const url = this._url(`/stats/players?game_system_id=${encodeURIComponent(systemId)}`)
-    const res = await fetch(url, { headers: { 'Accept': 'text/html' } })
-    this.playersRankingBodyTarget.innerHTML = await res.text()
-    this._setHidden(this.playersRankingTarget, false)
   }
 
   _factionRow(row) {

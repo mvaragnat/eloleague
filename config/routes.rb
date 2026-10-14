@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     # Stats (accessible to authenticated users via ApplicationController)
     get 'stats', to: 'stats#index', as: :stats
     get 'stats/factions', to: 'stats#factions', as: :stats_factions
-    get 'stats/players', to: 'stats#players', as: :stats_players
+    get 'stats/players_ranking', to: 'stats#players_ranking', as: :stats_players_ranking
     get 'stats/faction_vs', to: 'stats#faction_vs', as: :stats_faction_vs
     get 'stats/faction_rating_series', to: 'stats#faction_rating_series', as: :stats_faction_rating_series
     get 'stats/faction_top_players', to: 'stats#faction_top_players', as: :stats_faction_top_players
