@@ -1,0 +1,35 @@
+<% if @player_ratings.any? %>
+  <div class="table-responsive" data-controller="table-sort">
+    <table class="table" data-sort-index="2" data-sort-direction="desc">
+      <thead>
+        <tr>
+          <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number">#</th>
+          <th class="sortable" data-action="click->table-sort#sort" data-sort-type="text"><%= t('elo.player') %></th>
+          <th class="sortable is-sorted" aria-sort="descending" data-action="click->table-sort#sort" data-sort-type="number" title="<%= t('stats.players_ranking.conservative_hint', factor: rating_factor) %>"><%= t('stats.players_ranking.conservative', factor: rating_factor) %></th>
+          <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.rating') %></th>
+          <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number">RD</th>
+          <th class="sortable" data-action="click->table-sort#sort" data-sort-type="number"><%= t('stats.total_games', default: 'Games') %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @player_ratings.each_with_index do |row, index| %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td>
+              <%= link_to row.user.username, user_path(row.user) %>
+              <% if row.provisional? %>
+                <span class="status-badge status-badge--provisional"><%= t('elo.provisional') %></span>
+              <% end %>
+            </td>
+            <td><%= row.conservative_rating %></td>
+            <td><%= row.rating %></td>
+            <td><%= row.rating_deviation %></td>
+            <td><%= row.games_played %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p class="card-date"><%= t('stats.players_ranking.empty') %></p>
+<% end %>

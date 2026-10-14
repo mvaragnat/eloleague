@@ -11,13 +11,15 @@ export default class extends Controller {
     "topPlayers",
     "topPlayersTable",
     "chart",
-    "hideWarnings",
+    "hideHighConcentration",
+    "hideHighUncertainty",
     "tournamentOnly",
     "factionGames"
   ]
 
   connect() {
-    this._factionsSort = { key: "win_percent", dir: "desc" }
+    // Factions default to the displayed rating (R - 2·RD), best first
+    this._factionsSort = { key: "conservative_rating", dir: "desc" }
     this._vsSort = { key: "games", dir: "desc" }
     this._factionOptions = []
     this._lastTournamentOnly = this._tournamentOnlyEnabled()
@@ -64,7 +66,7 @@ export default class extends Controller {
   }
 
   async onFiltersChange() {
-    this._applyHideWarningsToAllTables()
+    this._applyFactionFilters()
 
     const tournamentOnly = this._tournamentOnlyEnabled()
     const tournamentOnlyChanged = tournamentOnly !== this._lastTournamentOnly
@@ -79,8 +81,8 @@ export default class extends Controller {
     const factionId = this.factionTarget.value
     if (!factionId) return
 
+    // The rating chart uses every competitive game and ignores the tournament-only filter
     await Promise.all([
-      this._loadFactionSeries(factionId),
       this._loadTopPlayers(factionId),
       this._loadVersusTable(factionId),
       this._loadFactionGames(factionId)
@@ -94,10 +96,21 @@ export default class extends Controller {
     const url = this._url(this._withStatsFilters(`/stats/factions?game_system_id=${encodeURIComponent(systemId)}`))
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
-    this._factionsData = this._normalizeRows(data.rows || [])
-    this._renderRows(this.factionsTableTarget, this._factionsData, row => `
-      <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
+    this._factionsData = this._sortData(this._normalizeRows(data.rows || []), this._factionsSort)
+    this._markSortedHeader(this.factionsTableTarget, this._factionsSort)
+    this._renderRows(this.factionsTableTarget, this._factionsData, row => this._factionRow(row))
+    // Show both wrapper and table
+    const wrapper = this.factionsTableTarget.closest('#factions-table')
+    this._setHidden(wrapper, false)
+    this.factionsTableTarget.hidden = false
+  }
+
+  _factionRow(row) {
+    return `
+      <tr data-faction-id="${row.faction_id}" data-high-concentration="${row.high_concentration}" data-high-uncertainty="${row.provisional}">
         <td>${this._e(row.faction_name)}</td>
+        ${this._ratingCell(row)}
+        ${this._concentrationCell(row)}
         <td>${row.total_games}</td>
         <td>${row.unique_players}</td>
         <td>${row.wins}</td>
@@ -107,13 +120,8 @@ export default class extends Controller {
         <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
         <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
         ${this._diffCell(row.win_loss_diff)}
-        <td>${this._e(row.warning_text)}</td>
       </tr>
-    `)
-    // Show both wrapper and table
-    const wrapper = this.factionsTableTarget.closest('#factions-table')
-    this._setHidden(wrapper, false)
-    this.factionsTableTarget.hidden = false
+    `
   }
 
   async _loadFactionOptions(systemId) {
@@ -130,7 +138,7 @@ export default class extends Controller {
   }
 
   async _loadFactionSeries(factionId) {
-    const url = this._url(this._withStatsFilters(`/stats/faction_winrate_series?faction_id=${encodeURIComponent(factionId)}`))
+    const url = this._url(`/stats/faction_rating_series?faction_id=${encodeURIComponent(factionId)}`)
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
     const series = data.series || []
@@ -212,7 +220,7 @@ export default class extends Controller {
   _renderRows(tableEl, rows, templateFn) {
     const tbody = tableEl.querySelector('tbody')
     tbody.innerHTML = rows.map(templateFn).join('')
-    this._applyHideWarnings(tableEl)
+    if (tableEl === this.factionsTableTarget) this._applyFactionFilters()
   }
 
   _sortTable(ev, tableEl, dataKey, state) {
@@ -225,40 +233,10 @@ export default class extends Controller {
       state.key = key
       state.dir = 'asc'
     }
-    // Update header visual states
-    tableEl.querySelectorAll('th.sortable').forEach(h => { h.classList.remove('is-sorted'); h.removeAttribute('aria-sort') })
-    th.classList.add('is-sorted')
-    th.setAttribute('aria-sort', state.dir === 'asc' ? 'ascending' : 'descending')
-    const data = this[dataKey] || []
-    data.sort((a, b) => {
-      const va = a[key]
-      const vb = b[key]
-      if (va == null && vb != null) return 1
-      if (va != null && vb == null) return -1
-      if (va == null && vb == null) return 0
-      if (typeof va === 'string') {
-        return state.dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
-      }
-      return state.dir === 'asc' ? (va - vb) : (vb - va)
-    })
+    this._markSortedHeader(tableEl, state)
+    const data = this._sortData(this[dataKey] || [], state)
     this._renderRows(tableEl, data, row => {
-      if (dataKey === '_factionsData') {
-        return `
-          <tr data-faction-id="${row.faction_id}" data-has-warning="${row.has_warning}">
-            <td>${this._e(row.faction_name)}</td>
-            <td>${row.total_games}</td>
-            <td>${row.unique_players}</td>
-            <td>${row.wins}</td>
-            <td>${row.losses}</td>
-            <td>${row.draws}</td>
-            <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
-            <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
-            <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
-            ${this._diffCell(row.win_loss_diff)}
-            <td>${this._e(row.warning_text)}</td>
-          </tr>
-        `
-      }
+      if (dataKey === '_factionsData') return this._factionRow(row)
       return `
         <tr data-has-warning="${row.has_warning}">
           <td>${this._e(row.opponent_faction_name)}</td>
@@ -275,6 +253,32 @@ export default class extends Controller {
           <td>${this._e(row.warning_text)}</td>
         </tr>
       `
+    })
+  }
+
+  _sortData(data, { key, dir }) {
+    return data.sort((a, b) => {
+      const va = a[key]
+      const vb = b[key]
+      if (va == null && vb != null) return 1
+      if (va != null && vb == null) return -1
+      if (va == null && vb == null) return 0
+      if (typeof va === 'string') {
+        return dir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va)
+      }
+      return dir === 'asc' ? (va - vb) : (vb - va)
+    })
+  }
+
+  _markSortedHeader(tableEl, { key, dir }) {
+    tableEl.querySelectorAll('th.sortable').forEach(h => {
+      const sorted = h.dataset.key === key
+      h.classList.toggle('is-sorted', sorted)
+      if (sorted) {
+        h.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : 'descending')
+      } else {
+        h.removeAttribute('aria-sort')
+      }
     })
   }
 
@@ -298,18 +302,14 @@ export default class extends Controller {
     })
   }
 
-  _applyHideWarnings(tableEl) {
-    const hide = this.hideWarningsTarget ? this.hideWarningsTarget.checked : true
-    tableEl.querySelectorAll('tbody tr').forEach(row => {
-      const hasWarning = row.dataset.hasWarning === 'true'
-      row.hidden = hide && hasWarning
+  // Hide factions flagged with the "high concentration" and/or "high uncertainty" badges
+  _applyFactionFilters() {
+    const hideConcentration = this.hasHideHighConcentrationTarget && this.hideHighConcentrationTarget.checked
+    const hideUncertainty = this.hasHideHighUncertaintyTarget && this.hideHighUncertaintyTarget.checked
+    this.factionsTableTarget.querySelectorAll('tbody tr').forEach(row => {
+      row.hidden = (hideConcentration && row.dataset.highConcentration === 'true') ||
+        (hideUncertainty && row.dataset.highUncertainty === 'true')
     })
-  }
-
-  _applyHideWarningsToAllTables() {
-    this._applyHideWarnings(this.factionsTableTarget)
-    this._applyHideWarnings(this.versusTableTarget)
-    this._updateVersusVisibility()
   }
 
   _updateVersusVisibility() {
@@ -339,6 +339,31 @@ export default class extends Controller {
     const cls = abs > 15 ? ' class="text-red"' : ''
     const sign = val > 0 ? '+' : ''
     return `<td${cls}>${sign}${val}%</td>`
+  }
+
+  _ratingCell(row) {
+    if (row.rating == null) return '<td></td>'
+    const badge = row.provisional ? ` ${this._badge(this._provisionalLabel())}` : ''
+    // Displayed rating is the lower bound R - 2·RD; R ± RD stays in the tooltip
+    const tooltip = `R ${row.rating} ± ${row.rating_deviation}`
+    return `<td title="${this._e(tooltip)}">${row.conservative_rating}${badge}</td>`
+  }
+
+  // Concentration of the faction's recent games among players (Herfindahl index)
+  _concentrationCell(row) {
+    if (row.concentration == null) return '<td></td>'
+    const badge = row.high_concentration
+      ? ` ${this._badge(this.element.dataset.highConcentrationLabel, 'concentration')}`
+      : ''
+    return `<td>${Math.round(row.concentration * 100)}%${badge}</td>`
+  }
+
+  _badge(label, kind = 'provisional') {
+    return `<span class="status-badge status-badge--${kind}">${this._e(label)}</span>`
+  }
+
+  _provisionalLabel() {
+    return this.element.dataset.provisionalLabel || 'Provisional'
   }
 
   _setHidden(el, hidden) { if (el) el.hidden = hidden }

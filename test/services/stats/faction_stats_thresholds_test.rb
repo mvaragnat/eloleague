@@ -24,18 +24,6 @@ module Stats
       assert_equal 11, f1_row[:total_games]
     end
 
-    test 'global winrates marks low-reliability rows with warnings instead of filtering' do
-      create_competitive_series(6)
-      Rails.application.config.x.stats.min_players = 10
-      Rails.application.config.x.stats.min_games = 10
-
-      rows = Stats::FactionWinRates.new(game_system: @system).call
-      f1_row = rows.find { |r| r[:faction_id] == @f1.id }
-      assert f1_row, 'F1 row should be present'
-      assert_includes f1_row[:warnings], I18n.t('stats.warnings.insufficient_players')
-      assert_includes f1_row[:warnings], I18n.t('stats.warnings.insufficient_games')
-    end
-
     test 'versus table keeps rows below thresholds and exposes warnings' do
       create_competitive_series(6)
       Rails.application.config.x.stats.min_matchup_players = 10
@@ -49,26 +37,24 @@ module Stats
       assert_includes f2_row[:warnings], I18n.t('stats.warnings.insufficient_games')
     end
 
-    test 'global winrates are sorted by win_percent desc by default' do
-      create_competitive_series(11)
+    test 'global winrates are sorted by displayed rating desc by default' do
+      FactionRating.create!(faction: @f1, game_system: @system, rating: 1400, rating_deviation: 100) # 1200
+      FactionRating.create!(faction: @f2, game_system: @system, rating: 1500, rating_deviation: 50)  # 1400
       rows = Stats::FactionWinRates.new(game_system: @system).call
-      assert rows.size >= 2, 'Expected at least two factions in results'
-      # F1 wins all games in setup, should be first
-      assert_equal @f1.id, rows.first[:faction_id]
-      assert rows.first[:win_percent] >= rows.second[:win_percent]
+
+      assert_equal [@f2.id, @f1.id], rows.pluck(:faction_id)
     end
 
-    test 'global winrates warns when one player over-represents games' do
-      create_dominated_series(10)
-      Rails.application.config.x.stats.max_player_match_share_percent = 50
+    test 'global winrates expose the faction concentration and its badge' do
+      FactionRating.create!(faction: @f1, game_system: @system, effective_players: 1.25, distinct_players: 3)
+      FactionRating.create!(faction: @f2, game_system: @system, effective_players: 4.0, distinct_players: 4)
 
-      rows = Stats::FactionWinRates.new(game_system: @system).call
-      f1_row = rows.find { |r| r[:faction_id] == @f1.id }
-
-      assert f1_row, 'F1 row should be present'
-      assert_includes f1_row[:warnings],
-                      I18n.t('stats.warnings.player_match_share',
-                             percent: Rails.application.config.x.stats.max_player_match_share_percent)
+      rows = Stats::FactionWinRates.new(game_system: @system).call.index_by { |r| r[:faction_id] }
+      assert_in_delta 0.8, rows[@f1.id][:concentration], 0.001
+      assert rows[@f1.id][:high_concentration]
+      assert_in_delta 0.25, rows[@f2.id][:concentration], 0.001
+      assert_not rows[@f2.id][:high_concentration]
+      assert_not rows[@f1.id].key?(:warnings)
     end
 
     private
@@ -144,22 +130,6 @@ module Stats
           game_participations_attributes: [
             { user_id: @users.first.id, faction_id: @f1.id, score: 1 },
             { user_id: @users.last.id, faction_id: @f2.id, score: 0 }
-          ]
-        )
-      end
-    end
-
-    def create_dominated_series(num)
-      opponents = @users.drop(1)
-      num.times do |i|
-        b_user = opponents[i % opponents.size]
-        Game::Event.create!(
-          game_system: @system,
-          played_at: 2.hours.from_now + i.minutes,
-          non_competitive: false,
-          game_participations_attributes: [
-            { user_id: @users.first.id, faction_id: @f1.id, score: 10 },
-            { user_id: b_user.id, faction_id: @f2.id, score: 0 }
           ]
         )
       end

@@ -12,10 +12,12 @@ namespace :elo do
       puts "Scoped rebuild for game_system_id=#{system_id}"
       EloRating.where(game_system_id: system_id).delete_all
       EloChange.where(game_system_id: system_id).delete_all
+      FactionRating.where(game_system_id: system_id).delete_all
     else
       puts 'Global rebuild for all systems'
       EloRating.delete_all
       EloChange.delete_all
+      FactionRating.delete_all
     end
 
     # Use explicit ordering and batch pagination without find_each to respect order
@@ -43,6 +45,15 @@ namespace :elo do
       end
 
       offset += batch_size
+    end
+
+    # Balance patches recorded after a faction's last game still raise its deviation
+    faction_ratings = FactionRating.all
+    faction_ratings = faction_ratings.where(game_system_id: system_id) if scoped
+    now = Time.current
+    faction_ratings.find_each do |row|
+      row.apply_pending_reset(now)
+      row.save! if row.changed?
     end
 
     puts "Recomputed Elo for #{count} events..."
