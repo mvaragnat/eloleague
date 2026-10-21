@@ -42,7 +42,8 @@
           <thead>
             <tr>
               <th class="sortable" data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
-              <th class="sortable" data-action="click->stats#sort" data-key="conservative_rating" title="<%= t('stats.rating_hint', factor: rating_factor) %>"><%= t('stats.rating') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="rating" title="<%= t('stats.rating_hint') %>"><%= t('stats.rating') %></th>
+              <th class="sortable" data-action="click->stats#sort" data-key="rating_deviation" title="<%= t('stats.uncertainty_hint') %>"><%= t('stats.uncertainty') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="concentration" title="<%= t('stats.concentration_hint', months: Elo::Calculator::DIVERSITY_WINDOW_MONTHS) %>"><%= t('stats.concentration') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="total_games"><%= t('stats.total_games', default: 'Games') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="unique_players"><%= t('stats.unique_players', default: 'Players') %></th>
@@ -73,7 +74,7 @@
     <div class="card-body">
       <div id="faction-graph" class="mt-2 chart-wrapper" hidden data-stats-target="chart" data-controller="elo-chart" data-elo-chart-series-value="[]">
         <svg data-elo-chart-target="chart" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;"></svg>
-        <div class="hint text-sm text-gray-500"><%= t('stats.rating_chart_hint', factor: rating_factor) %></div>
+        <div class="hint text-sm text-gray-500"><%= t('stats.rating_chart_hint') %></div>
       </div>
     </div>
 

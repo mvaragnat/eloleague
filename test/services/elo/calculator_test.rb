@@ -6,7 +6,8 @@ class EloCalculatorTest < ActiveSupport::TestCase
   Side = Elo::Calculator::Side
 
   def setup
-    @calc = Elo::Calculator.new
+    # Spec sections 3 to 6: plain additive model R_player + R_faction
+    @calc = Elo::Calculator.new(player_influence: nil)
     # Example 1/2 of the spec: veteran on a rare faction vs newcomer on a well-known faction
     @veteran = Side.new(player_rating: 1800, player_rd: 50, faction_rating: 1500, faction_rd: 300)
     @newcomer = Side.new(player_rating: 1500, player_rd: 300, faction_rating: 1600, faction_rd: 80)
@@ -136,5 +137,42 @@ class EloCalculatorTest < ActiveSupport::TestCase
     # v / d: the faction deviation shrinks more slowly
     assert_operator known_concentrated.faction_rd, :>, known_full.faction_rd
     assert_operator known_concentrated.faction_rd, :<, 120
+  end
+
+  test 'player influence a = 0.7 caps the faction weight (spec example 7.3)' do
+    a, = Elo::Calculator.new(player_influence: 0.7).rate(@veteran, @newcomer, 1.0)
+
+    assert_in_delta 0.703, a.expected, 0.001
+    assert_equal 1801, a.player_rating # +0.8
+    assert_equal 1512, a.faction_rating # +11.9
+  end
+
+  test 'with a player influence the faction weighs less than in the additive model' do
+    newcomer = Side.new(player_rating: 1500, player_rd: 300, faction_rating: 1500, faction_rd: 300)
+    additive, = @calc.rate(newcomer, newcomer.dup, 1.0)
+    weighted, = Elo::Calculator.new(player_influence: 0.7).rate(newcomer, newcomer.dup, 1.0)
+
+    # Same deviations: additive splits 50/50, a = 0.7 splits 70/30
+    assert_equal additive.player_rating - 1500, additive.faction_rating - 1500
+    assert_in_delta 0.7 / 0.3, (weighted.player_rating - 1500).to_f / (weighted.faction_rating - 1500), 0.3
+  end
+
+  test 'the default calculator uses the configured player influence' do
+    expected = Elo::Calculator.new(player_influence: Elo::Calculator::PLAYER_INFLUENCE).rate(@veteran, @newcomer, 1.0)
+    assert_equal expected.map(&:to_h), Elo::Calculator.new.rate(@veteran, @newcomer, 1.0).map(&:to_h)
+  end
+
+  test 'the player influence does not slow down the faction uncertainty (spec 7.3)' do
+    # Spec: RD_f 300, RD_i 50, v ≈ 209585 -> RD'² = 90000 − 300⁴ / (2500 + 90000 + 209585) ≈ 63187, RD' ≈ 251.4
+    spec = Math.sqrt(90_000 - ((300.0**4) / (2500 + 90_000 + 209_585)))
+    assert_in_delta 251.4, spec, 0.1
+
+    a, = Elo::Calculator.new(player_influence: 0.7).rate(@veteran, @newcomer, 1.0)
+    assert_equal [spec.round, Elo::Calculator::FACTION_RD_MAX].min, a.faction_rd
+
+    # Below the cap: 120 -> 116 (the naive (1 - a)² version would stay at 120)
+    known = Side.new(**@veteran.to_h, faction_rd: 120)
+    weighted, = Elo::Calculator.new(player_influence: 0.7).rate(known, @newcomer, 1.0)
+    assert_equal 116, weighted.faction_rd
   end
 end

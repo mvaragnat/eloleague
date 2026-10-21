@@ -32,7 +32,7 @@
             <% elo ||= EloRating.new %>
             <h5 class="text-sm font-medium text-gray-600 mb-1" title="<%= rating_tooltip(elo.rating, elo.rating_deviation) %>">
               <%= t('players.elo_label') %>
-              <%= elo.conservative_rating %>
+              <%= elo.rating %> ± <%= elo.rating_deviation %>
               <% if elo.provisional? %>
                 <span class="status-badge status-badge--provisional"><%= t('elo.provisional') %></span>
               <% end %>

@@ -3,11 +3,17 @@
 module Elo
   # Glicko-style rating of a (player + faction) pair.
   #
-  # Each side's effective strength is the sum of the player and faction ratings,
-  # with independent uncertainties (RD). A game yields one Glicko update for the
-  # combined pair, which is then split between player and faction in proportion
-  # to their variances (Kalman filter): the most uncertain component absorbs most
-  # of the signal, and its deviation shrinks the most.
+  # Each side's effective strength combines the player and faction ratings with
+  # coefficients (cp, cf): cp·R_player + cf·R_faction, uncertainties combining as
+  # cp²·RD_player² + cf²·RD_faction². With a player influence a (PLAYER_INFLUENCE)
+  # the coefficients are (a, 1 - a), a weighted mean that caps the faction's
+  # influence; without it they are (1, 1), the plain additive model.
+  # A game yields one Glicko update for the combined pair, which is then split
+  # between player and faction in proportion to cp·RD_player² and cf·RD_faction²:
+  # the most uncertain component absorbs most of the signal. Deviations shrink at
+  # the natural (additive, Kalman) pace whatever the coefficients:
+  # RD'² = RD² − RD⁴ / (RD_player² + RD_faction² + v). The influence only governs how
+  # much the ratings move, never how fast uncertainty decreases (spec section 7.3).
   #
   # When a faction is mostly played by a few players, its games say more about
   # them than about the faction. A diversity factor d (effective / actual number
@@ -25,14 +31,15 @@ module Elo
     START_DEVIATION = SETTINGS.player_start_deviation
     RD_MIN = SETTINGS.min_deviation
     RD_MAX = START_DEVIATION
-    # Factions start (and are capped) with a smaller uncertainty than players: the
-    # prior is that faction balance matters less than player skill.
+    # A faction's deviation never exceeds its start deviation.
     FACTION_START_RATING = SETTINGS.faction_start_rating
     FACTION_START_DEVIATION = SETTINGS.faction_start_deviation
     FACTION_RD_MAX = FACTION_START_DEVIATION
+    # Player influence a (factions weigh 1 - a); nil for the additive model.
+    PLAYER_INFLUENCE = SETTINGS.player_influence
     # Above this deviation a rating is shown as provisional.
     PROVISIONAL_RD = SETTINGS.provisional_deviation
-    # Displayed and seeding rating: R - CONSERVATIVE_FACTOR * RD.
+    # Seeding rating: R - CONSERVATIVE_FACTOR * RD.
     CONSERVATIVE_FACTOR = SETTINGS.conservative_factor
     DIVERSITY_WINDOW_MONTHS = SETTINGS.diversity_window_months
     # Above this concentration (Herfindahl index) a faction rating is flagged.
@@ -56,7 +63,7 @@ module Elo
         deviation.to_i > PROVISIONAL_RD
       end
 
-      # Lower bound shown everywhere in the UI and used for seeding.
+      # Cautious lower bound R - k·RD, used for elimination seeding.
       def conservative(rating, deviation)
         (rating - (CONSERVATIVE_FACTOR * deviation)).round
       end
@@ -78,6 +85,10 @@ module Elo
     # In a mirror match the faction cancels out and teaches nothing: it is left
     # out of the uncertainty and only the players are updated.
     # Returns [Result for A, Result for B].
+    def initialize(player_influence: PLAYER_INFLUENCE)
+      @player_coef, @faction_coef = player_influence ? [player_influence, 1.0 - player_influence] : [1.0, 1.0]
+    end
+
     def rate(side_a, side_b, score_a, mirror: false)
       [
         rate_side(side_a, side_b, score_a, mirror),
@@ -89,22 +100,24 @@ module Elo
 
     def rate_side(side, opp, score, mirror)
       player_var, faction_var = variances(side, mirror)
-      combined_var = player_var + faction_var
+      combined_var = combined_variance(player_var, faction_var)
 
-      g = attenuation(Math.sqrt(variances(opp, mirror).sum))
+      g = attenuation(Math.sqrt(combined_variance(*variances(opp, mirror))))
       expected = expected_score(combined_rating(side) - combined_rating(opp), g)
       observation_var = observation_variance(expected, g)
       delta = combined_change(combined_var, observation_var, g, score - expected)
 
-      # The faction takes its variance share scaled by diversity; the player takes the rest.
-      faction_weight = (faction_var / combined_var) * side.diversity
-      player = split(side.player_rating, player_var, (1.0 - faction_weight) * delta, combined_var + observation_var,
-                     RD_MAX)
+      # The faction takes its weighted variance share scaled by diversity; the player takes the rest.
+      faction_weight = faction_share(player_var, faction_var) * side.diversity
+      # Uncertainty decreases independently of the influence coefficients
+      raw_var = player_var + faction_var
+      player = split(side.player_rating, player_var, (1.0 - faction_weight) * delta,
+                     raw_var + observation_var, RD_MAX)
       faction = if mirror
                   [side.faction_rating, side.faction_rd]
                 else
                   split(side.faction_rating, faction_var, faction_weight * delta,
-                        combined_var + (observation_var / side.diversity), FACTION_RD_MAX)
+                        raw_var + (observation_var / side.diversity), FACTION_RD_MAX)
                 end
 
       Result.new(expected: expected, player_rating: player[0], player_rd: player[1],
@@ -121,8 +134,15 @@ module Elo
       1.0 / (1.0 + (10.0**(-attenuation * rating_gap / 400.0)))
     end
 
-    # Share of the combined update and posterior deviation (Kalman) for one component.
-    # `innovation_var` is the combined variance plus the observation variance.
+    # Faction share of the combined change: cf·RD_f² / (cp·RD_i² + cf·RD_f²).
+    def faction_share(player_var, faction_var)
+      weighted_faction = @faction_coef * faction_var
+      weighted_faction / ((@player_coef * player_var) + weighted_faction)
+    end
+
+    # Applies one component's share of the combined change and its posterior deviation
+    # RD'² = RD² − RD⁴ / innovation_var, where `innovation_var` is RD_player² + RD_faction²
+    # plus the observation variance.
     def split(rating, var, change, innovation_var, rd_max)
       new_rating = rating + change
       new_var = var * (1.0 - (var / innovation_var))
@@ -130,7 +150,12 @@ module Elo
     end
 
     def combined_rating(side)
-      side.player_rating + side.faction_rating
+      (@player_coef * side.player_rating) + (@faction_coef * side.faction_rating)
+    end
+
+    # cp²·RD_i² + cf²·RD_f²
+    def combined_variance(player_var, faction_var)
+      ((@player_coef**2) * player_var) + ((@faction_coef**2) * faction_var)
     end
 
     # [player variance, faction variance]; the faction is left out of a mirror match.

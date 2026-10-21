@@ -7,8 +7,9 @@
   - Factions mostly played by a few players: the concentration of the last 6 months of games (Herfindahl index) lowers the faction's share of each change, the rest going to the player, and slows down how fast the faction's uncertainty shrinks. The Stats faction table shows this concentration (Herfindahl index, in %) with a "High concentration" badge above 50%. The "Hide non-representative rows" toggle and the faction table's Warning column are replaced by two toggles hiding factions with the "High concentration" or "High uncertainty" badge.
   - Admins can record a balance patch on factions from Avo ("Reset rating deviation", default 150): the faction's uncertainty goes back up so its rating recalibrates. Resets are kept and replayed when ratings are rebuilt.
   - Stats: the faction table gains a sortable "Rating" column, and the faction win-rate chart is replaced by a rating chart with a shaded ± RD band and yellow bars at each balance patch.
-  - Temporary player ranking (R − 2·RD, R, RD, games) on a separate, unlinked page `/stats/players_ranking?game_system_id=…`, to help tune the rating parameters.
-  - Everywhere in the UI (profiles, game cards, Stats), the displayed rating is the cautious lower bound `R − 2 × RD`; hovering shows `R ± RD`. Game cards also show the faction's change.
+  - Temporary player ranking (rating R, uncertainty RD, games) on a separate, unlinked page `/stats/players_ranking?game_system_id=…`, to help tune the rating parameters.
+  - The UI shows the rating R and its uncertainty RD (profiles `R ± RD`, Stats tables in two columns); game cards show R before → after for the player and the faction.
+  - Factions' influence is capped by a player influence `a` (default 0.7, `RATING_PLAYER_INFLUENCE`): each side's strength is `a × R_player + (1 − a) × R_faction`.
   - Rating parameters (initial R and RD for players and factions, etc.) are set in `config/initializers/rating.rb` and can be overridden with environment variables.
   - Elimination seeding now sorts players by `rating − 2 × RD`, so an uncertain newcomer is not seeded above established players.
   - All existing ratings are discarded by the migration: run `rails elo:rebuild` after deploying.

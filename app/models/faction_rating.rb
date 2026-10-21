@@ -13,10 +13,6 @@ class FactionRating < ApplicationRecord
   validates :rating, :rating_deviation, :games_played, presence: true
   validates :faction_id, uniqueness: true
 
-  def conservative_rating
-    Elo::Calculator.conservative(rating, rating_deviation)
-  end
-
   # Herfindahl index of the faction's recent games among players: 1 / N_eff, from
   # 1/N (evenly shared) to 1 (a single player). Nil before the first rated game.
   def concentration

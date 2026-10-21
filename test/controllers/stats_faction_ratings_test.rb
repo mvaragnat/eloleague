@@ -45,14 +45,13 @@ class StatsFactionRatingsTest < ActionDispatch::IntegrationTest
     row = response.parsed_body['rows'].find { |r| r['faction_id'] == f1.id }
     assert_equal f1.faction_rating.rating, row['rating']
     assert_equal f1.faction_rating.rating_deviation, row['rating_deviation']
-    assert_equal f1.faction_rating.rating - (2 * f1.faction_rating.rating_deviation), row['conservative_rating']
     assert row['provisional']
     # A single player behind the faction: 100% concentration
     assert_in_delta 1.0, row['concentration'], 0.001
     assert row['high_concentration']
   end
 
-  test 'players ranking page is sorted by R - 2 RD and requires authentication' do
+  test 'players ranking page is sorted by R and requires authentication' do
     system = game_systems(:chess)
     get stats_players_ranking_path, params: { game_system_id: system.id }
     assert_response :redirect
@@ -61,14 +60,15 @@ class StatsFactionRatingsTest < ActionDispatch::IntegrationTest
                         password_confirmation: 'password123')
     sign_in user, scope: :user
     newcomer = User.create!(username: 'lucky', email: 'lucky@example.com', password: 'password123')
-    EloRating.create!(user: newcomer, game_system: system, rating: 1900, rating_deviation: 250) # 1400
-    EloRating.create!(user: user, game_system: system, rating: 1700, rating_deviation: 60)      # 1580
+    EloRating.create!(user: newcomer, game_system: system, rating: 1900, rating_deviation: 250)
+    EloRating.create!(user: user, game_system: system, rating: 1700, rating_deviation: 60)
 
     get stats_players_ranking_path, params: { game_system_id: system.id }
     assert_response :success
     assert_select 'h1', I18n.t('stats.players_ranking.title')
-    assert_operator response.body.index('ranker'), :<, response.body.index('lucky')
-    assert_includes response.body, '1580'
+    assert_select 'tbody tr:first-child td:nth-child(2)', 'lucky'
+    assert_select 'td', '1900'
+    assert_select 'td', /250/
     assert_includes response.body, 'status-badge--provisional'
   end
 

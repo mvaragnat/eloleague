@@ -87,14 +87,12 @@ class GameEventComponentTest < ViewComponent::TestCase
     assert_selector '.card--win'
   end
 
-  test 'renders rating changes as lower bounds R - 2 RD' do
+  test 'renders rating changes as R before and after' do
     Elo::Updater.new.update_for_event(@game)
     change = EloChange.find_by!(game_event: @game, user: @user)
 
     render_inline(GameEventComponent.new(event: @game, current_user: @user))
-    # A brand new player starts at START_RATING - 2 * START_DEVIATION
-    start = Elo::Calculator.conservative(Elo::Calculator::START_RATING, Elo::Calculator::START_DEVIATION)
-    assert_text "(#{start} → #{change.conservative_after})"
+    assert_text "(#{Elo::Calculator::START_RATING} → #{change.rating_after})"
     assert_selector "[title^='R #{change.rating_after} ± #{change.rd_after}']"
   end
 end

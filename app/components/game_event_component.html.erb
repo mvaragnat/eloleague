@@ -31,12 +31,12 @@ end %>
           <div class="card-date">
             <%= my.faction.localized_name %>
             <% if my_change&.faction_changed? %>
-              <span title="<%= helpers.rating_tooltip(my_change.faction_rating_after, my_change.faction_rd_after) %>">(<%= my_change.faction_conservative_before %> → <%= my_change.faction_conservative_after %>)</span>
+              <span title="<%= helpers.rating_tooltip(my_change.faction_rating_after, my_change.faction_rd_after) %>">(<%= my_change.faction_rating_before %> → <%= my_change.faction_rating_after %>)</span>
             <% end %>
           </div>
         <% end %>
         <% if my_change %>
-          <div class="card-date" title="<%= helpers.rating_tooltip(my_change.rating_after, my_change.rd_after) %>">(<%= my_change.conservative_before %> → <%= my_change.conservative_after %>)</div>
+          <div class="card-date" title="<%= helpers.rating_tooltip(my_change.rating_after, my_change.rd_after) %>">(<%= my_change.rating_before %> → <%= my_change.rating_after %>)</div>
         <% end %>
       </div>
       <div class="score">
@@ -53,12 +53,12 @@ end %>
           <div class="card-date">
             <%= opp.faction.localized_name %>
             <% if opp_change&.faction_changed? %>
-              <span title="<%= helpers.rating_tooltip(opp_change.faction_rating_after, opp_change.faction_rd_after) %>">(<%= opp_change.faction_conservative_before %> → <%= opp_change.faction_conservative_after %>)</span>
+              <span title="<%= helpers.rating_tooltip(opp_change.faction_rating_after, opp_change.faction_rd_after) %>">(<%= opp_change.faction_rating_before %> → <%= opp_change.faction_rating_after %>)</span>
             <% end %>
           </div>
         <% end %>
         <% if opp_change %>
-          <div class="card-date" title="<%= helpers.rating_tooltip(opp_change.rating_after, opp_change.rd_after) %>">(<%= opp_change.conservative_before %> → <%= opp_change.conservative_after %>)</div>
+          <div class="card-date" title="<%= helpers.rating_tooltip(opp_change.rating_after, opp_change.rd_after) %>">(<%= opp_change.rating_before %> → <%= opp_change.rating_after %>)</div>
         <% end %>
       </div>
     </div>

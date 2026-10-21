@@ -15,14 +15,14 @@ class StatsController < ApplicationController
     render json: { ok: true, rows: stats }
   end
 
-  # Player rating ranking for a system, by conservative rating R - 2·RD.
+  # Player rating ranking for a system, by rating R.
   # Temporary: helps tuning the player/faction rating parameters. Not linked from the UI.
   def players_ranking
     @systems = Game::System.order(:name)
     @system = Game::System.find_by(id: params[:game_system_id]) ||
               Game::System.find_by(id: 1) || Game::System.order(:id).first
     @player_ratings = EloRating.where(game_system: @system).includes(:user)
-                               .sort_by { |row| [-row.conservative_rating, -row.rating] }
+                               .sort_by { |row| [-row.rating, row.rating_deviation] }
   end
 
   # JSON: versus table for a given faction within its system

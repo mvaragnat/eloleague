@@ -18,8 +18,8 @@ export default class extends Controller {
   ]
 
   connect() {
-    // Factions default to the displayed rating (R - 2·RD), best first
-    this._factionsSort = { key: "conservative_rating", dir: "desc" }
+    // Factions default to the rating R, best first
+    this._factionsSort = { key: "rating", dir: "desc" }
     this._vsSort = { key: "games", dir: "desc" }
     this._factionOptions = []
     this._lastTournamentOnly = this._tournamentOnlyEnabled()
@@ -109,7 +109,7 @@ export default class extends Controller {
     return `
       <tr data-faction-id="${row.faction_id}" data-high-concentration="${row.high_concentration}" data-high-uncertainty="${row.provisional}">
         <td>${this._e(row.faction_name)}</td>
-        ${this._ratingCell(row)}
+        ${this._ratingCells(row)}
         ${this._concentrationCell(row)}
         <td>${row.total_games}</td>
         <td>${row.unique_players}</td>
@@ -341,13 +341,13 @@ export default class extends Controller {
     return `<td${cls}>${sign}${val}%</td>`
   }
 
-  _ratingCell(row) {
-    if (row.rating == null) return '<td></td>'
+  // Rating R, then its uncertainty RD with the "high uncertainty" badge
+  _ratingCells(row) {
+    if (row.rating == null) return '<td></td><td></td>'
     const badge = row.provisional ? ` ${this._badge(this._provisionalLabel())}` : ''
-    // Displayed rating is the lower bound R - 2·RD; R ± RD stays in the tooltip
-    const tooltip = `R ${row.rating} ± ${row.rating_deviation}`
-    return `<td title="${this._e(tooltip)}">${row.conservative_rating}${badge}</td>`
+    return `<td>${row.rating}</td><td>${row.rating_deviation}${badge}</td>`
   }
+
 
   // Concentration of the faction's recent games among players (Herfindahl index)
   _concentrationCell(row) {

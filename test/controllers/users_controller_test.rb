@@ -30,9 +30,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match(/#{@user.username}/, @response.body)
     assert_match(/#{system.name}/, @response.body)
-    # Displayed rating is the lower bound R - 2·RD; R ± RD is in the tooltip
-    assert_match(/ELO :\s*600|ELO:\s*600/, @response.body)
-    assert_match(/R 1300 ± 350/, @response.body)
+    assert_match(/ELO :\s*1300 ± 350|ELO:\s*1300 ± 350/, @response.body)
   end
 
   test 'should not include current user in search results' do

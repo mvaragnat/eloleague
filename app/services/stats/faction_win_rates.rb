@@ -6,7 +6,7 @@ module Stats
   class FactionWinRates
     ResultRow = Struct.new(:faction_id, :faction_name, :total_games, :unique_players,
                            :wins, :losses, :draws, :win_percent, :loss_percent, :draw_percent,
-                           :rating, :rating_deviation, :conservative_rating, :provisional,
+                           :rating, :rating_deviation, :provisional,
                            :concentration, :high_concentration,
                            keyword_init: true)
 
@@ -21,8 +21,8 @@ module Stats
       rows = @system.factions.map do |f|
         build_row_for_faction(f, parts, parts_by_event)
       end
-      # Default sort: highest displayed rating (R - 2·RD) first
-      rows.sort_by { |r| -r[:conservative_rating] }
+      # Default sort: highest rating first
+      rows.sort_by { |r| -r[:rating] }
     end
 
     private
@@ -53,7 +53,6 @@ module Stats
         draw_percent: totals[:draw_percent],
         rating: rating.rating,
         rating_deviation: rating.rating_deviation,
-        conservative_rating: rating.conservative_rating,
         provisional: rating.provisional?,
         concentration: rating.concentration&.round(3),
         high_concentration: rating.high_concentration?

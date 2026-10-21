@@ -24,14 +24,14 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 ### Ratings (player + faction, Glicko-style)
 - Each player has one `EloRating` per game system and each faction one `FactionRating`: a rating `R` (start 1500) and a rating deviation `RD` (uncertainty). Players start at RD 350 (bounded to 30..350); factions start at RD 150 (bounded to 30..150, `Elo::Calculator::FACTION_START_DEVIATION` / `FACTION_RD_MAX`): the prior is that faction balance weighs less than player skill, so a new player and a new faction split a game's change about 84/16 instead of 50/50. All values are stored as integers; maths run in floats in `Elo::Calculator`.
-- A game rates the combined pair of each side: `R = R_player + R_faction`, `RD = sqrt(RD_player² + RD_faction²)`, then a standard Glicko update. The combined change is split between player and faction in proportion to `RD²` (Kalman filter): the most uncertain component absorbs most of the change, and each deviation shrinks as `RD'² = RD² · (1 − RD² / (RD_comb² + v))`.
+- A game rates the combined pair of each side with a player influence `a` (`RATING_PLAYER_INFLUENCE`, default 0.7): `R = a·R_player + (1 − a)·R_faction`, `RD² = a²·RD_player² + (1 − a)²·RD_faction²`, then a standard Glicko update. The combined change is split between player and faction in proportion to `a·RD_player²` and `(1 − a)·RD_faction²` (bounded version, spec section 7): the most uncertain component absorbs most of the change. Deviations shrink independently of `a` (spec section 7.3): `RD'² = RD² − RD⁴ / (RD_player² + RD_faction² + v)`, so `a` only governs how much ratings move, never how fast uncertainty decreases. An empty `RATING_PLAYER_INFLUENCE` switches back to the plain additive model `R_player + R_faction` (coefficients 1 and 1).
 - Mirror matches (same faction on both sides) only update the players: the faction is left out of the combined uncertainty and its rating does not move.
 - No inactivity inflation: a player's RD only changes with games (the community plays irregularly). `EloRating#last_played_at` is kept for information.
 - Factions have no time-based inflation. Admins record a balance patch with the Avo action "Reset rating deviation" on Game Factions (default RD 150, the faction maximum): it creates a `FactionRatingReset` (history) and raises the current RD (never lowers it). Resets are replayed by `elo:rebuild`.
 - `EloChange` stores, per event and player, the player and faction rating/RD before and after.
 - Player concentration per faction: over a window of competitive games (`diversity_window_months`) ending with the rated game (included), `N_eff = 1 / Σ(share²)` (Herfindahl) and diversity `d = N_eff / N` (N = distinct players). The faction's share of the change becomes `weight_faction × d` (the player takes the rest), and the faction deviation uses the observation variance `v / d`, so it shrinks more slowly. `FactionRating` keeps the last `effective_players`, `distinct_players` and `diversity`; `EloChange#faction_diversity` keeps the factor used. A faction played by a single player has `d = 1` (not identifiable): the Stats "Concentration" column (Herfindahl index `H = 1 / N_eff`, shown in %) is the reliability signal, with a "High concentration" badge above `high_concentration` (default 0.5).
 - Parameters (start R and RD for players and factions, minimum RD, high-uncertainty threshold, high-concentration threshold, displayed-bound factor, diversity window) live in `config/initializers/rating.rb`, each overridable by an environment variable (`RATING_PLAYER_START`, `RATING_PLAYER_START_RD`, `RATING_FACTION_START`, `RATING_FACTION_START_RD`, ...). After a change: restart and run `rails elo:rebuild`.
-- The UI displays the cautious lower bound `R − 2·RD` everywhere (profile, game cards, Stats tables); `R ± RD` is shown in the tooltip. The faction chart draws R with a band `R ± 2·RD` whose lower edge is the displayed value.
+- The UI displays the rating R and its uncertainty RD (profile `R ± RD`, game cards `R before → R after`, separate Rating and Uncertainty columns in the Stats tables). The faction chart draws R with a band `R ± RD`.
 - A rating gets a "High uncertainty" badge while `RD > provisional_deviation` (default 100) on profiles and Stats. Elimination seeding sorts players by `R − 2·RD`.
 - `rails elo:rebuild` recomputes everything chronologically (optionally for one game system).
 
@@ -109,7 +109,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 ### Player Profile Page
 - Public page at `/users/:id` showing a player's cross-system profile
 - Sections:
-  - Statistics by game system: shows the player's displayed rating `R − 2·RD` (with a "High uncertainty" badge), per-system totals (games, wins, losses, draws, percentages) and per-faction breakdown with the same stats. Uses the same table styling as the Stats page.
+  - Statistics by game system: shows the player's rating `R ± RD` (with a "High uncertainty" badge), per-system totals (games, wins, losses, draws, percentages) and per-faction breakdown with the same stats. Uses the same table styling as the Stats page.
   - Game system selector to filter displayed statistics on demand.
   - All games played by the user across systems (same card component used elsewhere)
 - Profile links are available from tournament participants and tournament ranking tables.
@@ -137,7 +137,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 
 ### Stats
 - All authenticated users can access a `Stats` page (`/stats`) to explore per-system and per-faction performance.
-- Selecting a game system reveals a sortable table of all factions with: faction rating (`R − 2·RD`, "High uncertainty" badge), concentration (Herfindahl index in %, "High concentration" badge), total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by displayed rating (`R − 2·RD`, descending) by default.
+- Selecting a game system reveals a sortable table of all factions with: faction rating R, uncertainty RD ("High uncertainty" badge), concentration (Herfindahl index in %, "High concentration" badge), total games (including mirrors), unique players, Wins, Losses, Draws, and Win% (mirrors excluded from W/L/D and Win%). The table is sorted by rating R (descending) by default.
 - Selecting a faction shows:
   - A "Top players" table listing the 5 players with the most games on that faction (with profile links).
   - A rating-over-time graph: the faction rating with a shaded `± RD` band, and a vertical yellow bar at each balance-patch reset. It uses all competitive games (the tournament-only filter does not apply).
