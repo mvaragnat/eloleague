@@ -402,9 +402,6 @@ fr:
       card: "%d/%m/%Y"
   stats:
     balance_band_hint: "Les lignes en gras délimitent la zone d'équilibre idéale, ±%{band} autour du classement de départ (%{low}–%{high}) : entre deux joueurs de même niveau, deux factions de cette zone ne modifient pas la probabilité de victoire de plus de %{shift} points (%{favorite}/%{underdog} au pire). Visible quand le tableau est trié par classement."
-    score_vs_expected: "Score vs attendu"
-    score_vs_expected_hint: "Score réel (victoire 1, nul 0,5) moins le score prévu par les classements, compte tenu des joueurs et des adversaires. Positif : la faction a fait mieux que ne le prévoyait le niveau de ses joueurs."
-    score_vs_expected_tooltip: "Réel %{actual} / attendu %{expected} sur %{games} parties classées"
     uncertainty: "Incertitude"
     uncertainty_hint: "Déviation RD : à quel point le classement est encore incertain. Elle diminue à chaque partie."
     concentration: "Concentration"

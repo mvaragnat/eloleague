@@ -318,7 +318,6 @@ input:focus, select:focus, textarea:focus {
 /* ========================= Stats Page ========================= */
 /* Container similar to tournaments but a tad narrower for readability */
 .stats-container { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 1rem; }
-.nowrap { white-space: nowrap; }
 .balance-edge td { border-top: 3px solid currentColor; }
 
 /* Subtle helper text */

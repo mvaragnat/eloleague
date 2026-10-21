@@ -8,7 +8,6 @@ module Stats
                            :wins, :losses, :draws, :win_percent, :loss_percent, :draw_percent,
                            :rating, :rating_deviation, :provisional,
                            :concentration, :high_concentration,
-                           :rated_games, :actual_score, :expected_score, :score_vs_expected,
                            keyword_init: true)
 
     def initialize(game_system:, tournament_only: false)
@@ -19,7 +18,6 @@ module Stats
     def call
       parts, parts_by_event = preload_parts
       @ratings = FactionRating.where(game_system: @system).index_by(&:faction_id)
-      @scores = scores_by_faction
       rows = @system.factions.map do |f|
         build_row_for_faction(f, parts, parts_by_event)
       end
@@ -28,15 +26,6 @@ module Stats
     end
 
     private
-
-    # Rated games per faction: [count, sum of results (win 1, draw 0.5), sum of expected scores].
-    # Comes from the rating history, so it covers every competitive game whatever the filters.
-    def scores_by_faction
-      EloChange.where(game_system: @system).where.not(faction_id: nil)
-               .group(:faction_id)
-               .pluck(:faction_id, Arel.sql('COUNT(*)'), Arel.sql('SUM(actual_score)'), Arel.sql('SUM(expected_score)'))
-               .to_h { |fid, count, actual, expected| [fid, [count, actual.to_f, expected.to_f]] }
-    end
 
     def preload_parts
       events = Game::Event.where(game_system: @system).competitive
@@ -50,7 +39,6 @@ module Stats
       faction_parts = parts.select { |p| p.faction_id == faction.id }
       totals = totals_for(faction_parts, parts_by_event)
       rating = @ratings[faction.id] || FactionRating.new
-      games, actual, expected = @scores.fetch(faction.id, [0, 0.0, 0.0])
 
       ResultRow.new(
         faction_id: faction.id,
@@ -67,11 +55,7 @@ module Stats
         rating_deviation: rating.rating_deviation,
         provisional: rating.provisional?,
         concentration: rating.concentration&.round(3),
-        high_concentration: rating.high_concentration?,
-        rated_games: games,
-        actual_score: actual.round(1),
-        expected_score: expected.round(1),
-        score_vs_expected: games.zero? ? nil : (actual - expected).round(1)
+        high_concentration: rating.high_concentration?
       ).to_h
     end
 

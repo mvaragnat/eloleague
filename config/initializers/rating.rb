@@ -22,7 +22,7 @@ Rails.application.config.x.rating.tap do |rating|
   # si cette valeur est trop basse (exemple : 5) un joueur tres actif ne verrait presque plus son score bouger. garder min 30 environ
   rating.min_deviation = ENV.fetch('RATING_MIN_RD', '30').to_i
   # Ratings are flagged "provisional" above this deviation
-  rating.provisional_deviation = ENV.fetch('RATING_PROVISIONAL_RD', '100').to_i
+  rating.provisional_deviation = ENV.fetch('RATING_PROVISIONAL_RD', '90').to_i
   # A faction's concentration (Herfindahl index of its games among players, 0..1) is
   # flagged as too high above this value. 0.5 = fewer than 2 "effective" players.
   rating.high_concentration = ENV.fetch('RATING_HIGH_CONCENTRATION', '0.3').to_f

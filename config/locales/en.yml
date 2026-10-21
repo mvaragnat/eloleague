@@ -435,9 +435,6 @@ en:
       card: "%d/%m/%Y"
   stats:
     balance_band_hint: "Bold lines mark the ideal balance band, ±%{band} around the starting rating (%{low}–%{high}): between two players of the same level, two factions inside it change the win probability by at most %{shift} points (%{favorite}/%{underdog} at worst). Visible when sorted by rating."
-    score_vs_expected: "Score vs expected"
-    score_vs_expected_hint: "Actual score (win 1, draw 0.5) minus the score the ratings expected, given the players and opponents. Positive: the faction did better than its players' level predicted."
-    score_vs_expected_tooltip: "Actual %{actual} / expected %{expected} over %{games} rated games"
     uncertainty: "Uncertainty"
     uncertainty_hint: "Rating deviation RD: how unsure the rating still is. It shrinks with every game."
     concentration: "Concentration"

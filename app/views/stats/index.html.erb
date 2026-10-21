@@ -1,6 +1,6 @@
 <% content_for :title, t('stats.title', default: 'Stats') %>
 
-<div class="stats-container" data-controller="stats" data-provisional-label="<%= t('elo.provisional') %>" data-high-concentration-label="<%= t('stats.high_concentration') %>" data-score-vs-expected-tooltip="<%= t('stats.score_vs_expected_tooltip') %>"
+<div class="stats-container" data-controller="stats" data-provisional-label="<%= t('elo.provisional') %>" data-high-concentration-label="<%= t('stats.high_concentration') %>"
      <% half_band = Elo::Calculator.balance_half_band %>
      data-balance-low="<%= Elo::Calculator::FACTION_START_RATING - half_band %>"
      data-balance-high="<%= Elo::Calculator::FACTION_START_RATING + half_band %>">
@@ -61,7 +61,6 @@
               <th class="sortable" data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
-              <th class="sortable nowrap" data-action="click->stats#sort" data-key="score_vs_expected" title="<%= t('stats.score_vs_expected_hint') %>"><%= t('stats.score_vs_expected') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>

@@ -118,7 +118,6 @@ export default class extends Controller {
         <td>${row.wins}</td>
         <td>${row.losses}</td>
         <td>${row.draws}</td>
-        ${this._scoreVsExpectedCell(row)}
         <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
         <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
         <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
@@ -403,18 +402,6 @@ export default class extends Controller {
       ? ` ${this._badge(this.element.dataset.highConcentrationLabel, 'concentration')}`
       : ''
     return `<td>${Math.round(row.concentration * 100)}%${badge}</td>`
-  }
-
-  // Actual score (win 1, draw 0.5) minus the sum of expected scores over rated games
-  _scoreVsExpectedCell(row) {
-    if (row.score_vs_expected == null) return '<td></td>'
-    const diff = row.score_vs_expected
-    const sign = diff > 0 ? '+' : ''
-    const tooltip = (this.element.dataset.scoreVsExpectedTooltip || '%{actual} / %{expected} (%{games})')
-      .replace('%{actual}', row.actual_score)
-      .replace('%{expected}', row.expected_score)
-      .replace('%{games}', row.rated_games)
-    return `<td class="nowrap" title="${this._e(tooltip)}">${sign}${diff.toFixed(1)}</td>`
   }
 
   _badge(label, kind = 'provisional') {
