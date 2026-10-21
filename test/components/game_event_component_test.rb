@@ -86,4 +86,13 @@ class GameEventComponentTest < ViewComponent::TestCase
     render_inline(@component)
     assert_selector '.card--win'
   end
+
+  test 'renders rating changes as R before and after' do
+    Elo::Updater.new.update_for_event(@game)
+    change = EloChange.find_by!(game_event: @game, user: @user)
+
+    render_inline(GameEventComponent.new(event: @game, current_user: @user))
+    assert_text "(#{Elo::Calculator::START_RATING} → #{change.rating_after})"
+    assert_selector "[title^='R #{change.rating_after} ± #{change.rd_after}']"
+  end
 end

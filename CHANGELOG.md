@@ -1,3 +1,21 @@
+## 2026-10-12
+
+- Feature — Player + faction ratings with uncertainty (Glicko-style):
+  - Each faction now has its own rating, next to the player ratings. Every game updates both: the combined (player + faction) result is split between the player and the faction according to how uncertain each one is, so new players and rarely played factions move fast while well-known ones barely move.
+  - Every rating now carries an uncertainty (RD). It shrinks with each game. Players start at 1500 ± 350 and factions at 1500 ± 150 (factions weigh less than player skill: a new player and a new faction split a game's change about 84/16). Ratings get a "High uncertainty" badge while RD > 100.
+  - Mirror matches only update the players.
+  - Factions mostly played by a few players: the concentration of the last 6 months of games (Herfindahl index) lowers the faction's share of each change, the rest going to the player, and slows down how fast the faction's uncertainty shrinks. The Stats faction table shows this concentration (Herfindahl index, in %) with a "High concentration" badge above 50%. The "Hide non-representative rows" toggle and the faction table's Warning column are replaced by two toggles hiding factions with the "High concentration" or "High uncertainty" badge.
+  - Admins can record a balance patch on factions from Avo ("Reset rating deviation", default 150): the faction's uncertainty goes back up so its rating recalibrates. Resets are kept and replayed when ratings are rebuilt.
+  - Stats: the faction table gains a sortable "Rating" column, and the faction win-rate chart is replaced by a rating chart with a shaded ± RD band and yellow bars at each balance patch.
+  - Stats: the separate "Faction" box and its faction selector are removed; clicking a faction in the table shows its details (rating chart, top players, matchups, games) below the table, and clicking it again hides them.
+  - Stats: the matchup table no longer lists opponents the faction never faced (0 games).
+  - Temporary player ranking (rating R, uncertainty RD, games) on a separate, unlinked page `/stats/players_ranking?game_system_id=…`, to help tune the rating parameters.
+  - The UI shows the rating R and its uncertainty RD (profiles `R ± RD`, Stats tables in two columns); game cards show R before → after for the player and the faction.
+  - Factions' influence is capped by a player influence `a` (default 0.7, `RATING_PLAYER_INFLUENCE`): each side's strength is `R_player + ((1 − a) / a) × R_faction` (player ratings keep the Elo scale; `a = 0.5` is the plain sum).
+  - Rating parameters (initial R and RD for players and factions, etc.) are set in `config/initializers/rating.rb` and can be overridden with environment variables.
+  - Elimination seeding now sorts players by `rating − 2 × RD`, so an uncertain newcomer is not seeded above established players.
+  - All existing ratings are discarded by the migration: run `rails elo:rebuild` after deploying.
+
 ## 2026-09-07
 
 - Feature — Organizer-validated registrations (optional at tournament creation):

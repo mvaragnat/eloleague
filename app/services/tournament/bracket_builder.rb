@@ -46,7 +46,7 @@ module Tournament
 
     def elo_seeded(players)
       seeded = players.map do |u|
-        rating = EloRating.find_by(user: u, game_system: system)&.rating || EloRating::START_RATING
+        rating = EloRating.conservative_for(u, system)
         [u, rating]
       end
       seeded.sort_by { |(_u, r)| -r }.map(&:first)

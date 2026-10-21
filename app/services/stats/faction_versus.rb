@@ -71,7 +71,8 @@ module Stats
         row.warnings = warnings_for(row, my_parts, parts_by_event)
       end
 
-      rows.reject { |r| r.opponent_faction_id == @faction.id }.map do |r|
+      # Mirror row and opponents never faced are left out
+      rows.reject { |r| r.opponent_faction_id == @faction.id || r.games.zero? }.map do |r|
         build_row_hash(r)
       end
     end
