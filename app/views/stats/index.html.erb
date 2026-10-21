@@ -1,6 +1,9 @@
 <% content_for :title, t('stats.title', default: 'Stats') %>
 
-<div class="stats-container" data-controller="stats" data-provisional-label="<%= t('elo.provisional') %>" data-high-concentration-label="<%= t('stats.high_concentration') %>">
+<div class="stats-container" data-controller="stats" data-provisional-label="<%= t('elo.provisional') %>" data-high-concentration-label="<%= t('stats.high_concentration') %>" data-score-vs-expected-tooltip="<%= t('stats.score_vs_expected_tooltip') %>"
+     <% half_band = Elo::Calculator.balance_half_band %>
+     data-balance-low="<%= Elo::Calculator::FACTION_START_RATING - half_band %>"
+     data-balance-high="<%= Elo::Calculator::FACTION_START_RATING + half_band %>">
   <div class="page-header">
     <h1><%= t('stats.title', default: 'Stats') %></h1>
   </div>
@@ -36,9 +39,17 @@
     <div id="factions-table" class="mt-3" hidden>
       <div class="hint text-sm text-gray-500">
         <%= t('stats.mirror_hint', default: 'Mirror games are counted in total but excluded from W/L/D and Win%.') %>
+        <br>
+        <%= t('stats.balance_band_hint', band: half_band,
+                                         low: Elo::Calculator::FACTION_START_RATING - half_band,
+                                         high: Elo::Calculator::FACTION_START_RATING + half_band,
+                                         shift: (Elo::Calculator::BALANCE_MAX_SHIFT * 100).round,
+                                         favorite: (50 + (Elo::Calculator::BALANCE_MAX_SHIFT * 100)).round,
+                                         underdog: (50 - (Elo::Calculator::BALANCE_MAX_SHIFT * 100)).round) %>
+        <%= t('stats.faction_click_hint') %>
       </div>
       <div class="table-responsive">
-        <table class="table" data-stats-target="factionsTable">
+        <table class="table table--selectable" data-stats-target="factionsTable" data-action="click->stats#onFactionClick">
           <thead>
             <tr>
               <th class="sortable" data-action="click->stats#sort" data-key="faction_name"><%= t('stats.faction', default: 'Faction') %></th>
@@ -50,6 +61,7 @@
               <th class="sortable" data-action="click->stats#sort" data-key="wins"><%= t('stats.wins', default: 'Wins') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="losses"><%= t('stats.losses', default: 'Losses') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="draws"><%= t('stats.draws', default: 'Draws') %></th>
+              <th class="sortable nowrap" data-action="click->stats#sort" data-key="score_vs_expected" title="<%= t('stats.score_vs_expected_hint') %>"><%= t('stats.score_vs_expected') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="win_percent"><%= t('stats.win_percent', default: 'Win%') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="loss_percent"><%= t('stats.loss_percent', default: 'Loss%') %></th>
               <th class="sortable" data-action="click->stats#sort" data-key="draw_percent"><%= t('stats.draw_percent', default: 'Draw%') %></th>
@@ -62,15 +74,12 @@
     </div>
   </div>
 
-  <div class="card mt-6">
-    <label for="faction-select"><%= t('stats.faction_label', default: 'Faction') %></label>
+  <%# Details of the faction clicked in the table above %>
+  <div class="card mt-6" hidden data-stats-target="factionDetails">
+    <h3 class="mb-2" data-stats-target="factionName"></h3>
     <div class="hint text-sm text-gray-600 mb-3">
       <%= t('stats.versus_warning_hint', default: 'Warnings use at least %{players} unique players and %{games} games for matchup confidence.', players: Rails.application.config.x.stats.min_matchup_players, games: Rails.application.config.x.stats.min_matchup_games) %>
     </div>
-    <select id="faction-select" class="input" data-stats-target="faction" data-action="change->stats#onFactionChange" disabled>
-      <option value=""><%= t('stats.select_faction', default: 'Select a faction') %></option>
-    </select>
-
     <div class="card-body">
       <div id="faction-graph" class="mt-2 chart-wrapper" hidden data-stats-target="chart" data-controller="elo-chart" data-elo-chart-series-value="[]">
         <svg data-elo-chart-target="chart" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" style="width:100%; height:auto;"></svg>

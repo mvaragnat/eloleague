@@ -46,6 +46,11 @@ class StatsFactionRatingsTest < ActionDispatch::IntegrationTest
     assert_equal f1.faction_rating.rating, row['rating']
     assert_equal f1.faction_rating.rating_deviation, row['rating_deviation']
     assert row['provisional']
+    # Two rated wins: actual 2.0 against the expected scores stored in the rating history
+    expected = EloChange.where(faction: f1).sum(:expected_score).to_f
+    assert_equal 2, row['rated_games']
+    assert_in_delta 2.0, row['actual_score'], 0.001
+    assert_in_delta (2.0 - expected).round(1), row['score_vs_expected'], 0.001
     # A single player behind the faction: 100% concentration
     assert_in_delta 1.0, row['concentration'], 0.001
     assert row['high_concentration']

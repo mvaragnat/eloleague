@@ -188,4 +188,14 @@ class EloCalculatorTest < ActiveSupport::TestCase
     weighted, = Elo::Calculator.new(player_influence: 0.7).rate(known, @newcomer, 1.0)
     assert_equal 117, weighted.faction_rd
   end
+
+  test 'balance band: two factions inside shift the win probability by at most the target' do
+    # a = 0.7, 10 points: combined gap 70.4, faction gap 164, band ±82
+    assert_equal 82, Elo::Calculator.balance_half_band(0.7, 0.10)
+    # Additive model: the faction gap counts fully
+    assert_equal 35, Elo::Calculator.balance_half_band(nil, 0.10)
+
+    gap = 2 * Elo::Calculator.balance_half_band(0.7, 0.10) * (0.3 / 0.7)
+    assert_in_delta 0.60, 1.0 / (1.0 + (10.0**(-gap / 400.0))), 0.002
+  end
 end

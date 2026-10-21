@@ -16,6 +16,9 @@ class StatsControllerTest < ActionDispatch::IntegrationTest
     get stats_path
     assert_response :success
     assert_select 'h1', /Stats|Statistiques/
+    band = Elo::Calculator.balance_half_band
+    assert_select "[data-balance-low='#{Elo::Calculator::FACTION_START_RATING - band}']" \
+                  "[data-balance-high='#{Elo::Calculator::FACTION_START_RATING + band}']"
   end
 
   test 'factions json requires authentication' do

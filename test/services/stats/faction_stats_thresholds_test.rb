@@ -37,6 +37,15 @@ module Stats
       assert_includes f2_row[:warnings], I18n.t('stats.warnings.insufficient_games')
     end
 
+    test 'versus table leaves out opponents never faced' do
+      f3 = Game::Faction.create!(game_system: @system, name: 'F3')
+      create_competitive_series(6)
+
+      rows = Stats::FactionVersus.new(faction: @f1).call
+      assert_equal [@f2.id], rows.pluck(:opponent_faction_id)
+      assert_not_includes rows.pluck(:opponent_faction_id), f3.id
+    end
+
     test 'global winrates are sorted by displayed rating desc by default' do
       FactionRating.create!(faction: @f1, game_system: @system, rating: 1400, rating_deviation: 100) # 1200
       FactionRating.create!(faction: @f2, game_system: @system, rating: 1500, rating_deviation: 50)  # 1400

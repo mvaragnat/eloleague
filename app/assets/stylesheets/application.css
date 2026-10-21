@@ -317,7 +317,9 @@ input:focus, select:focus, textarea:focus {
 
 /* ========================= Stats Page ========================= */
 /* Container similar to tournaments but a tad narrower for readability */
-.stats-container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+.stats-container { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 1rem; }
+.nowrap { white-space: nowrap; }
+.balance-edge td { border-top: 3px solid currentColor; }
 
 /* Subtle helper text */
 .hint { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
@@ -340,6 +342,10 @@ input:focus, select:focus, textarea:focus {
 .table th.sortable::after { content: '\2195'; /* up-down arrow */ position: absolute; right: 0.4rem; color: var(--text-muted); font-size: 0.9rem; }
 .table th.sortable.is-sorted[aria-sort="ascending"]::after { content: '\25B2'; /* ▲ */ color: var(--blue-500); }
 .table th.sortable.is-sorted[aria-sort="descending"]::after { content: '\25BC'; /* ▼ */ color: var(--blue-500); }
+
+/* Faction rows show their details on click */
+.table--selectable tbody tr[data-faction-id] { cursor: pointer; }
+.table--selectable tbody tr.is-selected { background: #eff6ff; }
 
 /* Chart wrapper inside a card should not overflow */
 .chart-wrapper { width: 100%; overflow: hidden; }

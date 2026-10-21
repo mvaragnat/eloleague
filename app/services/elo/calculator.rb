@@ -44,6 +44,8 @@ module Elo
     # Seeding rating: R - CONSERVATIVE_FACTOR * RD.
     CONSERVATIVE_FACTOR = SETTINGS.conservative_factor
     DIVERSITY_WINDOW_MONTHS = SETTINGS.diversity_window_months
+    # Largest acceptable shift of the win probability caused by factions (balance band).
+    BALANCE_MAX_SHIFT = SETTINGS.balance_max_shift
     # Above this concentration (Herfindahl index) a faction rating is flagged.
     HIGH_CONCENTRATION = SETTINGS.high_concentration
 
@@ -59,6 +61,16 @@ module Elo
     class << self
       def high_concentration?(concentration)
         concentration.present? && concentration > HIGH_CONCENTRATION
+      end
+
+      # Half-width of the balanced band around the faction start rating: two factions inside
+      # it shift the win probability between two equal players by at most BALANCE_MAX_SHIFT.
+      # Largest combined gap: 400·log10((0.5 + s) / (0.5 - s)); a faction gap weighs
+      # (1 - a) / a of it, and the band is half the largest faction gap.
+      def balance_half_band(player_influence = PLAYER_INFLUENCE, max_shift = BALANCE_MAX_SHIFT)
+        influence = player_influence || 0.5
+        combined_gap = 400 * Math.log10((0.5 + max_shift) / (0.5 - max_shift))
+        (combined_gap * influence / (1.0 - influence) / 2).round
       end
 
       def provisional?(deviation)

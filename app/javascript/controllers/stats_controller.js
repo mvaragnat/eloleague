@@ -3,7 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "system",
-    "faction",
+    "factionDetails",
+    "factionName",
     "factionsTable",
     "versusTable",
     "versusTableWrapper",
@@ -21,7 +22,7 @@ export default class extends Controller {
     // Factions default to the rating R, best first
     this._factionsSort = { key: "rating", dir: "desc" }
     this._vsSort = { key: "games", dir: "desc" }
-    this._factionOptions = []
+    this._selectedFactionId = null
     this._lastTournamentOnly = this._tournamentOnlyEnabled()
 
     if (this.systemTarget.value) {
@@ -31,31 +32,32 @@ export default class extends Controller {
 
   async onSystemChange() {
     const systemId = this.systemTarget.value
-    // Reset faction select and views
-    this.factionTarget.innerHTML = `<option value="">${this._t('stats.select_faction', 'Select a faction')}</option>`
-    this.factionTarget.disabled = !systemId
+    this._collapseFaction()
     // Hide wrappers, not inner elements
     this._setHidden(this.factionsTableTarget.closest('#factions-table'), true)
-    this._setHidden(this.chartTarget?.closest('#faction-graph'), true)
-    this._setHidden(this.versusTableTarget.closest('#versus-table'), true)
-    this._setHidden(this.topPlayersTarget, true)
-    this._setHidden(this.factionGamesTarget, true)
     // Ensure inner elements are not stuck hidden from a previous state
     this.factionsTableTarget.hidden = false
     if (this.chartTarget) this.chartTarget.hidden = false
     if (!systemId) return
 
     await this._loadFactionsTable(systemId)
-    await this._loadFactionOptions(systemId)
   }
 
-  async onFactionChange() {
-    const factionId = this.factionTarget.value
-    this._setHidden(this.chartTarget?.closest('#faction-graph'), true)
-    this._setHidden(this.topPlayersTarget, true)
-    this._setHidden(this.versusTableTarget.closest('#versus-table'), true)
-    this._setHidden(this.factionGamesTarget, true)
-    if (!factionId) return
+  // Clicking a faction row shows its details below the table; clicking it again hides them
+  async onFactionClick(ev) {
+    if (ev.target.closest('a, button, input, select')) return
+    const row = ev.target.closest('tr[data-faction-id]')
+    if (!row) return
+
+    const factionId = row.dataset.factionId
+    if (this._selectedFactionId === factionId) {
+      this._collapseFaction()
+      return
+    }
+
+    this._collapseFaction()
+    this._selectedFactionId = factionId
+    this._showFactionDetails()
 
     await Promise.all([
       this._loadFactionSeries(factionId),
@@ -78,7 +80,7 @@ export default class extends Controller {
 
     await this._loadFactionsTable(systemId)
 
-    const factionId = this.factionTarget.value
+    const factionId = this._selectedFactionId
     if (!factionId) return
 
     // The rating chart uses every competitive game and ignores the tournament-only filter
@@ -107,7 +109,7 @@ export default class extends Controller {
 
   _factionRow(row) {
     return `
-      <tr data-faction-id="${row.faction_id}" data-high-concentration="${row.high_concentration}" data-high-uncertainty="${row.provisional}">
+      <tr data-faction-id="${row.faction_id}" data-faction-name="${this._e(row.faction_name)}" data-rating="${row.rating}" data-high-concentration="${row.high_concentration}" data-high-uncertainty="${row.provisional}">
         <td>${this._e(row.faction_name)}</td>
         ${this._ratingCells(row)}
         ${this._concentrationCell(row)}
@@ -116,6 +118,7 @@ export default class extends Controller {
         <td>${row.wins}</td>
         <td>${row.losses}</td>
         <td>${row.draws}</td>
+        ${this._scoreVsExpectedCell(row)}
         <td>${row.win_percent != null ? row.win_percent + '%' : ''}</td>
         <td>${row.loss_percent != null ? row.loss_percent + '%' : ''}</td>
         <td>${row.draw_percent != null ? row.draw_percent + '%' : ''}</td>
@@ -124,23 +127,56 @@ export default class extends Controller {
     `
   }
 
-  async _loadFactionOptions(systemId) {
-    const url = this._url(`/game/factions?game_system_id=${encodeURIComponent(systemId)}`)
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
-    const list = await res.json()
-    this._factionOptions = list
-    for (const f of list) {
-      const opt = document.createElement('option')
-      opt.value = String(f.id)
-      opt.textContent = f.name
-      this.factionTarget.appendChild(opt)
+  _factionRowEl(factionId) {
+    return this._factionRows().find(r => r.dataset.factionId === factionId)
+  }
+
+  // Bold lines where the rating-sorted rows enter and leave the balanced band
+  _markBalanceBand() {
+    const low = Number(this.element.dataset.balanceLow)
+    const high = Number(this.element.dataset.balanceHigh)
+    const byRating = this._factionsSort?.key === 'rating'
+    let previous = null
+    this._factionRows().forEach(row => {
+      row.classList.remove('balance-edge')
+      if (!byRating || row.hidden) return
+      const rating = Number(row.dataset.rating)
+      const inside = rating >= low && rating <= high
+      if (previous !== null && previous !== inside) row.classList.add('balance-edge')
+      previous = inside
+    })
+  }
+
+  _factionRows() {
+    return Array.from(this.factionsTableTarget.querySelectorAll('tbody tr[data-faction-id]'))
+  }
+
+  _showFactionDetails() {
+    const row = this._factionRowEl(this._selectedFactionId)
+    if (!row || row.hidden) {
+      this._collapseFaction()
+      return
     }
+    row.classList.add('is-selected')
+    this.factionNameTarget.textContent = row.dataset.factionName || ''
+    this._setHidden(this.factionDetailsTarget, false)
+  }
+
+  _collapseFaction() {
+    this._selectedFactionId = null
+    this._setHidden(this.factionDetailsTarget, true)
+    this._setHidden(this.chartTarget?.closest('#faction-graph'), true)
+    this._setHidden(this.topPlayersTarget, true)
+    this._setHidden(this.versusTableTarget.closest('#versus-table'), true)
+    this._setHidden(this.factionGamesTarget, true)
+    this._factionRows().forEach(r => r.classList.remove('is-selected'))
   }
 
   async _loadFactionSeries(factionId) {
     const url = this._url(`/stats/faction_rating_series?faction_id=${encodeURIComponent(factionId)}`)
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
+    if (this._selectedFactionId !== factionId) return
     const series = data.series || []
     // Update the elo-chart controller value directly to avoid timing issues
     const ctrl = this.application.getControllerForElementAndIdentifier(this.chartTarget, 'elo-chart')
@@ -160,6 +196,7 @@ export default class extends Controller {
     const url = this._url(this._withStatsFilters(`/stats/faction_vs?faction_id=${encodeURIComponent(factionId)}`))
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
+    if (this._selectedFactionId !== factionId) return
     this._vsData = this._normalizeRows(data.rows || [])
 
     if (this._vsData.length > 0) {
@@ -188,6 +225,7 @@ export default class extends Controller {
     const url = this._url(this._withStatsFilters(`/stats/faction_top_players?faction_id=${encodeURIComponent(factionId)}`))
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
     const data = await res.json()
+    if (this._selectedFactionId !== factionId) return
     const players = data.players || []
     const tbody = this.topPlayersTableTarget.querySelector('tbody')
     if (players.length === 0) {
@@ -212,6 +250,7 @@ export default class extends Controller {
     const url = this._url(this._withStatsFilters(`/stats/faction_games?faction_id=${encodeURIComponent(factionId)}`))
     const res = await fetch(url, { headers: { 'Accept': 'text/html' } })
     const html = await res.text()
+    if (this._selectedFactionId !== factionId) return
     const frame = this.factionGamesTarget.querySelector('#faction-games-frame')
     if (frame) frame.innerHTML = html
     this._setHidden(this.factionGamesTarget, false)
@@ -220,7 +259,11 @@ export default class extends Controller {
   _renderRows(tableEl, rows, templateFn) {
     const tbody = tableEl.querySelector('tbody')
     tbody.innerHTML = rows.map(templateFn).join('')
-    if (tableEl === this.factionsTableTarget) this._applyFactionFilters()
+    if (tableEl !== this.factionsTableTarget) return
+
+    this._applyFactionFilters()
+    // Keep the selected faction highlighted after a sort or a reload
+    if (this._selectedFactionId) this._showFactionDetails()
   }
 
   _sortTable(ev, tableEl, dataKey, state) {
@@ -306,10 +349,14 @@ export default class extends Controller {
   _applyFactionFilters() {
     const hideConcentration = this.hasHideHighConcentrationTarget && this.hideHighConcentrationTarget.checked
     const hideUncertainty = this.hasHideHighUncertaintyTarget && this.hideHighUncertaintyTarget.checked
-    this.factionsTableTarget.querySelectorAll('tbody tr').forEach(row => {
+    this._factionRows().forEach(row => {
       row.hidden = (hideConcentration && row.dataset.highConcentration === 'true') ||
         (hideUncertainty && row.dataset.highUncertainty === 'true')
     })
+    this._markBalanceBand()
+    // A faction hidden by the filters hides its details
+    const selected = this._selectedFactionId && this._factionRowEl(this._selectedFactionId)
+    if (selected?.hidden) this._collapseFaction()
   }
 
   _updateVersusVisibility() {
@@ -356,6 +403,18 @@ export default class extends Controller {
       ? ` ${this._badge(this.element.dataset.highConcentrationLabel, 'concentration')}`
       : ''
     return `<td>${Math.round(row.concentration * 100)}%${badge}</td>`
+  }
+
+  // Actual score (win 1, draw 0.5) minus the sum of expected scores over rated games
+  _scoreVsExpectedCell(row) {
+    if (row.score_vs_expected == null) return '<td></td>'
+    const diff = row.score_vs_expected
+    const sign = diff > 0 ? '+' : ''
+    const tooltip = (this.element.dataset.scoreVsExpectedTooltip || '%{actual} / %{expected} (%{games})')
+      .replace('%{actual}', row.actual_score)
+      .replace('%{expected}', row.expected_score)
+      .replace('%{games}', row.rated_games)
+    return `<td class="nowrap" title="${this._e(tooltip)}">${sign}${diff.toFixed(1)}</td>`
   }
 
   _badge(label, kind = 'provisional') {
