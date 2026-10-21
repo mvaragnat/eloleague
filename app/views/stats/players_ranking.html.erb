@@ -12,6 +12,12 @@
       <%= select_tag :game_system_id,
                      options_for_select(@systems.sort_by(&:localized_name).map { |sys| [sys.localized_name, sys.id] }, @system&.id),
                      class: 'input', onchange: 'this.form.submit()' %>
+      <label class="inline-flex items-center gap-2 mt-3">
+        <%= hidden_field_tag :hide_high_uncertainty, '0', id: nil %>
+        <%= check_box_tag :hide_high_uncertainty, '1', @hide_high_uncertainty,
+                          class: 'h-4 w-4', onchange: 'this.form.submit()' %>
+        <span><%= t('stats.players_ranking.hide_high_uncertainty') %></span>
+      </label>
     <% end %>
 
     <div class="mt-3">

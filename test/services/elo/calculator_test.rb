@@ -139,12 +139,25 @@ class EloCalculatorTest < ActiveSupport::TestCase
     assert_operator known_concentrated.faction_rd, :<, 120
   end
 
-  test 'player influence a = 0.7 caps the faction weight (spec example 7.3)' do
-    a, = Elo::Calculator.new(player_influence: 0.7).rate(@veteran, @newcomer, 1.0)
+  test 'player influence a = 0.7: strength R_player + (0.3 / 0.7)·R_faction, split as in spec 7.2' do
+    a, b = Elo::Calculator.new(player_influence: 0.7).rate(@veteran, @newcomer, 0.0)
 
-    assert_in_delta 0.703, a.expected, 0.001
-    assert_equal 1801, a.player_rating # +0.8
-    assert_equal 1512, a.faction_rating # +11.9
+    # 1800 + 0.4286 × 1500 vs 1500 + 0.4286 × 1600
+    assert_in_delta 0.744, a.expected, 0.001
+    # Spec weights for A: 0.061 / 0.939
+    assert_in_delta 0.061 / 0.939, (a.player_rating - 1800).to_f / (a.faction_rating - 1500), 0.01
+    # For B: 0.7 × 300² vs 0.3 × 80², i.e. 0.970 / 0.030
+    assert_in_delta 0.970 / 0.030, (b.player_rating - 1500).to_f / (b.faction_rating - 1600), 2
+  end
+
+  test 'a = 0.5 is the additive model' do
+    half = Elo::Calculator.new(player_influence: 0.5).rate(@veteran, @newcomer, 1.0)
+    assert_equal @calc.rate(@veteran, @newcomer, 1.0).map(&:to_h), half.map(&:to_h)
+  end
+
+  test 'a player influence outside ]0, 1] is rejected' do
+    assert_raises(ArgumentError) { Elo::Calculator.new(player_influence: 0) }
+    assert_raises(ArgumentError) { Elo::Calculator.new(player_influence: 1.2) }
   end
 
   test 'with a player influence the faction weighs less than in the additive model' do
@@ -170,9 +183,9 @@ class EloCalculatorTest < ActiveSupport::TestCase
     a, = Elo::Calculator.new(player_influence: 0.7).rate(@veteran, @newcomer, 1.0)
     assert_equal [spec.round, Elo::Calculator::FACTION_RD_MAX].min, a.faction_rd
 
-    # Below the cap: 120 -> 116 (the naive (1 - a)² version would stay at 120)
+    # Below the cap: 120 -> 117 (the naive (1 - a)² version would stay at 120)
     known = Side.new(**@veteran.to_h, faction_rd: 120)
     weighted, = Elo::Calculator.new(player_influence: 0.7).rate(known, @newcomer, 1.0)
-    assert_equal 116, weighted.faction_rd
+    assert_equal 117, weighted.faction_rd
   end
 end

@@ -429,6 +429,7 @@ en:
     hide_high_uncertainty: "Hide factions with high uncertainty"
     badges_hint: "Badges: \"High concentration\" when the concentration exceeds %{concentration}% (fewer than %{players} effective players), \"High uncertainty\" when the rating deviation (RD) exceeds %{deviation}. Non-competitive games are excluded."
     players_ranking:
+      hide_high_uncertainty: "Hide players with high uncertainty"
       title: "Player ranking"
       hint: "Temporary table. Sorted by rating R by default."
       empty: "No rated player for this game system yet."

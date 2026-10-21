@@ -21,8 +21,11 @@ class StatsController < ApplicationController
     @systems = Game::System.order(:name)
     @system = Game::System.find_by(id: params[:game_system_id]) ||
               Game::System.find_by(id: 1) || Game::System.order(:id).first
-    @player_ratings = EloRating.where(game_system: @system).includes(:user)
-                               .sort_by { |row| [-row.rating, row.rating_deviation] }
+    # Hide players with a high uncertainty unless explicitly unchecked (param "0")
+    @hide_high_uncertainty = params[:hide_high_uncertainty] != '0'
+    ratings = EloRating.where(game_system: @system).includes(:user)
+    ratings = ratings.where(rating_deviation: ..Elo::Calculator::PROVISIONAL_RD) if @hide_high_uncertainty
+    @player_ratings = ratings.sort_by { |row| [-row.rating, row.rating_deviation] }
   end
 
   # JSON: versus table for a given faction within its system

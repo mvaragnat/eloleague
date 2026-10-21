@@ -12,10 +12,11 @@ Rails.application.config.x.rating.tap do |rating|
   # Initial rating R and deviation RD of a new faction (the deviation is also its maximum).
   rating.faction_start_rating = ENV.fetch('RATING_FACTION_START', '1500').to_i
   rating.faction_start_deviation = ENV.fetch('RATING_FACTION_START_RD', '250').to_i
-  # Player influence a (0..1) on a game: each side's strength is a·R_player + (1 - a)·R_faction,
-  # so the faction weighs (1 - a). A game's change is split between player and faction in
-  # proportion to a·RD_player² and (1 - a)·RD_faction². 0.7 = factions weigh 30%.
-  # Set it to an empty value for the plain additive model R_player + R_faction.
+  # Player influence a (0 < a <= 1) on a game: each side's strength is
+  # R_player + ((1 - a) / a)·R_faction, so the faction weighs (1 - a) against a for the player
+  # while player ratings keep the Elo scale. A game's change is split between player and
+  # faction in proportion to a·RD_player² and (1 - a)·RD_faction². 0.7 = factions weigh 30%.
+  # 0.5 (or an empty value) is the plain additive model R_player + R_faction.
   rating.player_influence = ENV.fetch('RATING_PLAYER_INFLUENCE', '0.7').presence&.to_f
   # Lowest deviation anyone can reach; a player's maximum is its start deviation
   # si cette valeur est trop basse (exemple : 5) un joueur tres actif ne verrait presque plus son score bouger. garder min 30 environ

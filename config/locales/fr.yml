@@ -396,6 +396,7 @@ fr:
     hide_high_uncertainty: "Masquer les factions à incertitude élevée"
     badges_hint: "Badges : « Concentration élevée » quand la concentration dépasse %{concentration} % (moins de %{players} joueurs effectifs), « Incertitude élevée » quand l'incertitude (RD) dépasse %{deviation}. Les parties non compétitives sont exclues."
     players_ranking:
+      hide_high_uncertainty: "Masquer les joueurs à incertitude élevée"
       title: "Classement des joueurs"
       hint: "Tableau temporaire. Trié par défaut sur le classement R."
       empty: "Aucun joueur classé pour ce système de jeu."

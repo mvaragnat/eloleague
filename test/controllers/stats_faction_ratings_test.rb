@@ -63,7 +63,14 @@ class StatsFactionRatingsTest < ActionDispatch::IntegrationTest
     EloRating.create!(user: newcomer, game_system: system, rating: 1900, rating_deviation: 250)
     EloRating.create!(user: user, game_system: system, rating: 1700, rating_deviation: 60)
 
+    # High uncertainty players are hidden by default
     get stats_players_ranking_path, params: { game_system_id: system.id }
+    assert_response :success
+    assert_select 'input[type=checkbox][name=hide_high_uncertainty][checked]'
+    assert_select 'tbody tr', 1
+    assert_select 'tbody td', text: 'lucky', count: 0
+
+    get stats_players_ranking_path, params: { game_system_id: system.id, hide_high_uncertainty: '0' }
     assert_response :success
     assert_select 'h1', I18n.t('stats.players_ranking.title')
     assert_select 'tbody tr:first-child td:nth-child(2)', 'lucky'

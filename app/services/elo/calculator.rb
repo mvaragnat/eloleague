@@ -6,8 +6,10 @@ module Elo
   # Each side's effective strength combines the player and faction ratings with
   # coefficients (cp, cf): cp·R_player + cf·R_faction, uncertainties combining as
   # cp²·RD_player² + cf²·RD_faction². With a player influence a (PLAYER_INFLUENCE)
-  # the coefficients are (a, 1 - a), a weighted mean that caps the faction's
-  # influence; without it they are (1, 1), the plain additive model.
+  # the coefficients are (1, (1 - a) / a): the faction weighs (1 - a) against a for
+  # the player, while player ratings keep the Elo scale (400 points = 10:1 odds
+  # between two players on the same faction). a = 0.5 gives (1, 1), the plain
+  # additive model, which is also used when no influence is set.
   # A game yields one Glicko update for the combined pair, which is then split
   # between player and faction in proportion to cp·RD_player² and cf·RD_faction²:
   # the most uncertain component absorbs most of the signal. Deviations shrink at
@@ -86,7 +88,11 @@ module Elo
     # out of the uncertainty and only the players are updated.
     # Returns [Result for A, Result for B].
     def initialize(player_influence: PLAYER_INFLUENCE)
-      @player_coef, @faction_coef = player_influence ? [player_influence, 1.0 - player_influence] : [1.0, 1.0]
+      influence = player_influence || 0.5
+      raise ArgumentError, 'player influence must be in ]0, 1]' unless influence.positive? && influence <= 1
+
+      @player_coef = 1.0
+      @faction_coef = (1.0 - influence) / influence
     end
 
     def rate(side_a, side_b, score_a, mirror: false)

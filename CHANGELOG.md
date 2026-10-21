@@ -9,7 +9,7 @@
   - Stats: the faction table gains a sortable "Rating" column, and the faction win-rate chart is replaced by a rating chart with a shaded ± RD band and yellow bars at each balance patch.
   - Temporary player ranking (rating R, uncertainty RD, games) on a separate, unlinked page `/stats/players_ranking?game_system_id=…`, to help tune the rating parameters.
   - The UI shows the rating R and its uncertainty RD (profiles `R ± RD`, Stats tables in two columns); game cards show R before → after for the player and the faction.
-  - Factions' influence is capped by a player influence `a` (default 0.7, `RATING_PLAYER_INFLUENCE`): each side's strength is `a × R_player + (1 − a) × R_faction`.
+  - Factions' influence is capped by a player influence `a` (default 0.7, `RATING_PLAYER_INFLUENCE`): each side's strength is `R_player + ((1 − a) / a) × R_faction` (player ratings keep the Elo scale; `a = 0.5` is the plain sum).
   - Rating parameters (initial R and RD for players and factions, etc.) are set in `config/initializers/rating.rb` and can be overridden with environment variables.
   - Elimination seeding now sorts players by `rating − 2 × RD`, so an uncertain newcomer is not seeded above established players.
   - All existing ratings are discarded by the migration: run `rails elo:rebuild` after deploying.
