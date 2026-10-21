@@ -103,10 +103,12 @@ class EloCalculatorTest < ActiveSupport::TestCase
     assert_equal Elo::Calculator::RD_MIN, ra.faction_rd
   end
 
-  test 'provisional above 100 RD and conservative rating is R - 2 RD' do
-    assert Elo::Calculator.provisional?(101)
-    assert_not Elo::Calculator.provisional?(100)
-    assert_equal 1400, Elo::Calculator.conservative(1600, 100)
+  test 'provisional above the configured RD threshold and conservative rating is R - k RD' do
+    threshold = Elo::Calculator::PROVISIONAL_RD
+    assert Elo::Calculator.provisional?(threshold + 1)
+    assert_not Elo::Calculator.provisional?(threshold)
+    expected = (1600 - (Elo::Calculator::CONSERVATIVE_FACTOR * 100)).round
+    assert_equal expected, Elo::Calculator.conservative(1600, 100)
   end
 
   test 'diversity follows the Herfindahl index (spec example 5.4)' do
