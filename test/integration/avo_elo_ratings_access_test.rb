@@ -14,4 +14,30 @@ class AvoEloRatingsAccessTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes @response.body, 'Elo ratings'
   end
+
+  test 'admin can access faction ratings index' do
+    get '/avo/resources/faction_ratings'
+    assert_response :success
+  end
+
+  test 'admin can access faction rating resets index' do
+    get '/avo/resources/faction_rating_resets'
+    assert_response :success
+  end
+
+  test 'game factions offer the balance-patch reset action' do
+    get '/avo/resources/game_factions'
+    assert_response :success
+    assert_includes @response.body, 'Reset rating deviation (balance patch)'
+  end
+
+  test 'reset action raises the deviation and records the reset' do
+    faction = Game::Faction.create!(game_system: game_systems(:chess), name: 'Patched')
+    rating = FactionRating.create!(faction: faction, game_system: faction.game_system, rating_deviation: 60)
+    fields = { rating_deviation: Elo::Calculator::FACTION_RD_MAX.to_s }
+    Avo::Actions::ResetFactionRatingDeviation.new.handle(query: [faction], fields: fields)
+
+    assert_equal Elo::Calculator::FACTION_RD_MAX, rating.reload.rating_deviation
+    assert_equal 1, faction.faction_rating_resets.count
+  end
 end

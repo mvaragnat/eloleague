@@ -1,0 +1,28 @@
+<% content_for :title, t('stats.players_ranking.title') %>
+
+<%# Temporary: player ranking to check the rating parameters. Not linked from the UI. %>
+<div class="stats-container">
+  <div class="page-header">
+    <h1><%= t('stats.players_ranking.title') %></h1>
+  </div>
+
+  <div class="card">
+    <%= form_with url: stats_players_ranking_path, method: :get, local: true do %>
+      <label for="game_system_id"><%= t('stats.system_label', default: 'Game system') %></label>
+      <%= select_tag :game_system_id,
+                     options_for_select(@systems.sort_by(&:localized_name).map { |sys| [sys.localized_name, sys.id] }, @system&.id),
+                     class: 'input', onchange: 'this.form.submit()' %>
+      <label class="inline-flex items-center gap-2 mt-3">
+        <%= hidden_field_tag :hide_high_uncertainty, '0', id: nil %>
+        <%= check_box_tag :hide_high_uncertainty, '1', @hide_high_uncertainty,
+                          class: 'h-4 w-4', onchange: 'this.form.submit()' %>
+        <span><%= t('stats.players_ranking.hide_high_uncertainty') %></span>
+      </label>
+    <% end %>
+
+    <div class="mt-3">
+      <div class="hint text-sm text-gray-500 mb-2"><%= t('stats.players_ranking.hint') %></div>
+      <%= render 'stats/players' %>
+    </div>
+  </div>
+</div>

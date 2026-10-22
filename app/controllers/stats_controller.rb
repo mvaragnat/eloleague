@@ -15,6 +15,19 @@ class StatsController < ApplicationController
     render json: { ok: true, rows: stats }
   end
 
+  # Player rating ranking for a system, by rating R.
+  # Temporary: helps tuning the player/faction rating parameters. Not linked from the UI.
+  def players_ranking
+    @systems = available_game_systems
+    @system = Current.game_system || Game::System.find_by(id: params[:game_system_id]) ||
+              Game::System.find_by(id: 1) || Game::System.order(:id).first
+    # Hide players with a high uncertainty unless explicitly unchecked (param "0")
+    @hide_high_uncertainty = params[:hide_high_uncertainty] != '0'
+    ratings = EloRating.where(game_system: @system).includes(:user)
+    ratings = ratings.where(rating_deviation: ..Elo::Calculator::PROVISIONAL_RD) if @hide_high_uncertainty
+    @player_ratings = ratings.sort_by { |row| [-row.rating, row.rating_deviation] }
+  end
+
   # JSON: versus table for a given faction within its system
   def faction_vs
     faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
@@ -22,10 +35,11 @@ class StatsController < ApplicationController
     render json: { ok: true, rows: rows }
   end
 
-  # JSON: time series of winrate for a faction
-  def faction_winrate_series
+  # JSON: rating history (R ± RD) of a faction, with balance-patch resets.
+  # Ratings use every competitive game, so the tournament-only filter does not apply.
+  def faction_rating_series
     faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
-    series = Stats::FactionWinrateSeries.new(faction: faction, tournament_only: tournament_only?).call
+    series = Stats::FactionRatingSeries.new(faction: faction).call
     render json: { ok: true, series: series }
   end
 

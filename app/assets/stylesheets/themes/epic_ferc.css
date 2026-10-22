@@ -210,6 +210,8 @@ select option { background: var(--ea-surface-light); color: var(--text-strong); 
 /***** Badges & status colors *****/
 .status-badge--pending { background: rgba(232, 149, 47, 0.15); color: var(--ea-ember); }
 .status-badge--checked_in { background: rgba(95, 163, 90, 0.18); color: #9fd49a; }
+.status-badge--provisional { background: rgba(200, 160, 82, 0.15); color: var(--ea-gold-light); }
+.status-badge--concentration { background: rgba(196, 58, 26, 0.18); color: #f0a08a; }
 .validation-mark--ok { color: #7cc576; }
 .validation-mark--waiting { color: var(--ea-ember); }
 .text-red { color: #ef6b5a; }
@@ -225,6 +227,7 @@ select option { background: var(--ea-surface-light); color: var(--text-strong); 
   color: var(--ea-gold);
 }
 .ranking-th { border-bottom-color: var(--ea-gold-a20); border-right-color: var(--ea-line); }
+.table--selectable tbody tr.is-selected { background: var(--ea-gold-a10); }
 .ranking-td { border-bottom-color: var(--ea-line); border-right-color: var(--ea-line); }
 
 /***** Dashboard *****/

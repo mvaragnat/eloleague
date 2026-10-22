@@ -309,6 +309,20 @@ fr:
       type: "Tournoi"
       settings: "Paramètres"
       online_label: "Tournoi en ligne"
+    export_members:
+      sent: "Export envoyé à %{email}"
+    members_export:
+      title: "Exporter les joueurs"
+      description: "Recevez par email un fichier Excel des joueurs inscrits (pseudo, email, statut, vérifié) à l'adresse %{email}."
+      submit: "M'envoyer l'export"
+      sheet_name: "Joueurs"
+      "yes": "Oui"
+      "no": "Non"
+      columns:
+        username: "Pseudo"
+        email: "Email"
+        status: "Statut"
+        confirmed: "Vérifié"
     email_players:
       title: "Envoyer un email aux joueurs"
       description: "Envoyer un message à tous les joueurs inscrits ou à un seul d'entre eux. Votre email (%{organizer_email}) sera indiqué dans l'email pour que les joueurs puissent vous répondre directement."
@@ -361,6 +375,8 @@ fr:
       select_prompt: "Sélectionnez un système de score"
       about: "Système de score"
   elo:
+    provisional: "Incertitude élevée"
+    rating_tooltip: "R %{rating} ± %{deviation} : classement R et son incertitude RD, qui diminue à chaque partie ; elle est signalée comme élevée au-dessus de %{provisional}."
     title: "Classements ELO"
     game_systems: "Jeu"
     my_current_rankings: "Mes classements ELO actuels"
@@ -385,16 +401,30 @@ fr:
       long: "Le %d/%m/%Y à %Hh%M"
       card: "%d/%m/%Y"
   stats:
+    balance_band_hint: "Les lignes en gras délimitent la zone d'équilibre idéale, ±%{band} autour du classement de départ (%{low}–%{high}) : entre deux joueurs de même niveau, deux factions de cette zone ne modifient pas la probabilité de victoire de plus de %{shift} points (%{favorite}/%{underdog} au pire). Visible quand le tableau est trié par classement."
+    uncertainty: "Incertitude"
+    uncertainty_hint: "Déviation RD : à quel point le classement est encore incertain. Elle diminue à chaque partie."
+    concentration: "Concentration"
+    concentration_hint: "Concentration des parties de la faction entre ses joueurs sur les %{months} derniers mois (indice de Herfindahl) : 100 % si un seul joueur la joue, environ 1/N si N joueurs se la partagent également. Plus elle est élevée, plus le classement de la faction reflète quelques joueurs, et moins chacune de leurs parties compte pour la faction."
+    high_concentration: "Concentration élevée"
+    hide_high_concentration: "Masquer les factions à concentration élevée"
+    hide_high_uncertainty: "Masquer les factions à incertitude élevée"
+    badges_hint: "Badges : « Concentration élevée » quand la concentration dépasse %{concentration} % (moins de %{players} joueurs effectifs), « Incertitude élevée » quand l'incertitude (RD) dépasse %{deviation}. Les parties non compétitives sont exclues."
+    players_ranking:
+      hide_high_uncertainty: "Masquer les joueurs à incertitude élevée"
+      title: "Classement des joueurs"
+      hint: "Tableau temporaire. Trié par défaut sur le classement R."
+      empty: "Aucun joueur classé pour ce système de jeu."
+    rating_chart_hint: "Évolution du classement R de la faction. La zone ombrée couvre R ± RD ; les barres jaunes marquent les patchs d'équilibrage."
+    rating: "Classement"
+    rating_hint: "Classement R de la faction, calculé sur toutes les parties compétitives indépendamment du niveau des joueurs."
     title: "Statistiques"
     system_label: "Système de jeu"
     select_system: "Sélectionnez un système de jeu"
-    faction_label: "Faction"
-    select_faction: "Sélectionnez une faction"
     mirror_hint: "Les miroirs sont comptés dans le total mais exclus des V/D/N et du % de victoire."
+    faction_click_hint: "Cliquez sur une faction pour afficher ses détails."
     threshold_hint: "Les tableaux affichent uniquement les lignes avec suffisamment de données : au moins %{players} joueurs uniques et %{games} matchs. Les parties non-compétitives sont exclues."
-    warning_hint: "Toutes les lignes sont affichées. Les warnings signalent les lignes peu représentatives. Les parties non-compétitives sont exclues."
     versus_warning_hint: "Les warnings utilisent au moins %{players} joueurs uniques et %{games} matchs pour la confiance des matchups."
-    hide_non_representative: "Masquer les lignes non représentatives"
     tournament_only: "N'utiliser que les matchs de tournois"
     faction: "Faction"
     total_games: "Matchs"
@@ -430,6 +460,9 @@ fr:
       player_match_share: "Un joueur représente plus de %{percent}% des matchs"
   mailers:
     tournament_organizer:
+      members_export:
+        subject: "[%{tournament}] Export des joueurs"
+        body_html: "Vous trouverez en pièce jointe la liste des joueurs inscrits à <strong>%{tournament}</strong>."
       message_players:
         subject: "[%{tournament}] %{subject}"
         from_organizer_html: "Message de l'organisateur de <strong>%{tournament}</strong>, %{organizer} :"

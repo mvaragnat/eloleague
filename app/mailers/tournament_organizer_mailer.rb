@@ -23,6 +23,22 @@ class TournamentOrganizerMailer < ApplicationMailer
     end
   end
 
+  # Sends the organizer an Excel export of the tournament's registrations
+  def members_export
+    @tournament = params[:tournament]
+    @user = params[:user]
+    @tournament_url = tournament_url(@tournament, locale: I18n.locale)
+
+    I18n.with_locale(locale_for(@user)) do
+      export = Tournament::MembersExport.new(tournament: @tournament)
+      attachments[export.filename] = { mime_type: Tournament::MembersExport::CONTENT_TYPE, content: export.call }
+      mail(
+        to: @user.email,
+        subject: I18n.t('mailers.tournament_organizer.members_export.subject', tournament: @tournament.name)
+      )
+    end
+  end
+
   private
 
   def locale_for(_user)

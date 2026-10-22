@@ -29,6 +29,20 @@
 
 
 
+  <div class="card" id="export-members" style="margin-bottom:0.5rem;">
+    <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
+      <%= t('tournaments.members_export.title', default: 'Export players') %>
+    </h3>
+    <div class="card-body" style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+      <span class="card-date" style="font-style:normal;">
+        <%= t('tournaments.members_export.description', email: tournament.creator.email,
+              default: 'Receive an Excel file listing registered players (username, email, status, confirmed) at %{email}.') %>
+      </span>
+      <%= button_to t('tournaments.members_export.submit', default: 'Email me the export'),
+                    export_members_tournament_path(tournament), method: :post, class: 'btn' %>
+    </div>
+  </div>
+
   <div class="card" id="email-players" style="margin-bottom:0.5rem;">
     <h3 style="margin:0 0 0.25rem 0; font-size:1rem; font-weight:600;">
       <%= t('tournaments.email_players.title', default: 'Email players') %>

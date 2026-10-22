@@ -113,6 +113,15 @@ class GameSiteTest < ActionDispatch::IntegrationTest
     assert_equal [], response.parsed_body
   end
 
+  test 'game site players ranking stays on its game system' do
+    host! SITE_HOST
+    sign_in @user
+    get stats_players_ranking_path(locale: :en), params: { game_system_id: game_systems(:go).id }
+    assert_response :success
+    assert_select 'select[name=game_system_id] option', count: 1
+    assert_select 'select[name=game_system_id] option[selected][value=?]', game_systems(:chess).id.to_s
+  end
+
   test 'game site championships have no system selector' do
     host! SITE_HOST
     get championships_path(locale: :en), params: { game_system_id: game_systems(:go).id }

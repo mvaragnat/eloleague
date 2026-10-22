@@ -1,8 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
-// A lightweight SVG chart renderer for ELO over time across multiple systems.
+// A lightweight SVG chart renderer for ratings over time.
 // Expects data via data-elo-chart-series-value: an array of
-// [{ id, name, points: [{ t: epoch_ms, r: rating }, ...] }]
+// [{ id, name, band_factor, points: [{ t: epoch_ms, r: rating, rd: deviation }, ...], resets: [{ t: epoch_ms }, ...] }]
+// When points carry `rd`, a shaded band is drawn between r - k·rd and r + k·rd (k = band_factor, default 1).
+// Each reset (balance patch) is drawn as a vertical yellow bar.
+
+const SVG_NS = "http://www.w3.org/2000/svg"
+const RESET_COLOR = "#facc15"
 
 export default class extends Controller {
   static values = { series: Array }
@@ -20,13 +25,16 @@ export default class extends Controller {
     if (!series.length) return
 
     // Flatten points to compute domains
-    const allPoints = series.flatMap(s => s.points)
-    let minT = Math.min(...allPoints.map(p => p.t))
-    let maxT = Math.max(...allPoints.map(p => p.t))
+    const allPoints = series.flatMap(s => (s.points || []).map(p => ({ ...p, band: (p.rd || 0) * (s.band_factor || 1) })))
+    const allResets = series.flatMap(s => s.resets || [])
+    if (!allPoints.length) return
+    const allTimes = allPoints.map(p => p.t).concat(allResets.map(r => r.t))
+    let minT = Math.min(...allTimes)
+    let maxT = Math.max(...allTimes)
     const now = Date.now()
     if (now > maxT) maxT = now
-    const minR = Math.min(...allPoints.map(p => p.r))
-    const maxR = Math.max(...allPoints.map(p => p.r))
+    const minR = Math.min(...allPoints.map(p => p.r - p.band))
+    const maxR = Math.max(...allPoints.map(p => p.r + p.band))
 
     const padding = { left: 40, right: 10, top: 10, bottom: 20 }
     const W = 800, H = 300
@@ -49,7 +57,7 @@ export default class extends Controller {
     const sy = r => padding.top + ih - (ih * (r - yMin)) / (yMax - yMin || 1)
 
     // Axes (simple ticks)
-    const axis = document.createElementNS("http://www.w3.org/2000/svg", "g")
+    const axis = document.createElementNS(SVG_NS, "g")
     axis.style.stroke = "var(--chart-axis)"
     axis.setAttribute("stroke-width", "1")
     // X axis
@@ -67,30 +75,51 @@ export default class extends Controller {
     const primary = getComputedStyle(this.element).getPropertyValue("--chart-primary").trim()
     const colors = [
       primary || "#1f77b4",
-      "#ff7f0e", 
-      "#2ca02c", 
-      "#d62728", 
-      "#9467bd", 
+      "#ff7f0e",
+      "#2ca02c",
+      "#d62728",
+      "#9467bd",
       "#8c564b"
     ]
 
+    // Balance-patch resets, behind the curves
+    allResets.forEach(reset => {
+      const x = sx(reset.t)
+      const bar = this._line(x, padding.top, x, padding.top + ih)
+      bar.setAttribute("stroke", RESET_COLOR)
+      bar.setAttribute("stroke-width", "3")
+      bar.setAttribute("opacity", "0.9")
+      svg.appendChild(bar)
+    })
+
     series.forEach((s, idx) => {
-      // Apply moving average smoothing on rating values
-      const original = [...(s.points || [])]
-      const smoothed = this._movingAverage(original, 3)
+      const points = [...(s.points || [])]
       // Extend flat to now so the line reaches present
-      if (smoothed.length) {
-        const last = smoothed[smoothed.length - 1]
-        if (last.t < now) smoothed.push({ t: now, r: last.r })
+      if (points.length) {
+        const last = points[points.length - 1]
+        if (last.t < now) points.push({ ...last, t: now })
       }
-      if (!smoothed.length) return
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path")
+      if (!points.length) return
       const color = colors[idx % colors.length]
-      const points = smoothed.map(p => ({ x: sx(p.t), y: sy(p.r) }))
+
+      // Uncertainty band: r - k·rd .. r + k·rd
+      const k = s.band_factor || 1
+      if (points.every(p => p.rd != null)) {
+        const upper = points.map(p => `${sx(p.t)} ${sy(p.r + k * p.rd)}`)
+        const lower = points.slice().reverse().map(p => `${sx(p.t)} ${sy(p.r - k * p.rd)}`)
+        const band = document.createElementNS(SVG_NS, "path")
+        band.setAttribute("d", `M ${upper.join(" L ")} L ${lower.join(" L ")} Z`)
+        band.setAttribute("fill", color)
+        band.setAttribute("fill-opacity", "0.15")
+        band.setAttribute("stroke", "none")
+        svg.appendChild(band)
+      }
+
+      const path = document.createElementNS(SVG_NS, "path")
       // Straight line segments
       let d = ""
-      points.forEach((pt, i) => {
-        d += i === 0 ? `M ${pt.x} ${pt.y}` : ` L ${pt.x} ${pt.y}`
+      points.forEach((p, i) => {
+        d += i === 0 ? `M ${sx(p.t)} ${sy(p.r)}` : ` L ${sx(p.t)} ${sy(p.r)}`
       })
       path.setAttribute("d", d)
       path.setAttribute("fill", "none")
@@ -101,11 +130,11 @@ export default class extends Controller {
       svg.appendChild(path)
 
       // Label last point
-      const last = smoothed[smoothed.length - 1]
+      const last = points[points.length - 1]
       const maxX = padding.left + iw - 2
       const tx = Math.min(sx(last.t) + 6, maxX)
       const ty = sy(last.r)
-      const label = document.createElementNS("http://www.w3.org/2000/svg", "text")
+      const label = document.createElementNS(SVG_NS, "text")
       label.setAttribute("x", tx)
       label.setAttribute("y", ty)
       label.setAttribute("fill", color)
@@ -198,20 +227,4 @@ export default class extends Controller {
     if (seg === 'en' || seg === 'fr') return seg
     return document.documentElement.lang || navigator.language || 'en'
   }
-
-  // Simple moving average smoothing on rating values (window size n)
-  _movingAverage(points, n = 3) {
-    if (!points || points.length === 0) return []
-    const out = []
-    let sum = 0
-    for (let i = 0; i < points.length; i++) {
-      sum += points[i].r
-      if (i >= n) sum -= points[i - n].r
-      const count = Math.min(i + 1, n)
-      out.push({ t: points[i].t, r: sum / count })
-    }
-    return out
-  }
 }
-
-

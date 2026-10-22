@@ -8,9 +8,9 @@ class TournamentsController < ApplicationController
   skip_before_action :authenticate_user!, only: %i[index show]
   before_action :set_tournament,
                 only: %i[show register unregister check_in open_registration lock_registration finalize next_round
-                         update email_players]
+                         update email_players export_members]
   before_action :authorize_admin!,
-                only: %i[open_registration lock_registration finalize next_round update email_players]
+                only: %i[open_registration lock_registration finalize next_round update email_players export_members]
 
   def index
     # Populate Current.session/user even when authentication is not required
@@ -265,6 +265,14 @@ class TournamentsController < ApplicationController
                 notice: t('.sent',
                           count: recipients.size,
                           default: { one: '1 email sent', other: '%<count>s emails sent' })
+  end
+
+  # Emails the organizer an Excel export of the tournament's registrations
+  def export_members
+    TournamentOrganizerMailer.with(tournament: @tournament, user: Current.user).members_export.deliver_later
+
+    redirect_to tournament_path(@tournament, tab: @tournament.elimination? ? 3 : 4),
+                notice: t('.sent', email: Current.user.email, default: 'Export sent to %<email>s')
   end
 
   def finalize

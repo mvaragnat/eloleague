@@ -1546,6 +1546,45 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_select "select#email_recipient option[selected][value='#{target.id}']"
   end
 
+  test 'export_members emails the export to the organizer' do
+    sign_in @user
+    t = ::Tournament::Tournament.create!(
+      name: 'Export Cup',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+    t.registrations.create!(user: users(:player_two))
+
+    assert_enqueued_email_with TournamentOrganizerMailer, :members_export,
+                               params: { tournament: t, user: @user } do
+      post export_members_tournament_path(t, locale: I18n.locale)
+    end
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 4)
+    assert_not_nil flash[:notice]
+  end
+
+  test 'export_members is blocked for non-organizer' do
+    sign_in users(:player_two)
+    t = ::Tournament::Tournament.create!(
+      name: 'Export Cup Guard',
+      description: 'X',
+      game_system: game_systems(:chess),
+      format: 'open',
+      creator: @user,
+      state: 'registration'
+    )
+
+    assert_no_enqueued_emails do
+      post export_members_tournament_path(t, locale: I18n.locale)
+    end
+
+    assert_redirected_to tournament_path(t, locale: I18n.locale)
+  end
+
   test 'email_players is blocked for non-organizer' do
     sign_in users(:player_two)
     t = ::Tournament::Tournament.create!(

@@ -3,34 +3,201 @@
 require 'test_helper'
 
 class EloCalculatorTest < ActiveSupport::TestCase
+  Side = Elo::Calculator::Side
+
   def setup
-    @calc = Elo::Calculator.new
+    # Spec sections 3 to 6: plain additive model R_player + R_faction
+    @calc = Elo::Calculator.new(player_influence: nil)
+    # Example 1/2 of the spec: veteran on a rare faction vs newcomer on a well-known faction
+    @veteran = Side.new(player_rating: 1800, player_rd: 50, faction_rating: 1500, faction_rd: 300)
+    @newcomer = Side.new(player_rating: 1500, player_rd: 300, faction_rating: 1600, faction_rd: 80)
   end
 
-  test 'expected score symmetry sums to 1' do
-    a = 1500
-    b = 1700
-    ea = @calc.expected_score(a, b)
-    eb = @calc.expected_score(b, a)
-    assert_in_delta 1.0, ea + eb, 1e-9
+  test 'expected scores of both sides sum to 1 between equal uncertainties' do
+    a = Side.new(player_rating: 1500, player_rd: 100, faction_rating: 1500, faction_rd: 100)
+    b = Side.new(player_rating: 1700, player_rd: 100, faction_rating: 1500, faction_rd: 100)
+    ra, rb = @calc.rate(a, b, 1.0)
+    assert_in_delta 1.0, ra.expected + rb.expected, 1e-9
   end
 
-  test 'delta positive when score exceeds expected' do
-    expected = 0.25
-    delta = @calc.delta(score: 1.0, expected: expected)
-    assert_operator delta, :>, 0
+  test 'expected win: the uncertain faction absorbs almost all the signal' do
+    a, = @calc.rate(@veteran, @newcomer, 1.0)
+
+    assert_in_delta 0.694, a.expected, 0.001
+    assert_equal 1802, a.player_rating # +2.4
+    assert_equal 1585, a.faction_rating # +84.8
   end
 
-  test 'delta negative when score below expected' do
-    expected = 0.75
-    delta = @calc.delta(score: 0.0, expected: expected)
-    assert_operator delta, :<, 0
+  test 'upset: the uncertain newcomer gains a lot, its known faction little' do
+    _, b = @calc.rate(@veteran, @newcomer, 0.0)
+
+    assert_equal 1692, b.player_rating # +192
+    assert_equal 1614, b.faction_rating # +13.7
   end
 
-  test 'k factor is 30 by default' do
-    ea = @calc.expected_score(1500, 1700)
-    delta = @calc.delta(score: 1.0, expected: ea)
-    # should equal 30 * (1 - ea), rounded
-    assert_equal (30 * (1.0 - ea)).round, delta
+  test 'deviations shrink after a game, the most uncertain component the most (Kalman)' do
+    a, = @calc.rate(@veteran, @newcomer, 1.0)
+
+    assert_equal 50, a.player_rd # 49.8, rounded
+    # 261 by the spec maths, then capped at the faction maximum
+    assert_equal Elo::Calculator::FACTION_RD_MAX, a.faction_rd
+  end
+
+  test 'faction deviation shrinks below its cap' do
+    c = Side.new(player_rating: 1700, player_rd: 200, faction_rating: 1550, faction_rd: 120)
+    rc, = @calc.rate(c, c.dup, 1.0)
+
+    assert_operator rc.faction_rd, :<, 120
+    assert_operator rc.player_rd, :<, 200
+  end
+
+  test 'two newcomers split the change RD_player² : RD_faction² between player and faction' do
+    newcomer = Side.new(player_rating: 1500, player_rd: Elo::Calculator::START_DEVIATION,
+                        faction_rating: 1500, faction_rd: Elo::Calculator::FACTION_START_DEVIATION)
+    ra, = @calc.rate(newcomer, newcomer.dup, 1.0)
+
+    player_gain = ra.player_rating - 1500
+    faction_gain = ra.faction_rating - 1500
+    expected_ratio = (Elo::Calculator::START_DEVIATION.to_f**2) / (Elo::Calculator::FACTION_START_DEVIATION**2)
+    assert_in_delta expected_ratio, player_gain.to_f / faction_gain, 0.15 * expected_ratio
+  end
+
+  test 'calibrated pairs move little and share the change' do
+    c = Side.new(player_rating: 1700, player_rd: 40, faction_rating: 1550, faction_rd: 50)
+    d = Side.new(player_rating: 1650, player_rd: 45, faction_rating: 1500, faction_rd: 60)
+    rc, = @calc.rate(c, d, 0.0)
+
+    assert_in_delta 0.636, rc.expected, 0.001
+    assert_equal 1694, rc.player_rating
+    assert_equal 1541, rc.faction_rating
+  end
+
+  test 'mirror match only updates players' do
+    a = Side.new(player_rating: 1500, player_rd: 200, faction_rating: 1550, faction_rd: 300)
+    b = Side.new(player_rating: 1500, player_rd: 200, faction_rating: 1550, faction_rd: 300)
+    ra, rb = @calc.rate(a, b, 1.0, mirror: true)
+
+    assert_in_delta 0.5, ra.expected, 1e-9
+    assert_equal [1550, 300], [ra.faction_rating, ra.faction_rd]
+    assert_equal [1550, 300], [rb.faction_rating, rb.faction_rd]
+    assert_operator ra.player_rating, :>, 1500
+    assert_operator rb.player_rating, :<, 1500
+    assert_operator ra.player_rd, :<, 200
+  end
+
+  test 'draw between equal sides changes no rating' do
+    a = Side.new(player_rating: 1500, player_rd: 350, faction_rating: 1500, faction_rd: 350)
+    ra, rb = @calc.rate(a, a.dup, 0.5)
+
+    assert_equal 1500, ra.player_rating
+    assert_equal 1500, rb.faction_rating
+    assert_operator ra.player_rd, :<, 350
+  end
+
+  test 'deviation never goes below the minimum' do
+    min = Elo::Calculator::RD_MIN
+    a = Side.new(player_rating: 1500, player_rd: min, faction_rating: 1500, faction_rd: min)
+    ra, = @calc.rate(a, a.dup, 1.0)
+
+    assert_equal Elo::Calculator::RD_MIN, ra.player_rd
+    assert_equal Elo::Calculator::RD_MIN, ra.faction_rd
+  end
+
+  test 'provisional above the configured RD threshold and conservative rating is R - k RD' do
+    threshold = Elo::Calculator::PROVISIONAL_RD
+    assert Elo::Calculator.provisional?(threshold + 1)
+    assert_not Elo::Calculator.provisional?(threshold)
+    expected = (1600 - (Elo::Calculator::CONSERVATIVE_FACTOR * 100)).round
+    assert_equal expected, Elo::Calculator.conservative(1600, 100)
+  end
+
+  test 'diversity follows the Herfindahl index (spec example 5.4)' do
+    # 18 + 1 + 1 + 1 = 21 games (the spec divides by 20, which gives N_eff 1.22 and d 0.30)
+    d = Elo::Calculator.diversity([18, 1, 1, 1])
+
+    assert_in_delta 1.349, d.effective_players, 0.001 # H = 0.7415
+    assert_equal 4, d.players
+    assert_in_delta 0.337, d.factor, 0.001
+  end
+
+  test 'diversity is neutral without data and for evenly shared factions' do
+    assert_in_delta 1.0, Elo::Calculator.diversity([]).factor, 1e-9
+    assert_in_delta 1.0, Elo::Calculator.diversity([5, 5, 5]).factor, 1e-9
+  end
+
+  test 'a concentrated faction moves less and the player absorbs the rest' do
+    full = @calc.rate(@veteran, @newcomer, 1.0).first
+    concentrated = @calc.rate(Side.new(**@veteran.to_h, faction_diversity: 0.3), @newcomer, 1.0).first
+    known = Side.new(**@veteran.to_h, faction_rd: 120)
+    known_full = @calc.rate(known, @newcomer, 1.0).first
+    known_concentrated = @calc.rate(Side.new(**known.to_h, faction_diversity: 0.3), @newcomer, 1.0).first
+
+    # Same combined change (87.2), faction weight 0.973 * 0.3
+    assert_equal 1500 + (84.8 * 0.3).round, concentrated.faction_rating
+    assert_equal 1800 + (87.2 - (84.8 * 0.3)).round, concentrated.player_rating
+    assert_operator full.faction_rating, :>, concentrated.faction_rating
+    # v / d: the faction deviation shrinks more slowly
+    assert_operator known_concentrated.faction_rd, :>, known_full.faction_rd
+    assert_operator known_concentrated.faction_rd, :<, 120
+  end
+
+  test 'player influence a = 0.7: strength R_player + (0.3 / 0.7)·R_faction, split as in spec 7.2' do
+    a, b = Elo::Calculator.new(player_influence: 0.7).rate(@veteran, @newcomer, 0.0)
+
+    # 1800 + 0.4286 × 1500 vs 1500 + 0.4286 × 1600
+    assert_in_delta 0.744, a.expected, 0.001
+    # Spec weights for A: 0.061 / 0.939
+    assert_in_delta 0.061 / 0.939, (a.player_rating - 1800).to_f / (a.faction_rating - 1500), 0.01
+    # For B: 0.7 × 300² vs 0.3 × 80², i.e. 0.970 / 0.030
+    assert_in_delta 0.970 / 0.030, (b.player_rating - 1500).to_f / (b.faction_rating - 1600), 2
+  end
+
+  test 'a = 0.5 is the additive model' do
+    half = Elo::Calculator.new(player_influence: 0.5).rate(@veteran, @newcomer, 1.0)
+    assert_equal @calc.rate(@veteran, @newcomer, 1.0).map(&:to_h), half.map(&:to_h)
+  end
+
+  test 'a player influence outside ]0, 1] is rejected' do
+    assert_raises(ArgumentError) { Elo::Calculator.new(player_influence: 0) }
+    assert_raises(ArgumentError) { Elo::Calculator.new(player_influence: 1.2) }
+  end
+
+  test 'with a player influence the faction weighs less than in the additive model' do
+    newcomer = Side.new(player_rating: 1500, player_rd: 300, faction_rating: 1500, faction_rd: 300)
+    additive, = @calc.rate(newcomer, newcomer.dup, 1.0)
+    weighted, = Elo::Calculator.new(player_influence: 0.7).rate(newcomer, newcomer.dup, 1.0)
+
+    # Same deviations: additive splits 50/50, a = 0.7 splits 70/30
+    assert_equal additive.player_rating - 1500, additive.faction_rating - 1500
+    assert_in_delta 0.7 / 0.3, (weighted.player_rating - 1500).to_f / (weighted.faction_rating - 1500), 0.3
+  end
+
+  test 'the default calculator uses the configured player influence' do
+    expected = Elo::Calculator.new(player_influence: Elo::Calculator::PLAYER_INFLUENCE).rate(@veteran, @newcomer, 1.0)
+    assert_equal expected.map(&:to_h), Elo::Calculator.new.rate(@veteran, @newcomer, 1.0).map(&:to_h)
+  end
+
+  test 'the player influence does not slow down the faction uncertainty (spec 7.3)' do
+    # Spec: RD_f 300, RD_i 50, v ≈ 209585 -> RD'² = 90000 − 300⁴ / (2500 + 90000 + 209585) ≈ 63187, RD' ≈ 251.4
+    spec = Math.sqrt(90_000 - ((300.0**4) / (2500 + 90_000 + 209_585)))
+    assert_in_delta 251.4, spec, 0.1
+
+    a, = Elo::Calculator.new(player_influence: 0.7).rate(@veteran, @newcomer, 1.0)
+    assert_equal [spec.round, Elo::Calculator::FACTION_RD_MAX].min, a.faction_rd
+
+    # Below the cap: 120 -> 117 (the naive (1 - a)² version would stay at 120)
+    known = Side.new(**@veteran.to_h, faction_rd: 120)
+    weighted, = Elo::Calculator.new(player_influence: 0.7).rate(known, @newcomer, 1.0)
+    assert_equal 117, weighted.faction_rd
+  end
+
+  test 'balance band: two factions inside shift the win probability by at most the target' do
+    # a = 0.7, 10 points: combined gap 70.4, faction gap 164, band ±82
+    assert_equal 82, Elo::Calculator.balance_half_band(0.7, 0.10)
+    # Additive model: the faction gap counts fully
+    assert_equal 35, Elo::Calculator.balance_half_band(nil, 0.10)
+
+    gap = 2 * Elo::Calculator.balance_half_band(0.7, 0.10) * (0.3 / 0.7)
+    assert_in_delta 0.60, 1.0 / (1.0 + (10.0**(-gap / 400.0))), 0.002
   end
 end

@@ -18,9 +18,10 @@ class TournamentBracketBuilderTest < ActiveSupport::TestCase
     end
   end
 
-  def ensure_elo(user, rating)
+  def ensure_elo(user, rating, deviation = 350)
     EloRating.find_or_create_by!(user: user, game_system: @system) do |row|
       row.rating = rating
+      row.rating_deviation = deviation
       row.games_played = 0
     end
   end
@@ -74,6 +75,19 @@ class TournamentBracketBuilderTest < ActiveSupport::TestCase
     assert leaf_with_top.parent_match.present?
     parent = leaf_with_top.parent_match
     assert [parent.a_user_id, parent.b_user_id].compact.include?(top_user.id)
+  end
+
+  test 'seeding uses R - 2 RD: an uncertain high rating ranks below a calibrated one' do
+    t = build_tournament
+    users = create_users(3)
+    ensure_elo(users[0], 1800, 300) # 1200
+    ensure_elo(users[1], 1600, 50)  # 1500
+    ensure_elo(users[2], 1400, 50)  # 1300
+    register_users(t, users)
+
+    leaf = build_and_return_levels(t).first
+    bye = leaf.find { |m| m.a_user_id.present? ^ m.b_user_id.present? }
+    assert_equal users[1].id, bye.a_user_id || bye.b_user_id
   end
 
   test '16 players -> 16-size bracket, no byes, match counts' do

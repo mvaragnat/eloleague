@@ -68,4 +68,24 @@ class TournamentOrganizerMailerTest < ActionMailer::TestCase
 
     assert_includes mail.body.encoded, body_text
   end
+
+  test 'members_export sends an xlsx listing registrations to the organizer' do
+    @tournament.registrations.create!(user: @player, status: 'checked_in')
+    @tournament.registrations.create!(user: @organizer, status: 'cancelled')
+
+    mail = I18n.with_locale(:fr) do
+      TournamentOrganizerMailer.with(tournament: @tournament, user: @organizer).members_export.message
+    end
+
+    assert_equal [@organizer.email], mail.to
+    assert_equal 1, mail.attachments.size
+    attachment = mail.attachments.first
+    assert_equal 'test-cup-members.xlsx', attachment.filename
+
+    zip = Zip::File.open_buffer(StringIO.new(attachment.decoded))
+    sheet_xml = zip.glob('xl/**/*.xml').map { |e| zip.read(e).force_encoding('UTF-8') }.join
+    %w[Pseudo Email Statut Vérifié Présent Annulé].each { |text| assert_includes sheet_xml, text }
+    assert_includes sheet_xml, @player.email
+    assert_includes sheet_xml, @organizer.username
+  end
 end

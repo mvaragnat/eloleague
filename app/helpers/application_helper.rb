@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  # Tooltip behind a displayed rating: R ± RD and how to read the uncertainty.
+  def rating_tooltip(rating, deviation)
+    t('elo.rating_tooltip', rating: rating, deviation: deviation, provisional: Elo::Calculator::PROVISIONAL_RD)
+  end
+
   def game_event_error_flags(event)
     return {} unless event&.errors&.any?
 
@@ -287,7 +292,7 @@ module ApplicationHelper
     users = tournament.participants.to_a
     system = tournament.game_system
     seeded = users.map do |u|
-      rating = EloRating.find_by(user: u, game_system: system)&.rating || EloRating::START_RATING
+      rating = EloRating.conservative_for(u, system)
       [u.id, rating]
     end
     seeded.sort_by! { |(_id, rating)| -rating }

@@ -14,6 +14,7 @@ module Avo
         field :game_participations_count, as: :number, name: I18n.t('avo.fields.games_played'), sortable: true,
                                           readonly: true
         field :game_participations, as: :has_many, resource: Avo::Resources::GameParticipation
+        field :faction_rating_resets, as: :has_many, resource: Avo::Resources::FactionRatingReset
       end
 
       def filters
@@ -22,6 +23,7 @@ module Avo
 
       def actions
         action Avo::Actions::BulkDestroyFactions
+        action Avo::Actions::ResetFactionRatingDeviation
       end
     end
   end
