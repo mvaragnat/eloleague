@@ -16,6 +16,15 @@
   - Elimination seeding now sorts players by `rating − 2 × RD`, so an uncertain newcomer is not seeded above established players.
   - All existing ratings are discarded by the migration: run `rails elo:rebuild` after deploying.
 
+## 2026-10-11
+
+- Feature — Game sites: serve the application on dedicated domains, each locked on one game system:
+  - Domains are bound to sites with the `GAME_SITES` environment variable; sites are described in `config/game_sites.yml`.
+  - Per-site texts (translation overrides under `game_sites.<key>`), theme stylesheet, favicon and sharing image.
+  - No game system selector on a game site, and every other game system is hidden (lists filtered, other records answer 404, new records forced to the site's system).
+  - First site: Epic Armageddon - FERC (`epic_ferc`), served as a subdomain of epicarmageddon.fr and themed after it (dark brown and gold, Oswald / Crimson Text / Black Ops One fonts, its hero image and favicon). The nav shows an "EPIC ARMAGEDDON" logo linking back to the parent site (`parent_url`).
+  - Base CSS colors, fonts, the home wallpaper and chart colors are now `:root` tokens that themes can override; inline colors in views use those tokens.
+
 ## 2026-09-07
 
 - Feature — Organizer-validated registrations (optional at tournament creation):

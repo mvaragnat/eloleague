@@ -3,6 +3,7 @@
     <h1><%= t('players.title', username: @user.username) %></h1>
   </div>
 
+  <% unless game_site? %>
   <div class="card">
     <div class="card-body">
       <%= form_with url: user_path(@user), method: :get, local: true do %>
@@ -16,6 +17,7 @@
       <% end %>
     </div>
   </div>
+  <% end %>
 
   <% if @player_stats.any? %>
     <div class="card">

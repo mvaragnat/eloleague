@@ -58,7 +58,7 @@ export default class extends Controller {
 
     // Axes (simple ticks)
     const axis = document.createElementNS(SVG_NS, "g")
-    axis.setAttribute("stroke", "#ccc")
+    axis.style.stroke = "var(--chart-axis)"
     axis.setAttribute("stroke-width", "1")
     // X axis
     axis.appendChild(this._line(padding.left, padding.top + ih, padding.left + iw, padding.top + ih))
@@ -71,8 +71,10 @@ export default class extends Controller {
     this._drawXTicks(svg, { padding, iw, ih, minT, maxT, sx, locale })
     this._drawYTicks(svg, { padding, ih, yMin, yMax, sy })
 
+    // Themes can set the first series color through the --chart-primary token
+    const primary = getComputedStyle(this.element).getPropertyValue("--chart-primary").trim()
     const colors = [
-      "#1f77b4",
+      primary || "#1f77b4",
       "#ff7f0e",
       "#2ca02c",
       "#d62728",
@@ -153,7 +155,7 @@ export default class extends Controller {
 
   _drawXTicks(svg, { padding, iw, ih, minT, maxT, sx, locale }) {
     const group = document.createElementNS("http://www.w3.org/2000/svg", "g")
-    group.setAttribute("stroke", "#e5e7eb") // light grid
+    group.style.stroke = "var(--chart-grid)"
     group.setAttribute("stroke-width", "1")
 
     const ticks = 5
@@ -182,7 +184,7 @@ export default class extends Controller {
 
   _drawYTicks(svg, { padding, ih, yMin, yMax, sy }) {
     const group = document.createElementNS("http://www.w3.org/2000/svg", "g")
-    group.setAttribute("stroke", "#e5e7eb")
+    group.style.stroke = "var(--chart-grid)"
     group.setAttribute("stroke-width", "1")
 
     const ticks = 5

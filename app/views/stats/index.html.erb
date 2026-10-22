@@ -28,6 +28,7 @@
                               players: format('%g', (1 / Elo::Calculator::HIGH_CONCENTRATION).round(1)),
                               deviation: Elo::Calculator::PROVISIONAL_RD) %>
     </div>
+    <div <%= 'hidden' if game_site? %>>
     <label for="system-select"><%= t('stats.system_label', default: 'Game system') %></label>
     <select id="system-select" class="input" data-stats-target="system" data-action="change->stats#onSystemChange">
       <option value=""><%= t('stats.select_system', default: 'Select a game system') %></option>
@@ -35,6 +36,7 @@
         <option value="<%= sys.id %>" <%= 'selected' if @default_system&.id == sys.id %>><%= sys.localized_name %></option>
       <% end %>
     </select>
+    </div>
 
     <div id="factions-table" class="mt-3" hidden>
       <div class="hint text-sm text-gray-500">

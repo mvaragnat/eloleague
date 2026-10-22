@@ -29,6 +29,7 @@ class UsersController < ApplicationController
 
     # Player stats per system and faction
     stats = Stats::PlayerWinRates.new(user: @user).call
+    stats = stats.select { |row| row[:system_id] == Current.game_system.id } if game_site?
     @stats_system_options = stats.map { |row| [row[:system_name], row[:system_id]] }.sort_by(&:first)
     @selected_system_id = params[:game_system_id].presence&.to_i
     @player_stats = if @selected_system_id.present?
@@ -39,9 +40,9 @@ class UsersController < ApplicationController
 
     @elo_by_system = EloRating.where(user: @user).index_by(&:game_system_id)
 
-    # Recent games (all systems)
-    @events = @user.game_events.includes(:game_system, :game_participations, :players,
-                                         :tournament).order(played_at: :desc)
+    # Recent games (all visible systems)
+    @events = scope_to_game_site(@user.game_events).includes(:game_system, :game_participations, :players,
+                                                             :tournament).order(played_at: :desc)
   end
 
   private

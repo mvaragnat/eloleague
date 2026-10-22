@@ -28,7 +28,7 @@
     <% end %>
   <% else %>
     <% if is_owner_or_organizer && @tournament.army_list_locked? %>
-      <p class="card-date" style="color:#6b7280; margin-bottom:1rem;"><%= t('tournaments.army_list_locked_hint') %></p>
+      <p class="card-date" style="color:var(--text-muted); margin-bottom:1rem;"><%= t('tournaments.army_list_locked_hint') %></p>
     <% end %>
     <pre class="army-list-pre"><%= @registration.army_list.presence || t('tournaments.show.no_army_list', default: 'No army list provided') %></pre>
   <% end %>

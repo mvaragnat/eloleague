@@ -4,13 +4,13 @@ class StatsController < ApplicationController
   TOURNAMENT_ONLY_CAST = ActiveModel::Type::Boolean.new
 
   def index
-    @systems = Game::System.order(:name)
-    @default_system = Game::System.find_by(id: 1) || Game::System.order(:id).first
+    @systems = available_game_systems
+    @default_system = Current.game_system || Game::System.find_by(id: 1) || Game::System.order(:id).first
   end
 
   # JSON: factions win rates table for a system
   def factions
-    system = Game::System.find(params[:game_system_id])
+    system = scope_to_game_site(Game::System, column: :id).find(params[:game_system_id])
     stats = Stats::FactionWinRates.new(game_system: system, tournament_only: tournament_only?).call
     render json: { ok: true, rows: stats }
   end
@@ -18,8 +18,8 @@ class StatsController < ApplicationController
   # Player rating ranking for a system, by rating R.
   # Temporary: helps tuning the player/faction rating parameters. Not linked from the UI.
   def players_ranking
-    @systems = Game::System.order(:name)
-    @system = Game::System.find_by(id: params[:game_system_id]) ||
+    @systems = available_game_systems
+    @system = Current.game_system || Game::System.find_by(id: params[:game_system_id]) ||
               Game::System.find_by(id: 1) || Game::System.order(:id).first
     # Hide players with a high uncertainty unless explicitly unchecked (param "0")
     @hide_high_uncertainty = params[:hide_high_uncertainty] != '0'
@@ -30,7 +30,7 @@ class StatsController < ApplicationController
 
   # JSON: versus table for a given faction within its system
   def faction_vs
-    faction = Game::Faction.find(params[:faction_id])
+    faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
     rows = Stats::FactionVersus.new(faction: faction, tournament_only: tournament_only?).call
     render json: { ok: true, rows: rows }
   end
@@ -38,7 +38,7 @@ class StatsController < ApplicationController
   # JSON: rating history (R ± RD) of a faction, with balance-patch resets.
   # Ratings use every competitive game, so the tournament-only filter does not apply.
   def faction_rating_series
-    faction = Game::Faction.find(params[:faction_id])
+    faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
     series = Stats::FactionRatingSeries.new(faction: faction).call
     render json: { ok: true, series: series }
   end
@@ -46,7 +46,7 @@ class StatsController < ApplicationController
   TOP_PLAYERS_LIMIT = 5
 
   def faction_top_players
-    faction = Game::Faction.find(params[:faction_id])
+    faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
 
     scope = Game::Participation
             .joins(:game_event)
@@ -69,7 +69,7 @@ class StatsController < ApplicationController
   FACTION_GAMES_PER_PAGE = 10
 
   def faction_games
-    @faction = Game::Faction.find(params[:faction_id])
+    @faction = scope_to_game_site(Game::Faction).find(params[:faction_id])
     @page = [params.fetch(:page, 1).to_i, 1].max
 
     filter = Game::Event

@@ -21,7 +21,7 @@
           </div>
           <div class="card-body">
             <% if p.army_list.present? %>
-              <pre style="white-space:pre-wrap; background:#f9fafb; padding:1rem; border-radius:6px;"> <%= p.army_list %> </pre>
+              <pre style="white-space:pre-wrap; background:var(--surface-muted); padding:1rem; border-radius:6px;"> <%= p.army_list %> </pre>
             <% else %>
               <p class="card-date"><%= t('tournaments.show.no_army_list', default: 'No army list provided') %></p>
             <% end %>

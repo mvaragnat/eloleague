@@ -17,7 +17,8 @@ class TournamentsController < ApplicationController
     # Populate Current.user for guest pages
     Current.user = current_user
 
-    scope = ::Tournament::Tournament.includes(:game_system, :creator, :registrations).order(created_at: :desc)
+    scope = scope_to_game_site(::Tournament::Tournament).includes(:game_system, :creator, :registrations)
+                                                        .order(created_at: :desc)
     @my_tournaments = Current.user ? scope.where(creator: Current.user) : scope.none
     @accepting_tournaments = scope.where(state: 'registration')
     @ongoing_tournaments = scope.where(state: 'running')
@@ -67,12 +68,13 @@ class TournamentsController < ApplicationController
   end
 
   def new
-    @tournament = ::Tournament::Tournament.new
+    @tournament = ::Tournament::Tournament.new(game_system: Current.game_system)
   end
 
   def create
     @tournament = ::Tournament::Tournament.new(tournament_params)
     @tournament.creator = Current.user
+    @tournament.game_system = Current.game_system if game_site?
 
     if @tournament.save
       redirect_to tournament_path(@tournament), notice: t('tournaments.created', default: 'Tournament created')
@@ -325,8 +327,8 @@ class TournamentsController < ApplicationController
   end
 
   def set_tournament
-    @tournament = ::Tournament::Tournament.find_by(slug: params[:id]) ||
-                  ::Tournament::Tournament.find(params[:id])
+    scope = scope_to_game_site(::Tournament::Tournament)
+    @tournament = scope.find_by(slug: params[:id]) || scope.find(params[:id])
   end
 
   def authorize_admin!

@@ -52,7 +52,7 @@ export default class extends Controller {
 
     if (filtered.length === 0) {
       const msg = (window.I18n && window.I18n.t && window.I18n.t('games.search.no_results')) || 'No results found'
-      this.resultsTarget.innerHTML = `<div style="padding:0.75rem;color:#6b7280;">${msg}</div>`
+      this.resultsTarget.innerHTML = `<div style="padding:0.75rem;color:var(--text-muted);">${msg}</div>`
       return
     }
 

@@ -6,7 +6,7 @@ module Game
       system_id = params[:game_system_id]
       scoring_systems =
         if system_id.present?
-          Game::ScoringSystem.where(game_system_id: system_id).to_a
+          scope_to_game_site(Game::ScoringSystem).where(game_system_id: system_id).to_a
         else
           []
         end
@@ -27,7 +27,7 @@ module Game
     end
 
     def show
-      s = Game::ScoringSystem.find(params[:id])
+      s = scope_to_game_site(Game::ScoringSystem).find(params[:id])
       render json: {
         id: s.id,
         name: s.name,

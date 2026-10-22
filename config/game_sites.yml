@@ -1,0 +1,21 @@
+# Game sites: the same application served on a dedicated domain, locked on a single game system.
+#
+# Domains are bound to a site key through the GAME_SITES environment variable:
+#   GAME_SITES="epic.example.com=epic_ferc,other.example.com=other_site"
+# Requests coming from any other host get the regular, multi-game site.
+#
+# Per site:
+#   game_system: name of the Game::System (as in config/game_systems.yml) the site is locked on
+#   theme:       optional stylesheet loaded after application.css (app/assets/stylesheets/themes/<theme>.css)
+#   icon:        optional favicon path (served from public/)
+#   og_image:    optional social sharing image path (served from public/)
+#   parent_url:  optional URL of the site this one is part of; the nav logo links to it
+#
+# Texts: any translation key can be overridden for a site under `game_sites.<site key>.<key>`
+# in config/locales (e.g. game_sites.epic_ferc.app.name). Missing keys fall back to the base text.
+
+epic_ferc:
+  game_system: "Epic Armageddon - FERC"
+  theme: epic_ferc
+  icon: "/sites/epic_ferc/icon.png"
+  parent_url: "https://www.epicarmageddon.fr"
