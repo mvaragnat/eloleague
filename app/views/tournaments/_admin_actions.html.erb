@@ -127,7 +127,7 @@
                      data-action="blur->strategy#changed"
                      data-field="name"
                      style="width:100%;" />
-              <p class="card-date" style="margin-top:0.25rem; font-size:0.85rem; color:#666;">
+              <p class="card-date" style="margin-top:0.25rem; font-size:0.85rem; color:var(--text-muted);">
                 <%= t('tournaments.show.admin.slug_warning', default: 'Note: Changing the tournament name will not update the URL slug') %>
               </p>
             </div>
@@ -194,7 +194,7 @@
               <% else %>
                 <span><%= @tournament.require_registration_validation ? t('yes', default: 'Yes') : t('no', default: 'No') %></span>
               <% end %>
-              <p class="card-date" style="margin-top:0.25rem; font-size:0.85rem; color:#666;">
+              <p class="card-date" style="margin-top:0.25rem; font-size:0.85rem; color:var(--text-muted);">
                 <%= t('tournaments.new.require_registration_validation_hint', default: 'Players sign up on a waiting list; only registrations you confirm (for instance once paid) count towards the max players and can check in') %>
               </p>
             </div>

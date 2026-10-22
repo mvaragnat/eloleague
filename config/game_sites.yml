@@ -9,6 +9,7 @@
 #   theme:       optional stylesheet loaded after application.css (app/assets/stylesheets/themes/<theme>.css)
 #   icon:        optional favicon path (served from public/)
 #   og_image:    optional social sharing image path (served from public/)
+#   parent_url:  optional URL of the site this one is part of; the nav logo links to it
 #
 # Texts: any translation key can be overridden for a site under `game_sites.<site key>.<key>`
 # in config/locales (e.g. game_sites.epic_ferc.app.name). Missing keys fall back to the base text.
@@ -16,3 +17,5 @@
 epic_ferc:
   game_system: "Epic Armageddon - FERC"
   theme: epic_ferc
+  icon: "/sites/epic_ferc/icon.png"
+  parent_url: "https://www.epicarmageddon.fr"

@@ -5,6 +5,7 @@ fr:
     epic_ferc:
       app:
         name: "Epic League"
+        logo: "EPIC ARMAGEDDON"
         description: "Tournois, classements et statistiques de la communauté Epic Armageddon francophone."
       auth:
         signup_subtitle: "Créez votre compte Epic League"

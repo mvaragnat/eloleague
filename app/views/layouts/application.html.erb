@@ -45,6 +45,9 @@
 
   <body <%= tag.attributes(data: { game_site: current_game_site&.key }) %>>
     <nav class="site-nav">
+      <% if current_game_site %>
+        <%= link_to t('app.logo', default: t('app.name')), current_game_site.parent_url || root_path, class: "site-logo" %>
+      <% end %>
       <% if user_signed_in? %>
         <%= link_to t('home.link'), dashboard_path, class: "brand" %>
       <% end %>

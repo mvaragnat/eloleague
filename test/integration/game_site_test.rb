@@ -50,6 +50,18 @@ class GameSiteTest < ActionDispatch::IntegrationTest
     assert_select 'meta[property="og:image"][content=?]', "http://#{SITE_HOST}/sites/chess/og.png"
   end
 
+  test 'game site logo links to the parent site' do
+    GameSite.config['chess_site']['parent_url'] = 'https://chess.example.org'
+    host! SITE_HOST
+    get tournaments_path(locale: :en)
+    assert_select 'nav a.site-logo[href=?]', 'https://chess.example.org', text: 'Chess League'
+  end
+
+  test 'base site has no logo' do
+    get tournaments_path(locale: :en)
+    assert_select 'a.site-logo', count: 0
+  end
+
   test 'game site only lists tournaments of its game system' do
     host! SITE_HOST
     get tournaments_path(locale: :en)

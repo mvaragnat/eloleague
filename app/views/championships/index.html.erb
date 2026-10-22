@@ -26,7 +26,7 @@
                   <td style="white-space: nowrap; font-weight: 600;"><%= level.name %></td>
                   <td>
                     <% level.condensed_placement.each_with_index do |(start_rank, end_rank, pts), i| %>
-                      <% if i > 0 %><span style="color: #ccc;"> · </span><% end %>
+                      <% if i > 0 %><span style="color: var(--gray-300);"> · </span><% end %>
                       <% if start_rank == end_rank %>
                         <%= t('championship.rules_box.rank_label', rank: start_rank) %>:&nbsp;<strong><%= pts %></strong>
                       <% else %>
@@ -34,7 +34,7 @@
                       <% end %>
                     <% end %>
                     <% if level.participation_points.positive? %>
-                      <span style="color: #ccc;"> · </span>
+                      <span style="color: var(--gray-300);"> · </span>
                       <%= t('championship.rules_box.all_others') %>:&nbsp;<strong><%= level.participation_points %></strong>
                     <% end %>
                   </td>

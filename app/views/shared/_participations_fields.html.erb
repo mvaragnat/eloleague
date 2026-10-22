@@ -4,7 +4,7 @@
   <% i = 0 %>
   <%= form.fields_for :game_participations do |p_form| %>
     <% i += 1 %>
-    <div class="participation-block" style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; align-items:start; border:1px solid #e5e7eb; border-radius:0.5rem; padding:0.75rem;">
+    <div class="participation-block" style="display:grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; align-items:start; border:1px solid var(--gray-300); border-radius:0.5rem; padding:0.75rem;">
       <div style="grid-column: 1 / -1;">
         <% if i == 1 && preselected_user.present? %>
           <% removable_attr = preselected_removable ? 'true' : 'false' %>

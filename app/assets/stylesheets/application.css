@@ -34,6 +34,9 @@
   --font-heading: var(--font-body);
   --hero-bg: #000;
   --hero-image: url('/ork-wallpaper.jpg');
+  --warning: #b45309;
+  --chart-axis: #ccc;
+  --chart-grid: #e5e7eb;
 }
 
 /***** Base Typography *****/
@@ -81,6 +84,8 @@ main { flex: 1 0 auto; }
   color: var(--text-strong);
 }
 .site-nav .spacer { margin-left: auto; }
+/* Game site logo (only rendered on game sites) */
+.site-logo { font-family: var(--font-heading); font-weight: 800; font-size: 1.25rem; text-decoration: none; color: var(--blue-500); white-space: nowrap; }
 
 /* Keep long emails tidy */
 .user-email { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
