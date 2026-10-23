@@ -8,6 +8,10 @@ import { Controller } from "@hotwired/stimulus"
 
 const SVG_NS = "http://www.w3.org/2000/svg"
 const RESET_COLOR = "#facc15"
+const Y_MIN = 1200
+const Y_MAX = 1800
+const Y_MID = 1500
+const Y_STEP = 100
 
 export default class extends Controller {
   static values = { series: Array }
@@ -48,10 +52,10 @@ export default class extends Controller {
       maxT += day
     }
 
-    // Round rating domain to nice steps (50)
-    const niceStep = 50
-    const yMin = Math.floor(minR / niceStep) * niceStep
-    const yMax = Math.ceil(maxR / niceStep) * niceStep
+    // Fixed rating scale (1200..1800, centred on 1500), only widened by whole
+    // tick steps when a rating or its uncertainty band falls outside it
+    const yMin = Math.min(Y_MIN, Math.floor(minR / Y_STEP) * Y_STEP)
+    const yMax = Math.max(Y_MAX, Math.ceil(maxR / Y_STEP) * Y_STEP)
 
     const sx = t => padding.left + (iw * (t - minT)) / (maxT - minT || 1)
     const sy = r => padding.top + ih - (ih * (r - yMin)) / (yMax - yMin || 1)
@@ -187,14 +191,16 @@ export default class extends Controller {
     group.style.stroke = "var(--chart-grid)"
     group.setAttribute("stroke-width", "1")
 
-    const ticks = 5
-    const step = (yMax - yMin) / ticks
-    for (let i = 0; i <= ticks; i++) {
-      const r = yMin + i * step
+    for (let r = yMin; r <= yMax; r += Y_STEP) {
       const y = sy(r)
-      // grid line
+      // grid line, emphasised at the 1500 midpoint
       const grid = this._line(padding.left, y, padding.left + (svg.viewBox.baseVal.width - padding.right), y)
-      grid.setAttribute("opacity", "0.6")
+      if (r === Y_MID) {
+        grid.style.stroke = "var(--chart-axis)"
+        grid.setAttribute("stroke-dasharray", "4 3")
+      } else {
+        grid.setAttribute("opacity", "0.6")
+      }
       group.appendChild(grid)
 
       // label
