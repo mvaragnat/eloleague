@@ -21,6 +21,8 @@ module ActiveSupport
 
     setup do
       ActiveJob::Base.queue_adapter = :test
+      # Requests set I18n.locale on the shared thread: start every test from the default
+      I18n.locale = I18n.default_locale # rubocop:disable Rails/I18nLocaleAssignment
     end
   end
 end
@@ -32,6 +34,8 @@ module ActionDispatch
 
     setup do
       ActiveJob::Base.queue_adapter = :test
+      # Requests set I18n.locale on the shared thread: start every test from the default
+      I18n.locale = I18n.default_locale # rubocop:disable Rails/I18nLocaleAssignment
     end
   end
 end

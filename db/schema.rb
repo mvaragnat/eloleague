@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_10_12_090000) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_02_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
@@ -192,6 +192,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_12_090000) do
     t.string "child_slot"
     t.boolean "non_competitive", default: false, null: false
     t.integer "table_number"
+    t.boolean "not_played", default: false, null: false
     t.index ["a_user_id"], name: "index_tournament_matches_on_a_user_id"
     t.index ["b_user_id"], name: "index_tournament_matches_on_b_user_id"
     t.index ["game_event_id"], name: "index_tournament_matches_on_game_event_id"

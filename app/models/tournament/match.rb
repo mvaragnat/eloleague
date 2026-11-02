@@ -42,7 +42,7 @@ module Tournament
     private
 
     def copy_non_competitive_from_tournament
-      self.non_competitive = tournament&.non_competitive || false
+      self.non_competitive = tournament&.non_competitive || not_played || false
     end
 
     public

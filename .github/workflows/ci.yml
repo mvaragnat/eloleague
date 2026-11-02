@@ -12,7 +12,9 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Pinned: setup-ruby only ships the latest patch of each series on newer images,
+    # and the Gemfile requires the exact Ruby 3.4.3
+    runs-on: ubuntu-24.04
 
     services:
       postgres:

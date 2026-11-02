@@ -33,7 +33,7 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - Parameters (start R and RD for players and factions, minimum RD, high-uncertainty threshold, high-concentration threshold, displayed-bound factor, diversity window) live in `config/initializers/rating.rb`, each overridable by an environment variable (`RATING_PLAYER_START`, `RATING_PLAYER_START_RD`, `RATING_FACTION_START`, `RATING_FACTION_START_RD`, ...). After a change: restart and run `rails elo:rebuild`.
 - The UI displays the rating R and its uncertainty RD (profile `R ± RD`, game cards `R before → R after`, separate Rating and Uncertainty columns in the Stats tables). The faction chart draws R with a band `R ± RD`.
 - A rating gets a "High uncertainty" badge while `RD > provisional_deviation` (default 100) on profiles and Stats. Elimination seeding sorts players by `R − 2·RD`.
-- `rails elo:rebuild` recomputes everything chronologically (optionally for one game system).
+- `rails elo:rebuild` recomputes everything chronologically (optionally for one game system), via `Elo::Rebuilder`.
 
 ### Game::Event
 - Represents a single game played
@@ -174,6 +174,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
 - The non-competitive flag is copied down to all `Tournament::Match` records and created `Game::Event` records.
 - When the tournament's `non_competitive` flag is changed after matches/events have been created, the new value is automatically propagated to all existing matches and game events via an `after_update` callback.
 - Scopes exist to filter competitive vs non-competitive on tournaments, matches, and events.
+
+#### Matches not played
+- When entering scores (match page, first report or edit, and the Open "add match" modal), the organizer can tick "This match was not played": the match keeps its result and counts for the tournament (standings, pairings, bracket), but is left out of Elo and statistics.
+- Stored as `Tournament::Match#not_played`; the match and its `Game::Event` get `non_competitive = tournament.non_competitive || not_played`, so every Elo/Stats filter on `non_competitive` applies. Changing the tournament flag keeps not-played matches non-competitive.
+- Only the organizer can set it (the checkbox is hidden and the parameter ignored for participants).
+- Toggling it on an already reported match whose Elo was processed enqueues `EloRebuildJob`, which rebuilds the game system's ratings (`Elo::Rebuilder`, also used by `rails elo:rebuild`).
 
 #### Admin Check-in Toggle & Tab Persistence
 - The organizer can toggle any participant status between `pending` and `checked_in` from the `Participants` tab, bypassing participant requirements (faction selection or army list submission). This is intended for day-of check-in adjustments.

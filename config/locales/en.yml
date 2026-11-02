@@ -382,6 +382,8 @@ en:
     draw_not_allowed: "Draw is not allowed in elimination"
     cannot_advance_pending: "All matches must be completed to move to the next round"
     match_updated: "Match updated"
+    match_not_played_checkbox_text: "This match was not played. It counts for the tournament, but is left out of statistics and Elo"
+    match_not_played: "Match not played (excluded from statistics and Elo)"
     faction_required_hint: "Please select your faction in the Participants tab before checking in."
     faction_required_to_check_in: "Please select your faction before checking in"
     army_list_required_hint: "Army list is required to check in"

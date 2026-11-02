@@ -49,12 +49,13 @@ module Tournament
         end
       end
 
+      not_played = ActiveModel::Type::Boolean.new.cast(organizer_not_played(:game_event)) || false
       game = Game::Event.new(
         game_params.merge(
           played_at: Time.current,
           game_system: @tournament.game_system,
           tournament: @tournament,
-          non_competitive: @tournament.non_competitive,
+          non_competitive: not_played, # combined with the tournament flag by Game::Event
           scoring_system: @tournament.scoring_system
         )
       )
@@ -63,7 +64,7 @@ module Tournament
           a_user_id: game.game_participations.first.user_id,
           b_user_id: game.game_participations.second.user_id,
           game_event: game,
-          non_competitive: @tournament.non_competitive,
+          not_played: not_played, # non_competitive is derived by Tournament::Match
           result: ::Tournament::Match.deduce_result(
             game.game_participations.first.score.to_i,
             game.game_participations.second.score.to_i,
@@ -110,7 +111,8 @@ module Tournament
                    b_score: b_score,
                    a_secondary_score: a_secondary,
                    b_secondary_score: b_secondary
-                 }
+                 },
+                 not_played: organizer_not_played(:tournament_match)
                ).call
 
       unless result.ok
@@ -229,6 +231,9 @@ module Tournament
       participant_ids = @tournament.registrations.pluck(:user_id)
       (@tournament.creator_id == Current.user.id) || participant_ids.include?(Current.user.id)
     end
+
+    # Only the organizer may record a match as not played; nil keeps the current value
+    def organizer_not_played(scope) = (params.dig(scope, :not_played) if @tournament.creator == Current.user)
 
     def match_report_error_flags(result)
       return { scores: true } if %i[scores_missing draw_not_allowed].include?(result.error)

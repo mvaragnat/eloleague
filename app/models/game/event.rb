@@ -65,8 +65,9 @@ module Game
     private
 
     def apply_tournament_competitiveness
-      # Respect manual flag for non-tournament games; mirror tournament for tournament games
-      return self.non_competitive = tournament.non_competitive if tournament.present?
+      # Respect manual flag for non-tournament games. Tournament games are non-competitive when the
+      # tournament is, or when flagged (e.g. a match recorded as not played).
+      return self.non_competitive = tournament.non_competitive || non_competitive || false if tournament.present?
 
       # For non-tournament events, keep any explicit value, defaulting to false
       self.non_competitive = !!non_competitive

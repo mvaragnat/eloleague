@@ -165,8 +165,11 @@ module Tournament
     end
 
     def propagate_non_competitive_to_children
-      matches.each { |m| m.update!(non_competitive: non_competitive) }
-      Game::Event.where(tournament_id: id).find_each { |e| e.update!(non_competitive: non_competitive) }
+      # Matches recorded as not played stay non-competitive whatever the tournament flag
+      matches.each { |m| m.update!(non_competitive: non_competitive || m.not_played) }
+      Game::Event.where(tournament_id: id).includes(:match).find_each do |e|
+        e.update!(non_competitive: non_competitive || e.match&.not_played || false)
+      end
     end
 
     def strategy_keys_are_known
