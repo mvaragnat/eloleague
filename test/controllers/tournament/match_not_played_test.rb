@@ -4,6 +4,9 @@ require 'test_helper'
 
 # Organizer-only "not played" flag: the match counts for the tournament but not for Elo and statistics
 class TournamentMatchNotPlayedTest < ActionDispatch::IntegrationTest
+  # Mail jobs are left enqueued: CI has no SMTP sender configured
+  ELO_JOBS = [EloUpdateJob, EloRebuildJob].freeze
+
   setup do
     @user = users(:player_one)
     @opponent = users(:player_two)
@@ -36,7 +39,7 @@ class TournamentMatchNotPlayedTest < ActionDispatch::IntegrationTest
     get tournament_tournament_match_path(@tournament, m, locale: I18n.locale)
     assert_select 'input[type=checkbox][name=?]', 'tournament_match[not_played]'
 
-    perform_enqueued_jobs do
+    perform_enqueued_jobs(only: ELO_JOBS) do
       patch tournament_tournament_match_path(@tournament, m, locale: I18n.locale),
             params: { tournament_match: { a_score: 2, b_score: 1, not_played: '1' } }
     end
@@ -68,7 +71,7 @@ class TournamentMatchNotPlayedTest < ActionDispatch::IntegrationTest
   test 'marking a reported match as not played rebuilds Elo without it' do
     r = @tournament.rounds.create!(number: 1, state: 'pending')
     m = @tournament.matches.create!(round: r, a_user: @user, b_user: @opponent)
-    perform_enqueued_jobs do
+    perform_enqueued_jobs(only: ELO_JOBS) do
       patch tournament_tournament_match_path(@tournament, m, locale: I18n.locale),
             params: { tournament_match: { a_score: 2, b_score: 1 } }
     end
@@ -79,7 +82,7 @@ class TournamentMatchNotPlayedTest < ActionDispatch::IntegrationTest
       patch tournament_tournament_match_path(@tournament, m, locale: I18n.locale),
             params: { tournament_match: { a_score: 2, b_score: 1, not_played: '1' } }
     end
-    perform_enqueued_jobs
+    perform_enqueued_jobs(only: ELO_JOBS)
     assert m.reload.not_played
     assert_equal 0, EloChange.where(game_event_id: m.game_event_id).count
 

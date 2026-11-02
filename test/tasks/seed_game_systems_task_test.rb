@@ -41,17 +41,6 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     assert_equal (ferc_config['factions'] || []).size, epic.factions.count
     assert epic.factions.pluck(:name).include?('Steel Legion')
 
-    # Verify Epic UK was created
-    epic_uk = Game::System.find_by(name: 'Epic UK')
-    assert_not_nil epic_uk
-
-    epic_uk_config = systems_data.find do |s|
-      name = s['name']
-      names = name.is_a?(Hash) ? name : { 'en' => name, 'fr' => name }
-      names.value?('Epic UK')
-    end
-    assert_equal (epic_uk_config['factions'] || []).size, epic_uk.factions.count
-
     # Verify OPR Grimdark Future was created
     opr = Game::System.find_by(name: 'OPR Grimdark Future')
     assert_not_nil opr

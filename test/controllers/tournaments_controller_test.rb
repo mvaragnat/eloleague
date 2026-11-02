@@ -1182,8 +1182,8 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     sign_out @user
     get tournament_path(t, locale: I18n.locale, tab: 1)
     assert_response :success
-    body = @response.body
-    assert_includes body, I18n.t('tournaments.show.view_army_list', default: 'Army list')
+    # assert_select compares unescaped text ("Liste d'armée" is rendered as "Liste d&#39;armée")
+    assert_select 'a', text: I18n.t('tournaments.show.view_army_list', default: 'Army list')
   end
 
   test 'ranking can use score_sum as primary' do
