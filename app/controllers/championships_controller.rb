@@ -54,43 +54,9 @@ class ChampionshipsController < ApplicationController
   end
 
   def build_standings(scores)
-    grouped = scores.group_by(&:user)
-
-    @standings = grouped.map do |user, user_scores|
-      counted = apply_best_of(user_scores)
-      {
-        user: user,
-        total_points: counted.sum(&:total_points),
-        tournaments_count: user_scores.size
-      }
-    end
-
-    @standings.sort_by! { |s| [-s[:total_points], s[:user].username] }
-
-    rank = 1
-    previous_score = nil
-    previous_rank = nil
-
-    # on autorise les doublons
-    @standings.each do |standing|
-      standing[:rank] = if previous_score && previous_rank && standing[:total_points] == previous_score
-                          previous_rank
-                        else
-                          rank
-                        end
-      previous_rank = standing[:rank]
-      previous_score = standing[:total_points]
-      rank += 1
-    end
-  end
-
-  def apply_best_of(user_scores)
-    return user_scores unless @best_of
-
-    sorted = user_scores.sort_by { |s| -s.total_points }
-    excluded = sorted[@best_of..] || []
-    excluded.each { |s| @excluded_scores.add([s.user_id, s.tournament_id]) }
-    sorted.first(@best_of)
+    standings = Championship::Standings.new(scores, best_of: @best_of)
+    @standings = standings.entries
+    @excluded_scores = standings.excluded_scores
   end
 
   def build_tournament_breakdown(scores)

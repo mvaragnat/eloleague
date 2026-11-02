@@ -94,6 +94,25 @@ en:
         sign_in: "Already have an account?"
         sign_up: "Don't have an account?"
   vs: "vs"
+  game_site_home:
+    title: "Events"
+    intro_html: "All tournaments and events of the community. For more details, join us on %{discord}."
+    upcoming_title: "Upcoming events"
+    no_upcoming: "No event announced yet."
+    date_tbd: "Date to be confirmed"
+    online: "Online"
+    organizer: "Organized by %{name}"
+    see_event: "View event"
+    no_past: "No finished event yet."
+    all_events: "All events"
+    championship_title: "%{year} championship"
+    no_championship: "The championship has not started yet."
+    points: "%{count} pts"
+    date_range:
+      same_month: "%{month} %{start_day}-%{end_day}, %{year}"
+      other: "%{start} – %{end}"
+    history_title: "History"
+    full_standings: "Full standings"
   home:
     link: "My Dashboard"
     subtitle: "Tournaments and statistics for any game system"
@@ -431,6 +450,9 @@ en:
     stats_by_faction: "By faction"
     sort_hint: "In the faction table, click a header to sort"
     elo_label: "ELO:"
+  date:
+    formats:
+      event: "%B %-d, %Y"
   time:
     formats:
       long: "%d/%m/%Y at %H:%M"

@@ -16,3 +16,5 @@ en:
         welcome_box:
           title: "Welcome to Epic League 👋"
           paragraph_1: "On Epic League, you can keep the history of your Epic Armageddon games and take part in tournaments."
+      game_site_home:
+        intro_html: "The EA-FR community is particularly active in France and abroad, organizing many tournaments and events. Here you will find every Epic Armageddon gathering. For more details, join us on our %{discord}."

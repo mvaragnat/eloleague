@@ -65,6 +65,25 @@ fr:
         sign_in: "Vous avez déjà un compte ?"
         sign_up: "Vous n'avez pas de compte ?"
   vs: "vs"
+  game_site_home:
+    title: "Événements"
+    intro_html: "Tous les tournois et événements de la communauté. Pour plus de détails, rendez-vous sur %{discord}."
+    upcoming_title: "Événements à venir"
+    no_upcoming: "Aucun événement annoncé pour le moment."
+    date_tbd: "Date à confirmer"
+    online: "En ligne"
+    organizer: "Organisé par %{name}"
+    see_event: "Voir l'événement"
+    no_past: "Aucun événement terminé."
+    all_events: "Tous les événements"
+    championship_title: "Championnat %{year}"
+    no_championship: "Le championnat n'a pas encore commencé."
+    points: "%{count} pts"
+    date_range:
+      same_month: "%{start_day}-%{end_day} %{month} %{year}"
+      other: "%{start} – %{end}"
+    history_title: "Historique"
+    full_standings: "Classement complet"
   home:
     link: "Mon Dashboard"
     subtitle: "Tournois et statistiques pour tous les systèmes de jeu"
@@ -398,6 +417,18 @@ fr:
     stats_by_faction: "Par faction"
     sort_hint: "Dans le tableau des factions, cliquez sur un en-tête pour trier"
     elo_label: "ELO :"
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      event: "%-d %B %Y"
+    day_names: [dimanche, lundi, mardi, mercredi, jeudi, vendredi, samedi]
+    abbr_day_names: [dim, lun, mar, mer, jeu, ven, sam]
+    month_names: [~, janvier, février, mars, avril, mai, juin, juillet, août, septembre, octobre, novembre, décembre]
+    abbr_month_names: [~, janv., févr., mars, avr., mai, juin, juil., août, sept., oct., nov., déc.]
+    order:
+      - :day
+      - :month
+      - :year
   time:
     formats:
       long: "Le %d/%m/%Y à %Hh%M"

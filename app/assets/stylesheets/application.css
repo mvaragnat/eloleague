@@ -515,3 +515,101 @@ input:focus, select:focus, textarea:focus {
     margin-bottom: 0.5rem;
   }
 }
+
+/***** Game site home (pages/game_site_home) *****/
+.hero--compact { min-height: 0; padding: 3rem 1rem 2.5rem; }
+.site-home__intro { max-width: 46rem; margin: 0; font-size: 1.125rem; line-height: 1.6; color: var(--text-strong); }
+/* Title on its own row so the cards and the championship box start at the same height. */
+.site-home {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto 0;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  grid-template-areas: "upcoming-title ." "upcoming aside" "history history";
+  column-gap: 2rem;
+  align-items: start;
+}
+.site-home__upcoming-title { grid-area: upcoming-title; }
+.site-home__upcoming { grid-area: upcoming; }
+.site-home__aside { grid-area: aside; }
+.site-home__history { grid-area: history; margin-top: 3rem; }
+@media (max-width: 900px) {
+  .site-home { grid-template-columns: minmax(0, 1fr); grid-template-areas: "upcoming-title" "upcoming" "aside" "history"; }
+  .site-home__aside { margin-top: 2rem; }
+}
+.site-home__section-title { margin: 0 0 1rem; font-size: 1.5rem; }
+.event-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
+.event-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1.25rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--text-strong);
+  text-decoration: none;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.event-card:hover, .event-card:focus-visible { border-color: var(--blue-500); transform: translateY(-2px); color: var(--text-strong); }
+.event-card__date { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--blue-500); }
+.event-card__title { margin: 0; font-size: 1.25rem; line-height: 1.25; }
+.event-card__meta { font-size: 0.95rem; color: var(--text-muted); }
+.event-card__intro { margin: 0.25rem 0 0; font-size: 0.95rem; line-height: 1.5; }
+.event-card__cta { margin-top: auto; padding-top: 0.5rem; font-weight: 600; color: var(--blue-500); }
+.site-home__box { margin-bottom: 0; padding: 1.25rem; }
+.site-home__box-title { margin: 0 0 0.75rem; font-size: 1.15rem; }
+.site-home__more { display: inline-block; margin-top: 0.75rem; font-weight: 600; }
+.leaderboard { list-style: none; margin: 0; padding: 0; }
+.leaderboard__row { display: flex; align-items: baseline; gap: 0.75rem; padding: 0.45rem 0; border-bottom: 1px solid var(--gray-300); }
+.leaderboard__row:last-child { border-bottom: 0; }
+.leaderboard__rank { min-width: 1.5rem; font-weight: 700; color: var(--blue-500); }
+.leaderboard__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leaderboard__points { font-weight: 700; white-space: nowrap; }
+
+/* Past events: centered vertical line, cards alternating left and right, one block per year. */
+.timeline-year { display: flex; align-items: center; gap: 1rem; margin: 2rem 0 1.5rem; }
+.timeline-year::before, .timeline-year::after { content: ""; flex: 1; height: 1px; background: var(--gray-300); }
+.timeline-year span { font-size: 2rem; font-weight: 700; color: var(--blue-500); }
+.timeline { position: relative; list-style: none; margin: 0; padding: 0; }
+.timeline::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); background: var(--gray-300); }
+.timeline__item { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 3rem minmax(0, 1fr); padding-bottom: 1.5rem; }
+.timeline__item--left .timeline__card { grid-column: 1; }
+.timeline__item--right .timeline__card { grid-column: 3; }
+.timeline__dot {
+  position: absolute;
+  top: 1.5rem;
+  left: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+  transform: translateX(-50%);
+  border: 2px solid var(--blue-500);
+  border-radius: 999px;
+  background: var(--hero-bg);
+}
+.timeline__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 1.25rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--text-strong);
+  text-decoration: none;
+  transition: border-color .15s ease;
+}
+.timeline__card:hover, .timeline__card:focus-visible { border-color: var(--blue-500); color: var(--text-strong); }
+.timeline__title { margin: 0; font-size: 1.1rem; line-height: 1.25; }
+.timeline__date { font-size: 0.85rem; color: var(--blue-500); }
+.timeline__intro { margin: 0.25rem 0 0; font-size: 0.95rem; line-height: 1.5; }
+.timeline__meta { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: 0.85rem; color: var(--text-muted); }
+@media (max-width: 720px) {
+  .timeline::before { left: 0.5rem; }
+  .timeline__dot { left: 0.5rem; }
+  .timeline__item { grid-template-columns: 1.75rem minmax(0, 1fr); }
+  .timeline__item--left .timeline__card, .timeline__item--right .timeline__card { grid-column: 2; }
+}

@@ -1,0 +1,96 @@
+<%# Portal of a game site (config/game_sites.yml): upcoming events, championship leaders, past events timeline. %>
+<% discord_url = current_game_site.discord_url %>
+<% discord = discord_url ? link_to('Discord', discord_url, target: '_blank', rel: 'noopener') : 'Discord' %>
+
+<div class="hero hero--compact">
+  <div class="hero__content">
+    <h1 class="hero-title"><%= t('game_site_home.title') %></h1>
+    <p class="site-home__intro"><%= t('game_site_home.intro_html', discord: discord) %></p>
+  </div>
+</div>
+
+<div class="site-home">
+  <h2 id="upcoming-title" class="site-home__section-title site-home__upcoming-title"><%= t('game_site_home.upcoming_title') %></h2>
+
+  <section class="site-home__upcoming" aria-labelledby="upcoming-title">
+    <% if @upcoming_tournaments.any? %>
+      <div class="event-grid">
+        <% @upcoming_tournaments.each do |tournament| %>
+          <%= link_to tournament_path(tournament), class: 'event-card' do %>
+            <div class="event-card__date"><%= event_dates(tournament) || t('game_site_home.date_tbd') %></div>
+            <h3 class="event-card__title"><%= tournament.name %></h3>
+            <% place = tournament.online ? t('game_site_home.online') : tournament.location.presence %>
+            <% if place %>
+              <div class="event-card__meta">📍 <%= place %></div>
+            <% end %>
+            <div class="event-card__meta"><%= t('game_site_home.organizer', name: tournament.creator.username) %></div>
+            <% if tournament.description.present? %>
+              <p class="event-card__intro"><%= truncate(strip_tags(tournament.description).squish, length: 180, separator: ' ') %></p>
+            <% end %>
+            <span class="event-card__cta"><%= t('game_site_home.see_event') %> →</span>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-muted"><%= t('game_site_home.no_upcoming') %></p>
+    <% end %>
+  </section>
+
+  <aside class="site-home__aside">
+    <div class="card site-home__box">
+      <h2 class="site-home__box-title">
+        <%= @championship_year ? t('game_site_home.championship_title', year: @championship_year) : t('championship.title') %>
+      </h2>
+      <% if @championship_leaders.any? %>
+        <ol class="leaderboard">
+          <% @championship_leaders.each do |entry| %>
+            <li class="leaderboard__row">
+              <span class="leaderboard__rank"><%= entry[:rank] %></span>
+              <%= link_to entry[:user].username, user_path(entry[:user]), class: 'leaderboard__name' %>
+              <span class="leaderboard__points"><%= t('game_site_home.points', count: entry[:total_points]) %></span>
+            </li>
+          <% end %>
+        </ol>
+      <% else %>
+        <p class="text-muted"><%= t('game_site_home.no_championship') %></p>
+      <% end %>
+      <%= link_to "#{t('game_site_home.full_standings')} →", championships_path(year: @championship_year), class: 'site-home__more' %>
+    </div>
+  </aside>
+
+  <section class="site-home__history" aria-labelledby="history-title">
+    <h2 id="history-title" class="site-home__section-title"><%= t('game_site_home.history_title') %></h2>
+
+    <% if @past_tournaments.any? %>
+      <% index = 0 %>
+      <% @past_tournaments.group_by { |tournament| (tournament.starts_at || tournament.created_at).year }.each do |year, tournaments| %>
+        <div class="timeline-year"><span><%= year %></span></div>
+        <ol class="timeline">
+          <% tournaments.each do |tournament| %>
+            <li class="timeline__item <%= index.even? ? 'timeline__item--left' : 'timeline__item--right' %>">
+              <span class="timeline__dot" aria-hidden="true"></span>
+              <%= link_to tournament_path(tournament), class: 'timeline__card' do %>
+                <h3 class="timeline__title"><%= tournament.name %></h3>
+                <% if (dates = event_dates(tournament)) %>
+                  <div class="timeline__date"><%= dates %></div>
+                <% end %>
+                <% if tournament.description.present? %>
+                  <p class="timeline__intro"><%= truncate(strip_tags(tournament.description).squish, length: 220, separator: ' ') %></p>
+                <% end %>
+                <div class="timeline__meta">
+                  <% place = tournament.online ? t('game_site_home.online') : tournament.location.presence %>
+                  <% if place %><span>📍 <%= place %></span><% end %>
+                  <span><%= t('game_site_home.organizer', name: tournament.creator.username) %></span>
+                </div>
+              <% end %>
+            </li>
+            <% index += 1 %>
+          <% end %>
+        </ol>
+      <% end %>
+    <% else %>
+      <p class="text-muted"><%= t('game_site_home.no_past') %></p>
+    <% end %>
+    <%= link_to "#{t('game_site_home.all_events')} →", tournaments_path, class: 'site-home__more' %>
+  </section>
+</div>
