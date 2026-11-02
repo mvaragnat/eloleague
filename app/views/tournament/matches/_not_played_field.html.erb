@@ -1,0 +1,11 @@
+<%# Organizer-only checkbox: the match counts for the tournament but not for Elo and statistics %>
+<% scope = local_assigns.fetch(:scope, 'tournament_match') %>
+<% submitted = params.dig(scope, :not_played) %>
+<% checked = submitted.nil? ? local_assigns[:match]&.not_played : submitted == '1' %>
+<div style="margin-top:0.75rem;">
+  <label style="display:flex; gap:0.5rem; align-items:flex-start; cursor:pointer;">
+    <%= hidden_field_tag "#{scope}[not_played]", '0', id: nil %>
+    <%= check_box_tag "#{scope}[not_played]", '1', checked, style: 'margin-top:0.2rem;' %>
+    <span class="card-date" style="font-style:normal;"><%= t('tournaments.match_not_played_checkbox_text') %></span>
+  </label>
+</div>

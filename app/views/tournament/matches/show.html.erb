@@ -72,6 +72,9 @@
           </div>
           <div class="player" style="text-align:right; <%= is_draw ? 'color:var(--blue-500); font-weight:700;' : (b_win ? 'color: var(--green-500); font-weight:700;' : '' ) %>"><%= @match.b_user.username %></div>
         </div>
+        <% if @match.not_played %>
+          <p class="card-date" style="margin-top:0.5rem;"><%= t('tournaments.match_not_played') %></p>
+        <% end %>
         <% if Current.user && @tournament.creator_id == Current.user.id %>
           <div style="margin-top:1rem; border-top:1px solid var(--gray-200); padding-top:1rem;">
             <%= form_with model: @match, url: tournament_tournament_match_path(@tournament, @match), method: :patch do |f| %>
@@ -98,6 +101,7 @@
               <% end %>
                 </div>
               </div>
+              <%= render 'not_played_field', match: @match %>
               <div style="margin-top:0.75rem;">
                 <%= f.submit t('layouts.shared.save', default: 'Save'), class: 'btn btn-primary' %>
               </div>
@@ -129,6 +133,9 @@
               <% end %>
             </div>
           </div>
+          <% if Current.user && @tournament.creator_id == Current.user.id %>
+            <%= render 'not_played_field', match: @match %>
+          <% end %>
           <div style="margin-top:0.75rem;">
             <%= f.submit 'Save', class: 'btn btn-primary' %>
           </div>

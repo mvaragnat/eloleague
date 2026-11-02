@@ -351,6 +351,8 @@ fr:
     draw_not_allowed: "Match nul interdit en élimination"
     cannot_advance_pending: "Tous les matchs doivent être terminés pour passer à la ronde suivante"
     match_updated: "Match mis à jour"
+    match_not_played_checkbox_text: "Ce match n'a pas été joué. Il comptera pour le tournoi, mais ne pas l'inclure dans les calculs de statistiques et d'Elo"
+    match_not_played: "Match non joué (hors statistiques et Elo)"
     faction_required_hint: "Veuillez sélectionner votre faction dans l'onglet Participants avant le check-in."
     faction_required_to_check_in: "Veuillez sélectionner votre faction avant l'enregistrement"
     army_list_required_hint: "La liste d'armée est requise pour le check-in"

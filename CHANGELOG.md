@@ -1,3 +1,7 @@
+## 2026-11-02
+
+- Feature — Matches not played: when entering a tournament match's scores, the organizer can tick "This match was not played. It counts for the tournament, but is left out of statistics and Elo". The result still counts for standings, pairings and the bracket; the game is excluded from ratings and Stats. Ticking or unticking it on an already reported match recomputes the game system's ratings in the background.
+
 ## 2026-10-12
 
 - Feature — Player + faction ratings with uncertainty (Glicko-style):

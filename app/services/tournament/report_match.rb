@@ -7,9 +7,12 @@ module Tournament
   class ReportMatch
     Result = Struct.new(:ok, :event, :error)
 
-    def initialize(tournament:, match:, scores: {})
+    # not_played: true/false to record whether the match was actually played (organizer only);
+    # nil keeps the match's current value.
+    def initialize(tournament:, match:, scores: {}, not_played: nil)
       @tournament = tournament
       @match = match
+      @not_played = not_played.nil? ? match.not_played : (ActiveModel::Type::Boolean.new.cast(not_played) || false)
       @a_score = scores[:a_score]
       @b_score = scores[:b_score]
       @a_secondary = scores[:a_secondary_score]
@@ -34,6 +37,11 @@ module Tournament
 
     private
 
+    # A match not played counts for the tournament but not for Elo and statistics
+    def non_competitive?
+      @tournament.non_competitive || @not_played
+    end
+
     def scores_present?
       @a_score.present? && @b_score.present?
     end
@@ -55,6 +63,10 @@ module Tournament
         b_part = event.game_participations.find { |p| p.user_id == @match.b_user_id }
       end
 
+      event.non_competitive = non_competitive?
+      # Elo already applied (or skipped) with the previous flag: ratings must be recomputed
+      @rebuild_elo = event.non_competitive_changed? && event.elo_applied
+
       success = persist_event_and_parts?(event, a_part, b_part)
       [success, event]
     end
@@ -64,7 +76,7 @@ module Tournament
         game_system: @tournament.game_system,
         played_at: Time.current,
         tournament: @tournament,
-        non_competitive: @tournament.non_competitive,
+        non_competitive: non_competitive?,
         scoring_system: @tournament.scoring_system
       )
       add_participations(event)
@@ -98,11 +110,13 @@ module Tournament
 
     def finalize_match_update(event)
       @match.game_event ||= event
-      @match.non_competitive = @tournament.non_competitive
+      @match.not_played = @not_played
+      @match.non_competitive = non_competitive?
       @match.result = ::Tournament::Match.deduce_result(@a_score.to_i, @b_score.to_i,
                                                         scoring_system: @tournament.scoring_system)
       @match.save!
       @match.propagate_winner_to_parent!
+      EloRebuildJob.perform_later(event.game_system_id) if @rebuild_elo
       ::UserNotifications::Notifier.match_result_recorded(@match, event)
     end
   end
