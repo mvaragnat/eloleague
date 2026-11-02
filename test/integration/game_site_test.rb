@@ -130,6 +130,58 @@ class GameSiteTest < ActionDispatch::IntegrationTest
     assert_select 'select[name=game_system_id] option[selected][value=?]', game_systems(:chess).id.to_s
   end
 
+  test 'game site defaults to its locale' do
+    GameSite.config['chess_site']['default_locale'] = 'fr'
+    host! SITE_HOST
+    get tournaments_path
+    assert_equal :fr, I18n.locale
+    assert_select 'h1', 'Tournois'
+  end
+
+  test 'base site keeps the default locale' do
+    get tournaments_path
+    assert_equal I18n.default_locale, I18n.locale
+  end
+
+  test 'game site home lists events and championship leaders' do
+    host! SITE_HOST
+    @chess_tournament.update!(starts_at: 3.days.from_now, location: 'Lyon', description: '<p>Grand tournoi annuel</p>')
+    past = create_tournament('Chess Past', game_systems(:chess))
+    past.update!(state: 'completed', starts_at: 2.months.ago)
+    Championship::Score.create!(user: @user, tournament: past, game_system: game_systems(:chess),
+                                year: Time.current.year, total_points: 42)
+
+    get root_path(locale: :en)
+    assert_response :success
+    assert_select 'a.event-card[href=?]', tournament_path(@chess_tournament, locale: :en) do
+      assert_select '.event-card__title', 'Chess Open'
+      assert_select '.event-card__meta', /Lyon/
+      assert_select '.event-card__meta', /#{@user.username}/
+      assert_select '.event-card__intro', 'Grand tournoi annuel'
+    end
+    assert_select '.event-card__title', text: 'Go Open', count: 0
+    assert_select '.timeline__title', 'Chess Past'
+    assert_select '.leaderboard__row', 1
+    assert_select '.leaderboard__points', '42 pts'
+  end
+
+  test 'game site home stays visible when signed in' do
+    host! SITE_HOST
+    sign_in @user
+    get root_path(locale: :en)
+    assert_response :success
+    assert_select 'h1', 'Events'
+  end
+
+  test 'game site home links the discord from the environment' do
+    ENV['CHESS_SITE_DISCORD_URL'] = 'https://discord.gg/chess'
+    host! SITE_HOST
+    get root_path(locale: :en)
+    assert_select '.site-home__intro a[href=?]', 'https://discord.gg/chess'
+  ensure
+    ENV.delete('CHESS_SITE_DISCORD_URL')
+  end
+
   private
 
   def create_tournament(name, system)

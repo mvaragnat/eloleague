@@ -240,3 +240,30 @@ select option { background: var(--ea-surface-light); color: var(--text-strong); 
 .site-footer { margin-top: 3rem; padding: 2rem 1rem; border-top-color: var(--ea-gold-a10); }
 .footer-content { font-size: 0.95rem; }
 .footer-link { color: var(--ea-gold); }
+
+/***** Game site home *****/
+.hero--compact { min-height: 0; padding: 4rem 1.5rem 3rem; }
+.site-home__intro { color: #d1d5db; }
+.site-home__section-title, .site-home__box-title { color: var(--ea-gold); }
+.site-home__section-title::after {
+  content: "";
+  display: block;
+  width: 7rem;
+  height: 2px;
+  margin-top: 0.5rem;
+  background: linear-gradient(to right, var(--ea-gold), transparent);
+}
+.event-card, .timeline__card { border-color: var(--ea-gold-a20); background: var(--ea-surface-light); }
+.event-card:hover, .event-card:focus-visible,
+.timeline__card:hover, .timeline__card:focus-visible { border-color: var(--ea-gold-a40); background: var(--ea-surface-lighter); }
+.event-card__date { font-family: var(--font-heading); color: var(--ea-gold); }
+.event-card__title, .timeline__title { color: #f3f4f6; }
+.site-home__box { border-color: var(--ea-gold-a20); }
+.leaderboard__row { border-bottom-color: var(--ea-line); }
+.leaderboard__rank { font-family: var(--font-heading); color: var(--ea-gold); }
+
+.timeline-year::before, .timeline-year::after { background: var(--ea-gold-a20); }
+.timeline-year span { font-family: var(--font-heading); color: rgba(200, 160, 82, 0.75); }
+.timeline::before { background: var(--ea-gold-a20); }
+.timeline__dot { border-color: var(--ea-gold); background: var(--ea-surface); box-shadow: 0 0 8px var(--ea-gold-a40); }
+.timeline__date { color: var(--ea-gold); }

@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
     chosen ||= cookies[:locale]
     chosen = chosen.to_s if chosen
     available = I18n.available_locales.map(&:to_s)
-    chosen = I18n.default_locale unless available.include?(chosen)
+    chosen = default_locale unless available.include?(chosen)
 
     I18n.locale = chosen
 
@@ -45,6 +45,11 @@ class ApplicationController < ActionController::Base
     return unless params[:locale].present? && params[:locale].to_s != cookies[:locale]
 
     cookies[:locale] = { value: params[:locale].to_s, expires: 1.year.from_now }
+  end
+
+  # A game site has its own default locale (config/game_sites.yml), used when the visitor has not picked one.
+  def default_locale
+    current_game_site&.default_locale || I18n.default_locale
   end
 
   def extract_locale

@@ -6,7 +6,7 @@
 class GameSite
   CONFIG_PATH = Rails.root.join('config/game_sites.yml')
 
-  attr_reader :key, :game_system_name, :theme, :icon, :og_image, :parent_url
+  attr_reader :key, :game_system_name, :theme, :icon, :og_image, :parent_url, :default_locale
 
   class << self
     attr_writer :config
@@ -39,6 +39,12 @@ class GameSite
     @icon = attrs['icon'].presence
     @og_image = attrs['og_image'].presence
     @parent_url = attrs['parent_url'].presence
+    @default_locale = attrs['default_locale'].presence&.to_sym
+  end
+
+  # Community Discord invite, read from <SITE KEY>_DISCORD_URL (e.g. EPIC_FERC_DISCORD_URL).
+  def discord_url
+    ENV.fetch("#{key.upcase}_DISCORD_URL", nil).presence
   end
 
   def game_system

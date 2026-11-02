@@ -1,5 +1,6 @@
 ## 2026-11-02
 
+- Feature — Epic League home page: the Epic site now opens in French by default and its home page lists the upcoming Epic events (date, place, organizer, start of the description; each card opens the event), a "History" timeline of the past events grouped by year, and the top 5 of the championship with a link to the full standings. The intro links the community Discord (`EPIC_FERC_DISCORD_URL`). Signed-in players see this page too, through the new "Événements" menu entry.
 - Feature — Matches not played: when entering a tournament match's scores, the organizer can tick "This match was not played. It counts for the tournament, but is left out of statistics and Elo". The result still counts for standings, pairings and the bracket; the game is excluded from ratings and Stats. Ticking or unticking it on an already reported match recomputes the game system's ratings in the background.
 
 ## 2026-10-12
