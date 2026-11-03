@@ -24,9 +24,12 @@
       </label>
     </div>
     <div class="hint text-sm text-gray-600 mb-3">
-      <%= t('stats.badges_hint', concentration: (Elo::Calculator::HIGH_CONCENTRATION * 100).round,
-                              players: format('%g', (1 / Elo::Calculator::HIGH_CONCENTRATION).round(1)),
-                              deviation: Elo::Calculator::PROVISIONAL_RD) %>
+      <%= t('stats.badges_hint') %>
+      <ul class="list-disc pl-5">
+        <li><%= t('stats.badge_concentration_hint', concentration: (Elo::Calculator::HIGH_CONCENTRATION * 100).round,
+                                                    players: format('%g', (1 / Elo::Calculator::HIGH_CONCENTRATION).round(1))) %></li>
+        <li><%= t('stats.badge_uncertainty_hint', deviation: Elo::Calculator::PROVISIONAL_RD) %></li>
+      </ul>
     </div>
     <div <%= 'hidden' if game_site? %>>
     <label for="system-select"><%= t('stats.system_label', default: 'Game system') %></label>
@@ -43,11 +46,8 @@
         <%= t('stats.mirror_hint', default: 'Mirror games are counted in total but excluded from W/L/D and Win%.') %>
         <br>
         <%= t('stats.balance_band_hint', band: half_band,
-                                         low: Elo::Calculator::FACTION_START_RATING - half_band,
-                                         high: Elo::Calculator::FACTION_START_RATING + half_band,
-                                         shift: (Elo::Calculator::BALANCE_MAX_SHIFT * 100).round,
-                                         favorite: (50 + (Elo::Calculator::BALANCE_MAX_SHIFT * 100)).round,
-                                         underdog: (50 - (Elo::Calculator::BALANCE_MAX_SHIFT * 100)).round) %>
+                                         shift: (Elo::Calculator::BALANCE_MAX_SHIFT * 100).round) %>
+        <br>
         <%= t('stats.faction_click_hint') %>
       </div>
       <div class="table-responsive">
