@@ -24,8 +24,8 @@ Rails.application.config.x.rating.tap do |rating|
   # Ratings are flagged "provisional" above this deviation
   rating.provisional_deviation = ENV.fetch('RATING_PROVISIONAL_RD', '100').to_i
   # A faction's concentration (Herfindahl index of its games among players, 0..1) is
-  # flagged as too high above this value. 0.5 = fewer than 2 "effective" players.
-  rating.high_concentration = ENV.fetch('RATING_HIGH_CONCENTRATION', '0.3').to_f
+  # flagged as too high above this value. 0.25 = fewer than 4 "effective" players.
+  rating.high_concentration = ENV.fetch('RATING_HIGH_CONCENTRATION', '0.25').to_f
   # Balance target: between two players of the same level, a faction gap may shift the win
   # probability by at most this much (0.05 = 55/45). The Stats faction table draws the
   # matching band around the faction start rating (about ±41 with a = 0.7).

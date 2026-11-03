@@ -434,7 +434,7 @@ fr:
       long: "Le %d/%m/%Y à %Hh%M"
       card: "%d/%m/%Y"
   stats:
-    balance_band_hint: "Les lignes en gras délimitent la zone d'équilibre idéale, ±%{band} autour du classement de départ (%{low}–%{high}) : entre deux joueurs de même niveau, deux factions de cette zone ne modifient pas la probabilité de victoire de plus de %{shift} points (%{favorite}/%{underdog} au pire). Visible quand le tableau est trié par classement."
+    balance_band_hint: "Les lignes en gras délimitent la zone d'équilibre idéale à ±%{shift} % de probabilité de victoire (±%{band} autour du classement de départ)."
     uncertainty: "Incertitude"
     uncertainty_hint: "Déviation RD : à quel point le classement est encore incertain. Elle diminue à chaque partie."
     concentration: "Concentration"
@@ -442,7 +442,9 @@ fr:
     high_concentration: "Concentration élevée"
     hide_high_concentration: "Masquer les factions à concentration élevée"
     hide_high_uncertainty: "Masquer les factions à incertitude élevée"
-    badges_hint: "Badges : « Concentration élevée » quand la concentration dépasse %{concentration} % (moins de %{players} joueurs effectifs), « Incertitude élevée » quand l'incertitude (RD) dépasse %{deviation}. Les parties non compétitives sont exclues."
+    badges_hint: "Badges :"
+    badge_concentration_hint: "« Concentration élevée » au-dessus de %{concentration} % (il faut au moins %{players} joueurs réguliers),"
+    badge_uncertainty_hint: "« Incertitude élevée » quand l'incertitude sur le Elo dépasse %{deviation}."
     players_ranking:
       hide_high_uncertainty: "Masquer les joueurs à incertitude élevée"
       title: "Classement des joueurs"

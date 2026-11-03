@@ -458,7 +458,7 @@ en:
       long: "%d/%m/%Y at %H:%M"
       card: "%d/%m/%Y"
   stats:
-    balance_band_hint: "Bold lines mark the ideal balance band, ±%{band} around the starting rating (%{low}–%{high}): between two players of the same level, two factions inside it change the win probability by at most %{shift} points (%{favorite}/%{underdog} at worst). Visible when sorted by rating."
+    balance_band_hint: "Bold lines mark the ideal balance band at ±%{shift}% win probability (±%{band} around the starting rating)."
     uncertainty: "Uncertainty"
     uncertainty_hint: "Rating deviation RD: how unsure the rating still is. It shrinks with every game."
     concentration: "Concentration"
@@ -466,7 +466,9 @@ en:
     high_concentration: "High concentration"
     hide_high_concentration: "Hide factions with high concentration"
     hide_high_uncertainty: "Hide factions with high uncertainty"
-    badges_hint: "Badges: \"High concentration\" when the concentration exceeds %{concentration}% (fewer than %{players} effective players), \"High uncertainty\" when the rating deviation (RD) exceeds %{deviation}. Non-competitive games are excluded."
+    badges_hint: "Badges:"
+    badge_concentration_hint: "\"High concentration\" above %{concentration}% (at least %{players} regular players are needed),"
+    badge_uncertainty_hint: "\"High uncertainty\" when the uncertainty on the Elo exceeds %{deviation}."
     players_ranking:
       hide_high_uncertainty: "Hide players with high uncertainty"
       title: "Player ranking"
