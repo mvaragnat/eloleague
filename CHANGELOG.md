@@ -1,3 +1,7 @@
+## 2026-11-07
+
+- Fix — Tournament match score entry: with the secondary score used as a tie-break, both players' fields are now labeled "Secondary score" (the right-hand one was wrongly labeled "Opponent secondary score", even when the signed-in player was on the right).
+
 ## 2026-11-02
 
 - Feature — Epic League home page: the Epic site now opens in French by default and its home page lists the upcoming Epic events (date, place, organizer, start of the description; each card opens the event), a "History" timeline of the past events grouped by year, and the top 5 of the championship with a link to the full standings. The intro links the community Discord (`EPIC_FERC_DISCORD_URL`). Signed-in players see this page too, through the new "Événements" menu entry.
