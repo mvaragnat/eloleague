@@ -1,7 +1,7 @@
 <ul class="matches-grid" id="matches-list">
   <% matches.each do |m| %>
     <li>
-      <%= content_tag :svg, width: 240, height: 88 do %>
+      <%= content_tag :svg, width: 240, height: ApplicationHelper::MATCH_BOX_HEIGHT do %>
         <%= small_match_box(tournament, m, 0, 0, width: 240, show_seeds: false) %>
       <% end %>
     </li>
