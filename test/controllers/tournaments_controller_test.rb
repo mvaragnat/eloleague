@@ -556,6 +556,46 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, 'Open'
   end
 
+  test 'swiss pairings show army list link next to players who provided one' do
+    sign_in @user
+    post tournaments_path(locale: I18n.locale),
+         params: { tournament: {
+           name: 'Swiss Lists',
+           description: 'S',
+           game_system_id: game_systems(:chess).id,
+           format: 'swiss',
+           rounds_count: 1
+         } }
+    t = Tournament::Tournament.order(:created_at).last
+    t.update!(state: 'registration')
+    post register_tournament_path(t, locale: I18n.locale)
+    f1 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'White')
+    reg1 = t.registrations.find_by(user: @user)
+    reg1.update!(faction: f1, army_list: 'My list')
+    post check_in_tournament_path(t, locale: I18n.locale)
+
+    sign_out @user
+    sign_in users(:player_two)
+    post register_tournament_path(t, locale: I18n.locale)
+    f2 = Game::Faction.find_or_create_by!(game_system: t.game_system, name: 'Black')
+    reg2 = t.registrations.find_by(user: users(:player_two))
+    reg2.update!(faction: f2)
+    post check_in_tournament_path(t, locale: I18n.locale)
+
+    sign_out users(:player_two)
+    sign_in @user
+    post lock_registration_tournament_path(t, locale: I18n.locale)
+    post next_round_tournament_path(t, locale: I18n.locale)
+
+    sign_out @user
+    get tournament_path(t, locale: I18n.locale, tab: 1)
+    assert_response :success
+    assert_select '#matches-list a[href=?]', tournament_tournament_registration_path(t, reg1, locale: I18n.locale),
+                  text: I18n.t('tournaments.show.view_army_list')
+    assert_select '#matches-list a[href=?]', tournament_tournament_registration_path(t, reg2, locale: I18n.locale),
+                  count: 0
+  end
+
   test 'reporting swiss match result works like elimination' do
     # Setup swiss
     sign_in @user

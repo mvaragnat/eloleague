@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  # Height of a match box (bracket and round pairing grids).
+  MATCH_BOX_HEIGHT = 104
+
   # Tooltip behind a displayed rating: R ± RD and how to read the uncertainty.
   def rating_tooltip(rating, deviation)
     t('elo.rating_tooltip', rating: rating, deviation: deviation, provisional: Elo::Calculator::PROVISIONAL_RD)
@@ -56,7 +59,7 @@ module ApplicationHelper
 
     # Layout constants
     cell_w = 240
-    cell_h = 88
+    cell_h = MATCH_BOX_HEIGHT
     col_gap = 120
     row_gap = 36
     padding = 24
@@ -151,7 +154,7 @@ module ApplicationHelper
   # Exposed to reuse in other formats (e.g., swiss/open rounds list) by calling this helper per match.
   def small_match_box(tournament, match, pos_x, pos_y, options = {})
     cell_w = options[:width].presence || 240
-    cell_h = 88
+    cell_h = MATCH_BOX_HEIGHT
     admin = Current.user && tournament.creator_id == Current.user.id
 
     a_set = match.a_user_id.present?
@@ -219,8 +222,8 @@ module ApplicationHelper
       link = allowed ? tournament_tournament_match_path(tournament, match) : nil
     end
 
-    a_faction_label = a_faction.present? ? truncate(a_faction, length: 24) : nil
-    b_faction_label = b_faction.present? ? truncate(b_faction, length: 24) : nil
+    a_list_path = army_list_path_for_user(tournament, match.a_user_id)
+    b_list_path = army_list_path_for_user(tournament, match.b_user_id)
 
     table_text = match.respond_to?(:table_number) && match.table_number.present? ? match.table_number.to_s : nil
     text_start_x = pos_x + (table_text ? 40 : 14)
@@ -231,8 +234,8 @@ module ApplicationHelper
       # Table number (left column), when available
       (if table_text
          [
-           content_tag(:circle, nil, cx: pos_x + 20, cy: pos_y + 44, r: 12, fill: '#f3f4f6'),
-           content_tag(:text, table_text, x: pos_x + 20, y: pos_y + 48, 'text-anchor': 'middle',
+           content_tag(:circle, nil, cx: pos_x + 20, cy: pos_y + (cell_h / 2) - 4, r: 12, fill: '#f3f4f6'),
+           content_tag(:text, table_text, x: pos_x + 20, y: pos_y + (cell_h / 2), 'text-anchor': 'middle',
                                           'font-size': 12, 'font-weight': 'bold', fill: '#4b5563')
          ]
        end),
@@ -240,21 +243,15 @@ module ApplicationHelper
       content_tag(:text, score_text, x: pos_x + cell_w - 14, y: pos_y + 22, 'text-anchor': 'end',
                                      'font-size': 14, fill: '#6b7280'),
       # Top player username
-      content_tag(:text, a_label, x: text_start_x, y: pos_y + 26,
+      content_tag(:text, a_label, x: text_start_x, y: pos_y + 24,
                                   style: a_style, 'font-size': 14),
-      # Top player faction (smaller, grey)
-      (if a_faction_label
-         content_tag(:text, a_faction_label, x: text_start_x, y: pos_y + 42,
-                                             'font-size': 12, fill: '#6b7280')
-       end),
+      # Top player faction and army list link (smaller, grey)
+      match_box_player_details(a_faction, a_list_path, text_start_x, pos_y + 42),
       # Bottom player username
-      content_tag(:text, b_label, x: text_start_x, y: pos_y + 64,
+      content_tag(:text, b_label, x: text_start_x, y: pos_y + 66,
                                   style: b_style, 'font-size': 14),
-      # Bottom player faction (smaller, grey)
-      (if b_faction_label
-         content_tag(:text, b_faction_label, x: text_start_x, y: pos_y + 80,
-                                             'font-size': 12, fill: '#6b7280')
-       end)
+      # Bottom player faction and army list link (smaller, grey)
+      match_box_player_details(b_faction, b_list_path, text_start_x, pos_y + 84)
     ].flatten.compact
 
     if link
@@ -272,7 +269,7 @@ module ApplicationHelper
   # Controller-generated list item wrapper for small match boxes
   def svg_match_list_item(tournament, match)
     content_tag(:li, style: 'margin:0; display:flex; justify-content:center;') do
-      content_tag(:svg, width: 240, height: 88) do
+      content_tag(:svg, width: 240, height: MATCH_BOX_HEIGHT) do
         small_match_box(tournament, match, 0, 0, width: 240, show_seeds: false)
       end
     end
@@ -299,19 +296,45 @@ module ApplicationHelper
     seeded.to_h { |uid, rating| [uid, seeded.index([uid, rating]) + 1] }
   end
 
-  def registration_faction_map_for(tournament)
-    registration_cache = Thread.current[:registration_faction_map_cache] ||= {}
-    registration_cache[tournament.id] ||= tournament.registrations
-                                                    .includes(:faction)
-                                                    .each_with_object({}) do |reg, acc|
-      acc[reg.user_id] = reg.faction&.localized_name(I18n.locale)
-    end
-    registration_cache[tournament.id]
+  # Registrations of a tournament indexed by user id, memoized for the current
+  # render (one query per tournament, however many match boxes are drawn).
+  def registrations_by_user_for(tournament)
+    @registrations_by_user ||= {}
+    @registrations_by_user[tournament.id] ||= tournament.registrations.includes(:faction).index_by(&:user_id)
   end
 
   def faction_label_for_user(tournament, user)
     return nil unless user
 
-    registration_faction_map_for(tournament)[user.id]
+    registrations_by_user_for(tournament)[user.id]&.faction&.localized_name(I18n.locale)
+  end
+
+  # Path to a player's army list, when it can be viewed (same rule as the
+  # participants and standings tables: once the tournament has started).
+  def army_list_path_for_user(tournament, user_id)
+    return nil unless user_id && (tournament.running? || tournament.completed?)
+
+    registration = registrations_by_user_for(tournament)[user_id]
+    return nil if registration&.army_list.blank?
+
+    tournament_tournament_registration_path(tournament, registration)
+  end
+
+  # Second line of a player in a match box: faction, then a link to the army list.
+  def match_box_player_details(faction, list_path, pos_x, pos_y)
+    return nil if faction.blank? && list_path.nil?
+
+    content_tag(:text, x: pos_x, y: pos_y, 'font-size': 12, fill: '#6b7280') do
+      parts = []
+      parts << truncate(faction, length: list_path ? 15 : 24) if faction.present?
+      parts << ' · ' if faction.present? && list_path
+      if list_path
+        parts << content_tag(:a, href: list_path, target: '_blank', rel: 'noopener') do
+          content_tag(:tspan, t('tournaments.show.view_army_list', default: 'Army list'),
+                      fill: '#2563eb', 'font-size': 11, 'text-decoration': 'underline')
+        end
+      end
+      safe_join(parts)
+    end
   end
 end
