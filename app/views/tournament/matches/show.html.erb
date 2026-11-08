@@ -95,7 +95,7 @@
                   <%= number_field_tag 'tournament_match[b_score]', b.score, min: 0, step: 1, required: true, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
               <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
                 <div style="margin-top:0.25rem;">
-                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
                   <%= number_field_tag 'tournament_match[b_secondary_score]', b.secondary_score, min: 0, step: 1, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
                 </div>
               <% end %>
@@ -127,7 +127,7 @@
               <%= number_field_tag 'tournament_match[b_score]', nil, min: 0, step: 1, required: true, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
               <% if [@tournament.primary_key, @tournament.tiebreak1_key, @tournament.tiebreak2_key].include?('secondary_score_sum') %>
                 <div style="margin-top:0.25rem;">
-                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.opponent_secondary_score', default: 'Opponent secondary') %></label>
+                  <label class="card-date" style="font-style:normal; display:block; margin-bottom:0.25rem;"><%= t('games.new.secondary_score', default: 'Secondary score') %></label>
                   <%= number_field_tag 'tournament_match[b_secondary_score]', nil, min: 0, step: 1, class: "input #{'input-error' if score_error}", style: 'width:100%;', aria: { invalid: score_error } %>
                 </div>
               <% end %>
