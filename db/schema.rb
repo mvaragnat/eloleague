@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_02_090000) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_11_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_stat_statements"
@@ -165,6 +165,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_02_090000) do
     t.boolean "is_default", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "max_total_score"
     t.index ["game_system_id", "is_default"], name: "idx_game_scoring_systems_default"
     t.index ["game_system_id"], name: "index_game_scoring_systems_on_game_system_id"
   end

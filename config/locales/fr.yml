@@ -138,6 +138,7 @@ fr:
       scoring_system_wrong_system: "Le système de score sélectionné appartient à un autre système de jeu"
       score_exceeds_max: "Chaque score doit être compris entre 0 et %{max}"
       total_must_equal: "La somme des deux scores doit être égale à %{total}"
+      total_exceeds_max: "La somme des deux scores ne peut pas dépasser %{max}"
     secondary_score_short: "Points"
     tournament_label: "Tournoi"
     scoring:
@@ -551,4 +552,5 @@ fr:
     summary:
       max_per_player: "Max par joueur: %{value}"
       fixed_total: "Total fixe: %{value}"
+      max_total: "Total max : %{value}"
       min_diff: "Victoire si écart > %{value}"

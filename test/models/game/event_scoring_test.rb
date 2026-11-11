@@ -64,4 +64,26 @@ class GameEventScoringTest < ActiveSupport::TestCase
     assert event.valid?
     assert_nil event.winner_user
   end
+
+  test 'max total score rejects a sum above the cap and accepts sums up to it' do
+    scoring = game_scoring_systems(:chess_capped_total) # max_total_score = 3
+    event = Game::Event.new(game_system: game_systems(:chess), scoring_system: scoring, played_at: Time.current)
+    white = game_factions(:chess_white)
+
+    event.game_participations.build(user: users(:player_one), score: 2, faction: white)
+    event.game_participations.build(user: users(:player_two), score: 2, faction: white)
+    assert_not event.valid?
+    assert_includes event.errors.full_messages.join, I18n.t('games.errors.total_exceeds_max', max: 3)
+
+    [[2, 1], [1, 1], [0, 0], [3, 0]].each do |a, b|
+      event.game_participations.clear
+      event.game_participations.build(user: users(:player_one), score: a, faction: white)
+      event.game_participations.build(user: users(:player_two), score: b, faction: white)
+      assert event.valid?, "#{a}-#{b} should be valid: #{event.errors.full_messages.to_sentence}"
+    end
+  end
+
+  test 'summary lists the max total score' do
+    assert_includes game_scoring_systems(:chess_capped_total).summary(:en), 'Max total: 3'
+  end
 end

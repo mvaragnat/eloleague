@@ -9,6 +9,7 @@ module Game
     validates :name, presence: true
     validates :max_score_per_player, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
     validates :fix_total_score, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
+    validates :max_total_score, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
     validates :min_difference_for_win, numericality: { only_integer: true, greater_than_or_equal_to: 0 },
                                        allow_nil: true
     validates :is_default, inclusion: { in: [true, false] }
@@ -44,6 +45,9 @@ module Game
       end
       if fix_total_score.present?
         parts << I18n.t('scoring_system.summary.fixed_total', value: fix_total_score, locale: locale)
+      end
+      if max_total_score.present?
+        parts << I18n.t('scoring_system.summary.max_total', value: max_total_score, locale: locale)
       end
       if min_difference_for_win.present?
         parts << I18n.t('scoring_system.summary.min_diff', value: min_difference_for_win, locale: locale)

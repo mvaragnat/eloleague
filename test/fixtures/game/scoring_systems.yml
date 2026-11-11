@@ -11,6 +11,13 @@ chess_constrained:
   min_difference_for_win: 5
   is_default: false
 
+chess_capped_total:
+  game_system: chess
+  name: Capped total
+  max_score_per_player: 3
+  max_total_score: 3
+  is_default: false
+
 go_default:
   game_system: go
   name: Default

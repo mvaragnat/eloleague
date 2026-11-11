@@ -11,8 +11,10 @@ export default class extends Controller {
     bothFactionsRequiredMessage: String,
     scoreExceedsMaxMessage: String,
     totalMustEqualMessage: String,
+    totalExceedsMaxMessage: String,
     scoringMax: Number,
-    scoringTotal: Number
+    scoringTotal: Number,
+    scoringMaxTotal: Number
   }
 
   connect() {
@@ -335,10 +337,16 @@ export default class extends Controller {
     return template.replace('%{total}', String(total))
   }
 
+  totalExceedsMaxErrorMessage(max) {
+    const template = this.hasTotalExceedsMaxMessageValue ? this.totalExceedsMaxMessageValue : 'Total of both scores cannot exceed %{max}'
+    return template.replace('%{max}', String(max))
+  }
+
   syncScoringConstraintsFrom(item) {
     if (!item) {
       this.scoringMaxValue = undefined
       this.scoringTotalValue = undefined
+      this.scoringMaxTotalValue = undefined
       return
     }
 
@@ -346,6 +354,8 @@ export default class extends Controller {
     const total = item.fix_total_score
     this.scoringMaxValue = max == null ? null : Number(max)
     this.scoringTotalValue = total == null ? null : Number(total)
+    const maxTotal = item.max_total_score
+    this.scoringMaxTotalValue = maxTotal == null ? null : Number(maxTotal)
   }
 
   validateScoringConstraints(scoreInputs) {
@@ -376,6 +386,17 @@ export default class extends Controller {
       if ((values[0] + values[1]) !== total) {
         this.showError(
           this.totalMustEqualErrorMessage(total),
+          'input[name^="game_event[game_participations_attributes]"][name$="[score]"]'
+        )
+        return false
+      }
+    }
+
+    if (this.hasScoringMaxTotalValue && Number.isFinite(this.scoringMaxTotalValue)) {
+      const maxTotal = this.scoringMaxTotalValue
+      if ((values[0] + values[1]) > maxTotal) {
+        this.showError(
+          this.totalExceedsMaxErrorMessage(maxTotal),
           'input[name^="game_event[game_participations_attributes]"][name$="[score]"]'
         )
         return false
