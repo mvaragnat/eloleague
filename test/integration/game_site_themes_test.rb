@@ -31,6 +31,14 @@ class GameSiteThemesTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'every game site has its own link preview image and color' do
+    sites.each do |key, attrs|
+      assert attrs['og_image'].present?, "#{key}: missing og_image"
+      assert Rails.public_path.join(attrs['og_image'].delete_prefix('/')).exist?, "#{key}: missing #{attrs['og_image']}"
+      assert_match(/\A#\h{6}\z/, attrs['theme_color'].to_s, "#{key}: theme_color must be a hex color")
+    end
+  end
+
   test 'every game site has its texts in French and English' do
     sites.each_key do |key|
       %i[fr en].each do |locale|
