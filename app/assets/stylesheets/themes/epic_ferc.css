@@ -52,6 +52,9 @@
   --hero-bg: var(--ea-surface);
   --hero-image: url('/sites/epic_ferc/hero-bg.jpg');
 
+  --highlight-bg: rgba(200, 160, 82, 0.14);
+  --table-line: var(--ea-line);
+
   --chart-axis: #5a4a40;
   --chart-grid: #3a2e28;
   --chart-primary: var(--ea-gold);

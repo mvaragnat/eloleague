@@ -40,6 +40,12 @@ Allowed commands
 - all layout shall be responsive for mobile and tablets
 - use ViewComponent for modularity
 - use Hotwire for all user interactions
+- the application is served on several domains with different looks (the base site plus the game sites of config/game_sites.yml, each with its theme in app/assets/stylesheets/themes/). Any design change (CSS, view markup, new component, new theme) MUST be checked on ALL of them before it is proposed:
+  - never hardcode a color, a font or an image in a view, a component, an inline style or a Stimulus controller: use the tokens declared in the `:root` of app/assets/stylesheets/application.css (`--surface`, `--text-strong`, `--highlight-bg`...). If no token fits, add one in application.css with its base value, and set it in EVERY theme file
+  - themes are both dark (epic_ferc) and light (trench_crusade, confrontation, base site): check that text stays readable on its background in each of them
+  - render the changed pages on the base site and on every game site (set `GAME_SITES="epic.localhost=epic_ferc,tc.localhost=trench_crusade,conf.localhost=confrontation"` and browse http://epic.localhost:3000 etc.), on desktop and mobile widths, and state in your answer which sites and pages were checked
+  - when adding a game site, follow "Adding a game site" in context.md; test/integration/game_site_themes_test.rb must pass
+  - only use images and fonts we have the rights to: the trench_crusade theme must not embed any artwork or font of the game or of trenchcrusade.fr
 - always use localization, never use hardcoded strings. always populated both French and English locales. The only exception is the admin dashboard (/avo) that does not need to be localized and is coded only in english
 
 # Style

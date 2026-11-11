@@ -37,6 +37,9 @@
   --warning: #b45309;
   --chart-axis: #ccc;
   --chart-grid: #e5e7eb;
+  /* Ranking table: background of the columns used to rank players, and cell separators */
+  --highlight-bg: #fff8c4;
+  --table-line: #f0f0f0;
 }
 
 /***** Base Typography *****/
@@ -519,14 +522,14 @@ input:focus, select:focus, textarea:focus {
   color: var(--text-muted);
   white-space: nowrap;
   border-bottom: 2px solid var(--gray-300);
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid var(--gray-300);
 }
 .ranking-th:last-child { border-right: none; }
 .ranking-th--left { text-align: left; }
 .ranking-td {
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #f0f0f0;
-  border-right: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--table-line);
+  border-right: 1px solid var(--table-line);
 }
 .ranking-td:last-child { border-right: none; }
 .ranking-td--rank {
@@ -535,6 +538,8 @@ input:focus, select:focus, textarea:focus {
 }
 .ranking-td--player { white-space: nowrap; }
 .ranking-td--num { text-align: right; }
+/* Columns used as primary or tie-break strategy. Themes set --highlight-bg: it must stay readable under the cell text. */
+.ranking-cell--highlight { background-color: var(--highlight-bg); }
 .ranking-faction { color: var(--text-muted); }
 .ranking-table tbody tr:hover { background: var(--surface-hover); }
 

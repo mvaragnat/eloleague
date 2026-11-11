@@ -1,0 +1,221 @@
+/*
+ * Theme for the Confrontation game site (config/game_sites.yml).
+ * Loaded after application.css: override the :root tokens declared there.
+ * Site images live in public/sites/confrontation/ and are referenced with absolute paths.
+ *
+ * Copies the look of https://confederation-dragon-rouge.fr (Confédération du Dragon Rouge
+ * Francophone): parchment pages, navy titles and buttons, dark textured header, dragon red accent.
+ * Images (hero, textures, dragon logo, icon) come from that site, reused with permission.
+ * Its fonts (Caslon Antique, ITC Goudy Sans) are replaced by close free Google Fonts.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap');
+
+:root {
+  color-scheme: light;
+
+  /* Palette of confederation-dragon-rouge.fr */
+  --cdr-navy: #0c1e36;
+  --cdr-navy-light: #1d3454;
+  --cdr-parchment: #faedda;
+  --cdr-paper: #fff6ea;
+  --cdr-red: #972825;
+  --cdr-red-bright: #e52726;
+  --cdr-slate: #2b3034;
+  --cdr-line: rgba(12, 30, 54, 0.14);
+
+  /* Application tokens */
+  --blue-500: var(--cdr-navy);
+  --blue-600: var(--cdr-navy-light);
+  --red-500: var(--cdr-red);
+  --green-500: #3f7d4e;
+  --gray-100: #f8f0e3;
+  --gray-300: #dfceb3;
+  --text-strong: var(--cdr-navy);
+  --text-muted: #5f5a52;
+  --warning: #8a5a00;
+
+  --surface: var(--cdr-paper);
+  --surface-muted: var(--cdr-parchment);
+  --surface-hover: #f8e8d0;
+  --on-primary: var(--cdr-parchment);
+  --focus-ring: rgba(12, 30, 54, 0.2);
+  --accent-soft: rgba(151, 40, 37, 0.08);
+  --accent-border: rgba(151, 40, 37, 0.25);
+  --accent-border-strong: rgba(151, 40, 37, 0.5);
+  --accent-hover: var(--cdr-red);
+  --highlight-bg: #f3dcc0;
+  --table-line: var(--cdr-line);
+
+  --font-body: "Alegreya Sans", "Gill Sans", "Trebuchet MS", sans-serif;
+  --font-heading: "IM Fell English", "Caslon Antique", Georgia, serif;
+
+  --hero-bg: var(--cdr-slate);
+  --hero-image: url('/sites/confrontation/hero-bg.jpg');
+
+  --chart-axis: #b9a88c;
+  --chart-grid: #e6d8bf;
+  --chart-primary: var(--cdr-red);
+}
+
+/* Parchment texture at the top of every page, fading into the page color */
+body {
+  font-size: 1.0625rem;
+  background-image: url('/sites/confrontation/parchment.jpg');
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 100% auto;
+  background-blend-mode: multiply;
+}
+
+::selection { background: var(--cdr-navy); color: var(--cdr-parchment); }
+
+a { text-decoration-color: var(--accent-border-strong); text-underline-offset: 2px; }
+a:hover, a:focus { color: var(--cdr-red); }
+
+/***** Headings *****/
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); font-weight: 400; color: var(--cdr-navy); }
+h1, h2 { text-transform: uppercase; letter-spacing: 0.03em; line-height: 1.1; }
+h1 { font-size: 2.5rem; }
+h2 { font-size: 1.625rem; }
+h3 { font-size: 1.3125rem; }
+
+/* Red rule below page titles */
+.page-header h1::after {
+  content: "";
+  display: block;
+  width: 5rem;
+  height: 3px;
+  margin: 0.75rem auto 0;
+  background: var(--cdr-red);
+}
+
+@media (max-width: 640px) {
+  h1 { font-size: 1.875rem; }
+  h2 { font-size: 1.375rem; }
+}
+
+/***** Nav *****/
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  gap: 0.25rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--cdr-slate) url('/sites/confrontation/nav-bg.jpg') center / cover;
+  border-bottom: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-right: 0.5rem;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 1.125rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cdr-parchment);
+}
+.site-logo::before {
+  content: "";
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: none;
+  background: url('/sites/confrontation/logo.svg') center / contain no-repeat;
+}
+.site-logo:hover, .site-logo:focus { color: #fff; }
+.site-nav .brand {
+  padding: 0.375rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: var(--font-heading);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--cdr-parchment);
+  transition: color .15s ease, background-color .15s ease;
+}
+.site-nav .brand:hover, .site-nav .brand:focus { background: rgba(250, 237, 218, 0.12); color: #fff; }
+.site-nav .user-email { min-width: 0; font-size: 0.9375rem; color: rgba(250, 237, 218, 0.7) !important; font-weight: 400 !important; }
+
+@media (max-width: 640px) {
+  .site-nav { position: static; padding: 0.5rem 0.75rem; }
+  .site-logo { flex-basis: 100%; }
+  .site-logo::before { width: 2rem; height: 2rem; }
+  .site-nav .brand { padding: 0.25rem 0.5rem; font-size: 0.8125rem; }
+}
+
+/***** Forms & buttons *****/
+input, select, textarea, button { font-family: inherit; }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], select, textarea {
+  background-color: #fffaf2;
+  border-radius: 0.25rem;
+}
+
+.btn { border-radius: 0.25rem; font-family: var(--font-heading); font-size: 1.0625rem; letter-spacing: 0.02em; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); }
+.btn-sm { font-size: 0.875rem; box-shadow: none; }
+
+/***** Hero (home) *****/
+.hero { min-height: 70vh; place-items: end center; padding: 2.5rem 1.5rem; }
+.hero::before { opacity: 1; background-position: center 30%; }
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(12, 30, 54, 0.92) 0%, rgba(12, 30, 54, 0.55) 40%, rgba(12, 30, 54, 0.1) 75%);
+}
+.hero-title {
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 400;
+  overflow-wrap: break-word;
+  color: var(--cdr-parchment);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+.hero-subtitle { color: var(--cdr-parchment); letter-spacing: 0.08em; }
+.hero .btn-inverse { background: var(--cdr-parchment); border-color: var(--cdr-parchment); color: var(--cdr-navy); }
+.hero .btn-inverse:hover, .hero .btn-inverse:focus { background: #fff; border-color: #fff; color: var(--cdr-navy); }
+
+/***** Cards *****/
+.card { border: 1px solid var(--cdr-line); border-radius: 0.25rem; box-shadow: 0 2px 6px rgba(44, 22, 3, 0.1); }
+.card--win, .card--loss, .card--draw { border-left-width: 4px; }
+.card--win { border-left-color: var(--green-500); }
+.card--loss { border-left-color: var(--cdr-red); }
+.card--draw { border-left-color: var(--cdr-navy); }
+
+.modal-card { border-radius: 0.25rem; }
+
+/***** Tables *****/
+.table thead th, .ranking-th {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--cdr-navy);
+}
+.ranking-th { border-bottom-color: var(--cdr-navy); }
+
+/***** Footer *****/
+.site-footer {
+  margin-top: 3rem;
+  padding: 1.5rem 1rem;
+  background: var(--cdr-slate) url('/sites/confrontation/nav-bg.jpg') center / cover;
+  border-top: none;
+  color: var(--cdr-parchment);
+}
+.site-footer .footer-content { color: rgba(250, 237, 218, 0.8); }
+.site-footer .footer-link { color: #fff; text-decoration: underline; }
+
+/***** Game site home *****/
+.hero--compact { min-height: 22rem; padding: 3rem 1.5rem 2.5rem; }
+.site-home__intro { margin: 0 auto; color: var(--cdr-parchment); font-size: 1.125rem; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7); }
+.site-home__intro a:hover, .site-home__intro a:focus { color: #fff; }
+.event-card, .timeline__card { border-radius: 0.25rem; box-shadow: 0 2px 6px rgba(44, 22, 3, 0.1); }
+.event-card:hover, .event-card:focus-visible,
+.timeline__card:hover, .timeline__card:focus-visible { border-color: var(--cdr-red); }
+.event-card__date, .timeline__date { color: var(--cdr-red); font-weight: 700; }
+.leaderboard__rank { font-family: var(--font-heading); color: var(--cdr-red); }
+.timeline-year span { font-family: var(--font-heading); font-size: 1.375rem; color: var(--cdr-navy); }
+.timeline__dot { border-color: var(--cdr-red); background: var(--cdr-parchment); }

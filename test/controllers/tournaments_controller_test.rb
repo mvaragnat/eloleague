@@ -1082,7 +1082,7 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     body = @response.body
 
-    highlight_style = 'background-color:#fff8c4;'
+    highlight_style = 'ranking-cell--highlight'
 
     # Score sum header highlighted
     score_sum_label = I18n.t('tournaments.show.strategies.names.primary.score_sum', default: 'Score sum')

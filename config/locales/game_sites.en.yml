@@ -18,3 +18,35 @@ en:
           paragraph_1: "On Epic League, you can keep the history of your Epic Armageddon games and take part in tournaments."
       game_site_home:
         intro_html: "The EA-FR community is particularly active in France and abroad, organizing many tournaments and events. Here you will find every Epic Armageddon gathering. For more details, join us on our %{discord}."
+    trench_crusade:
+      app:
+        name: "Trench Crusade League"
+        logo: "Trench Crusade"
+        description: "Tournaments, rankings and statistics for the French-speaking Trench Crusade community."
+      auth:
+        signup_subtitle: "Create your Trench Crusade League account"
+      welcome: "Welcome to Trench Crusade League"
+      home:
+        subtitle: "Trench Crusade tournaments and statistics"
+      dashboard:
+        welcome_box:
+          title: "Welcome to Trench Crusade League 👋"
+          paragraph_1: "On Trench Crusade League, you can keep the history of your Trench Crusade games and take part in tournaments."
+      game_site_home:
+        intro_html: "Faithful or Heretic, here you will find the tournaments and events of the French-speaking Trench Crusade community. For more details, join us on our %{discord}."
+    confrontation:
+      app:
+        name: "Confrontation League"
+        logo: "Confrontation"
+        description: "Tournaments, rankings and statistics for the French-speaking Confrontation community."
+      auth:
+        signup_subtitle: "Create your Confrontation League account"
+      welcome: "Welcome to Confrontation League"
+      home:
+        subtitle: "Confrontation tournaments and statistics"
+      dashboard:
+        welcome_box:
+          title: "Welcome to Confrontation League 👋"
+          paragraph_1: "On Confrontation League, you can keep the history of your Confrontation games and take part in tournaments."
+      game_site_home:
+        intro_html: "Here you will find the tournaments and events of Confrontation, the legendary skirmish game of the continent of Aarklash, supported by the Confédération du Dragon Rouge Francophone. For more details, join us on our %{discord}."

@@ -1,5 +1,8 @@
 ## 2026-11-11
 
+- Feature — Two new game sites: Trench Crusade (`trench-crusade.eloleague.com`, black header, blood red accent, blackletter titles, inspired by trenchcrusade.fr without using any of its images or fonts) and Confrontation (`confrontation.eloleague.com`, parchment pages, navy titles and the artwork of confederation-dragon-rouge.fr). Each has its own texts, icon and French default locale. Bind them with `GAME_SITES` and set `TRENCH_CRUSADE_DISCORD_URL` / `CONFRONTATION_DISCORD_URL`.
+- Fix — Epic site: in a tournament's Ranking tab, the columns used to rank players were highlighted in pale yellow, which made their light text unreadable on the dark theme. The highlight now follows each site's theme. The "New game" form, which showed light text on a white box on the Epic site, follows the theme too.
+- Project rule — Any design change must now be checked on the base site and on every game site; views must use theme tokens instead of hardcoded colors.
 - Feature — Tournaments list: each tab is now sorted by tournament date. Tournaments accepting signups and ongoing ones show the next one first; closed tournaments and "My tournaments" show the latest first. Tournaments without a date come last.
 - Design — Tournament page: lighter header (state shown as a badge, details on one line), underlined tabs, rounds as small pills, and matches shown as result lines (table, player, score, player) instead of boxed cards. Faction names are no longer truncated; on mobile the two players are stacked with the scores on the right. The army list is flagged by a document icon after the faction, and the whole player block (name and faction) opens it. Same information and links as before (army lists, opening a match to enter or edit its score).
 
