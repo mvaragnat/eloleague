@@ -1,0 +1,37 @@
+<%# One match as a result line: table · player A · score · player B %>
+<% d = match_display(tournament, match) %>
+<li class="match-row">
+  <span class="match-row__table"><%= d[:table] %></span>
+  <% %i[a b].each do |key| %>
+    <% side = d[key] %>
+    <div class="match-row__player match-row__player--<%= key %><%= " match-row__player--#{side[:outcome]}" if side[:outcome] %><%= ' match-row__player--placeholder' if side[:placeholder] %>">
+      <span class="match-row__name"><%= side[:name] %></span>
+      <% if side[:faction].present? || side[:list_path] %>
+        <span class="match-row__details">
+          <% if side[:faction].present? %><span class="match-row__faction"><%= side[:faction] %></span><% end %>
+          <% if side[:list_path] %>
+            <%= link_to t('tournaments.show.view_army_list', default: 'Army list'), side[:list_path], target: '_blank', rel: 'noopener', class: 'match-row__list' %>
+          <% end %>
+        </span>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="match-row__result">
+    <% if d[:played] %>
+      <% score = capture do %>
+        <span class="match-row__score<%= ' match-row__score--win' if d[:a][:outcome] == :win %>"><%= d[:a][:score] %></span>
+        <span class="match-row__sep" aria-hidden="true">–</span>
+        <span class="match-row__score<%= ' match-row__score--win' if d[:b][:outcome] == :win %>"><%= d[:b][:score] %></span>
+      <% end %>
+      <% if d[:link] %>
+        <%= link_to score, d[:link], class: 'match-row__scores match-row__scores--link', title: t('tournaments.open') %>
+      <% else %>
+        <span class="match-row__scores"><%= score %></span>
+      <% end %>
+    <% elsif d[:link] %>
+      <%= link_to t('tournaments.open'), d[:link], class: 'match-row__open' %>
+    <% else %>
+      <span class="match-row__status"><%= d[:status] %></span>
+    <% end %>
+  </div>
+</li>

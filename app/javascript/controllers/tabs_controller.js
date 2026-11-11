@@ -36,7 +36,8 @@ export default class extends Controller {
     this.tabTargets.forEach((el, i) => {
       const selected = i === index
       el.setAttribute("aria-selected", selected ? "true" : "false")
-      el.classList.toggle("btn-primary", selected)
+      // Button-style tabs are highlighted with a class; link-style tabs rely on aria-selected
+      if (el.classList.contains("btn")) el.classList.toggle("btn-primary", selected)
     })
 
     this.panelTargets.forEach((el, i) => {
