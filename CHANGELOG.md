@@ -1,5 +1,6 @@
 ## 2026-11-11
 
+- Feature — Link previews (Discord, social networks): the Epic, Trench Crusade and Confrontation sites now show their own image and accent color instead of the Eloleague one.
 - Feature — Two new game sites: Trench Crusade (`trench-crusade.eloleague.com`, black header, blood red accent, blackletter titles, inspired by trenchcrusade.fr without using any of its images or fonts) and Confrontation (`confrontation.eloleague.com`, parchment pages, navy titles and the artwork of confederation-dragon-rouge.fr). Each has its own texts, icon and French default locale. Bind them with `GAME_SITES` and set `TRENCH_CRUSADE_DISCORD_URL` / `CONFRONTATION_DISCORD_URL`.
 - Fix — Epic site: in a tournament's Ranking tab, the columns used to rank players were highlighted in pale yellow, which made their light text unreadable on the dark theme. The highlight now follows each site's theme. The "New game" form, which showed light text on a white box on the Epic site, follows the theme too.
 - Project rule — Any design change must now be checked on the base site and on every game site; views must use theme tokens instead of hardcoded colors.

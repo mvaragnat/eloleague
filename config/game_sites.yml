@@ -8,7 +8,8 @@
 #   game_system: name of the Game::System (as in config/game_systems.yml) the site is locked on
 #   theme:       optional stylesheet loaded after application.css (app/assets/stylesheets/themes/<theme>.css)
 #   icon:        optional favicon path (served from public/)
-#   og_image:    optional social sharing image path (served from public/)
+#   og_image:    optional social sharing image path (served from public/), 1200x630, shown in link previews (Discord, social networks)
+#   theme_color: optional color of the link preview accent bar (Discord) and of the mobile browser toolbar
 #   parent_url:  optional URL of the site this one is part of; the nav logo links to it
 #   default_locale: optional locale used when the visitor has not picked one (defaults to I18n.default_locale)
 #
@@ -21,6 +22,8 @@ epic_ferc:
   game_system: "Epic Armageddon - FERC"
   theme: epic_ferc
   icon: "/sites/epic_ferc/icon.png"
+  og_image: "/sites/epic_ferc/og.jpg"
+  theme_color: "#c8a052"
   parent_url: "https://www.epicarmageddon.fr"
   default_locale: fr
 
@@ -29,6 +32,8 @@ trench_crusade:
   game_system: "Trench Crusade"
   theme: trench_crusade
   icon: "/sites/trench_crusade/icon.png"
+  og_image: "/sites/trench_crusade/og.jpg"
+  theme_color: "#8f1519"
   default_locale: fr
 
 # Look and images of https://confederation-dragon-rouge.fr (images reused with permission).
@@ -36,4 +41,6 @@ confrontation:
   game_system: "Confrontation"
   theme: confrontation
   icon: "/sites/confrontation/icon.png"
+  og_image: "/sites/confrontation/og.jpg"
+  theme_color: "#972825"
   default_locale: fr
