@@ -76,7 +76,7 @@ module Tournament
           format.turbo_stream do
             render turbo_stream: [
               turbo_stream.remove('no-matches-message'),
-              turbo_stream.prepend('matches-list', view_context.svg_match_list_item(@tournament, match)),
+              turbo_stream.prepend('matches-list', view_context.match_list_item(@tournament, match)),
               turbo_stream.replace('modal', '')
             ]
           end
@@ -246,8 +246,6 @@ module Tournament
         scores: attrs.include?(:base) || attrs.include?(:players) || attrs.any? { |attr| attr.to_s.include?('score') }
       }
     end
-
-    # View helper moved to ApplicationHelper#svg_match_list_item
 
     # rubocop:disable Rails/StrongParametersExpect
     def game_params

@@ -8,13 +8,13 @@
   <div data-controller="tabs"
        data-tabs-active-index-value="<%= @active_round_index %>"
        data-tabs-param-name-value="round_tab">
-    <div class="tabs-nav">
+    <div class="tabs-nav tabs-nav--pills">
       <% rounds.each_with_index do |round, idx| %>
         <a href="#"
            data-action="click->tabs#select"
            data-index="<%= idx %>"
            data-tabs-target="tab"
-           class="btn <%= idx == 0 ? 'btn-primary' : '' %>"
+           class="tab-link"
            aria-selected="<%= idx == 0 ? 'true' : 'false' %>">
           <%= t('tournaments.show.round_label', n: round.number) %>
         </a>
@@ -23,19 +23,17 @@
 
     <% rounds.each_with_index do |round, idx| %>
       <div data-tabs-target="panel" style="<%= idx == 0 ? '' : 'display:none;' %>">
-        <div class="card">
-          <div class="card-body">
-            <% if round.matches.any? %>
-              <% ms = round.matches.to_a %>
-              <% if ms.any? { |m| m.table_number.present? } %>
-                <% ms = ms.sort_by { |m| [m.table_number ? 0 : 1, m.table_number || 0] } %>
-              <% end %>
-              <%= render 'matches_grid', tournament: tournament, matches: ms %>
-            <% else %>
-              <p class="card-date"><%= t('tournaments.show.no_matches', default: 'No matches yet') %></p>
-            <% end %>
+        <% if round.matches.any? %>
+          <% ms = round.matches.to_a %>
+          <% if ms.any? { |m| m.table_number.present? } %>
+            <% ms = ms.sort_by { |m| [m.table_number ? 0 : 1, m.table_number || 0] } %>
+          <% end %>
+          <%= render 'matches_grid', tournament: tournament, matches: ms %>
+        <% else %>
+          <div class="card">
+            <p class="card-date"><%= t('tournaments.show.no_matches', default: 'No matches yet') %></p>
           </div>
-        </div>
+        <% end %>
       </div>
     <% end %>
   </div>

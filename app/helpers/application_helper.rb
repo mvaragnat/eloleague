@@ -150,82 +150,63 @@ module ApplicationHelper
     end
   end
 
+  # Everything a view needs to display a match: both sides (name, faction, score,
+  # outcome, army list link), the status of an unplayed match and the link to open it.
+  def match_display(tournament, match)
+    admin = Current.user && tournament.creator_id == Current.user.id
+    a_set = match.a_user_id.present?
+    b_set = match.b_user_id.present?
+    leaf = match.child_matches.empty?
+    bye_label = t('tournaments.show.bye', default: 'Bye')
+
+    a = match_display_side(tournament, match.a_user, !a_set && b_set && leaf)
+    b = match_display_side(tournament, match.b_user, a_set && !b_set && leaf)
+    played = match.game_event_id.present?
+
+    if played
+      pa = match.game_event.game_participations.find_by(user: match.a_user)
+      pb = match.game_event.game_participations.find_by(user: match.b_user)
+      a[:faction] = pa.faction.localized_name(I18n.locale) if pa&.faction
+      b[:faction] = pb.faction.localized_name(I18n.locale) if pb&.faction
+      a[:score] = pa&.score
+      b[:score] = pb&.score
+      # Outcome follows the stored match.result, which reflects the scoring rules
+      a[:outcome], b[:outcome] = { 'a_win' => %i[win loss], 'b_win' => %i[loss win],
+                                   'draw' => %i[draw draw] }.fetch(match.result, [nil, nil])
+      allowed = admin
+    else
+      one_sided_win = (a_set && !b_set && match.result == 'a_win') || (b_set && !a_set && match.result == 'b_win')
+      status = one_sided_win ? bye_label : t('tournaments.show.pending', default: 'Pending')
+      allowed = admin || [match.a_user_id, match.b_user_id].compact.include?(Current.user&.id)
+    end
+
+    {
+      a: a, b: b, played: played, status: status,
+      score_text: played ? "#{a[:score]} - #{b[:score]}" : status,
+      link: allowed && a_set && b_set ? tournament_tournament_match_path(tournament, match) : nil,
+      table: match.respond_to?(:table_number) ? match.table_number.presence : nil
+    }
+  end
+
   # Render a small match box (names, optional score, winner highlighted) as used in elimination bracket.
-  # Exposed to reuse in other formats (e.g., swiss/open rounds list) by calling this helper per match.
   def small_match_box(tournament, match, pos_x, pos_y, options = {})
     cell_w = options[:width].presence || 240
     cell_h = MATCH_BOX_HEIGHT
-    admin = Current.user && tournament.creator_id == Current.user.id
+    display = match_display(tournament, match)
+    box_styles = { win: 'font-weight:700; fill:#16a34a;', draw: 'font-weight:700; fill:#2563eb;' }
 
-    a_set = match.a_user_id.present?
-    b_set = match.b_user_id.present?
-    a_bye = !a_set && b_set && match.child_matches.empty?
-    b_bye = a_set && !b_set && match.child_matches.empty?
+    a_label = truncate(display[:a][:name], length: 24)
+    b_label = truncate(display[:b][:name], length: 24)
+    a_style = box_styles.fetch(display[:a][:outcome], '')
+    b_style = box_styles.fetch(display[:b][:outcome], '')
+    a_faction = display[:a][:faction]
+    b_faction = display[:b][:faction]
+    a_list_path = display[:a][:list_path]
+    b_list_path = display[:b][:list_path]
+    score_text = display[:score_text]
+    link = display[:link]
 
-    a_name = if a_set
-               match.a_user.username
-             elsif a_bye
-               t('tournaments.show.bye', default: 'Bye')
-             else
-               'TBD'
-             end
-    b_name = if b_set
-               match.b_user.username
-             elsif b_bye
-               t('tournaments.show.bye', default: 'Bye')
-             else
-               'TBD'
-             end
-
-    a_faction = match.a_user_id ? faction_label_for_user(tournament, match.a_user) : nil
-    b_faction = match.b_user_id ? faction_label_for_user(tournament, match.b_user) : nil
-
-    a_label = truncate(a_name, length: 24)
-    b_label = truncate(b_name, length: 24)
-
-    if match.game_event_id
-      pa = match.game_event.game_participations.find_by(user: match.a_user)
-      pb = match.game_event.game_participations.find_by(user: match.b_user)
-      a_faction = pa.faction.localized_name(I18n.locale) if pa&.faction
-      b_faction = pb.faction.localized_name(I18n.locale) if pb&.faction
-      # Highlight by stored match.result to reflect scoring rules (win green, draw blue)
-      case match.result
-      when 'a_win'
-        a_style = 'font-weight:700; fill:#16a34a;'
-        b_style = ''
-      when 'b_win'
-        a_style = ''
-        b_style = 'font-weight:700; fill:#16a34a;'
-      when 'draw'
-        a_style = 'font-weight:700; fill:#2563eb;'
-        b_style = 'font-weight:700; fill:#2563eb;'
-      else
-        a_style = ''
-        b_style = ''
-      end
-      score_text = "#{pa&.score} - #{pb&.score}"
-      # For open format listing, we may show secondary below or omit to reduce clutter. Keep compact here.
-      both_present = match.a_user_id.present? && match.b_user_id.present?
-      link = admin && both_present ? tournament_tournament_match_path(tournament, match) : nil
-    else
-      a_style = ''
-      b_style = ''
-      # If one-sided bye win, show BYE rather than Pending
-      score_text = if (match.a_user_id && match.b_user_id.nil? && match.result == 'a_win') ||
-                      (match.b_user_id && match.a_user_id.nil? && match.result == 'b_win')
-                     t('tournaments.show.bye', default: 'Bye')
-                   else
-                     t('tournaments.show.pending', default: 'Pending')
-                   end
-      both_present = match.a_user_id.present? && match.b_user_id.present?
-      allowed = both_present && (admin || [match.a_user_id, match.b_user_id].compact.include?(Current.user&.id))
-      link = allowed ? tournament_tournament_match_path(tournament, match) : nil
-    end
-
-    a_list_path = army_list_path_for_user(tournament, match.a_user_id)
-    b_list_path = army_list_path_for_user(tournament, match.b_user_id)
-
-    table_text = match.respond_to?(:table_number) && match.table_number.present? ? match.table_number.to_s : nil
+    table_text = display[:table]&.to_s
     text_start_x = pos_x + (table_text ? 40 : 14)
 
     parts = [
@@ -266,16 +247,22 @@ module ApplicationHelper
     safe_join(parts)
   end
 
-  # Controller-generated list item wrapper for small match boxes
-  def svg_match_list_item(tournament, match)
-    content_tag(:li, style: 'margin:0; display:flex; justify-content:center;') do
-      content_tag(:svg, width: 240, height: MATCH_BOX_HEIGHT) do
-        small_match_box(tournament, match, 0, 0, width: 240, show_seeds: false)
-      end
-    end
+  # Controller-generated list item for the matches list (turbo stream prepend)
+  def match_list_item(tournament, match)
+    render 'tournaments/match_row', tournament: tournament, match: match
   end
 
   private
+
+  # One side of a match: the player, or a placeholder (bye / not known yet).
+  def match_display_side(tournament, user, bye)
+    unless user
+      return { name: bye ? t('tournaments.show.bye', default: 'Bye') : 'TBD', placeholder: true }
+    end
+
+    { name: user.username, user: user, faction: faction_label_for_user(tournament, user),
+      list_path: army_list_path_for_user(tournament, user.id) }
+  end
 
   def round_label_for_column(index, total)
     return 'Final' if index == total - 1

@@ -590,8 +590,9 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     sign_out @user
     get tournament_path(t, locale: I18n.locale, tab: 1)
     assert_response :success
-    assert_select '#matches-list a[href=?]', tournament_tournament_registration_path(t, reg1, locale: I18n.locale),
-                  text: I18n.t('tournaments.show.view_army_list')
+    assert_select '#matches-list a[href=?][title=?]',
+                  tournament_tournament_registration_path(t, reg1, locale: I18n.locale),
+                  I18n.t('tournaments.show.view_army_list')
     assert_select '#matches-list a[href=?]', tournament_tournament_registration_path(t, reg2, locale: I18n.locale),
                   count: 0
   end
@@ -1682,6 +1683,29 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_redirected_to tournament_path(t, locale: I18n.locale, tab: 3)
+  end
+
+  test 'index sorts tournaments by tournament date' do
+    system = game_systems(:chess)
+    make = lambda do |name, state, starts_at|
+      ::Tournament::Tournament.create!(name: name, creator: @user, game_system: system, format: 'open',
+                                       state: state, starts_at: starts_at)
+    end
+    make.call('Sort Late', 'registration', 3.months.from_now)
+    make.call('Sort Soon', 'registration', 1.week.from_now)
+    make.call('Sort Undated', 'registration', nil)
+    make.call('Sort Old', 'completed', 2.years.ago)
+    make.call('Sort Recent', 'completed', 1.month.ago)
+
+    get tournaments_path(locale: I18n.locale)
+
+    assert_response :success
+    body = response.body
+    # Coming tournaments: the next one first, undated ones last
+    assert_operator body.index('Sort Soon'), :<, body.index('Sort Late')
+    assert_operator body.index('Sort Late'), :<, body.index('Sort Undated')
+    # Past tournaments: the latest one first
+    assert_operator body.index('Sort Recent'), :<, body.index('Sort Old')
   end
 
   test 'index card shows formatted starts_at date' do

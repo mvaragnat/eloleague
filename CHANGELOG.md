@@ -1,3 +1,8 @@
+## 2026-11-11
+
+- Feature — Tournaments list: each tab is now sorted by tournament date. Tournaments accepting signups and ongoing ones show the next one first; closed tournaments and "My tournaments" show the latest first. Tournaments without a date come last.
+- Design — Tournament page: lighter header (state shown as a badge, details on one line), underlined tabs, rounds as small pills, and matches shown as result lines (table, player, score, player) instead of boxed cards. Faction names are no longer truncated; on mobile the two players are stacked with the scores on the right. The army list is flagged by a document icon after the faction, and the whole player block (name and faction) opens it. Same information and links as before (army lists, opening a match to enter or edit its score).
+
 ## 2026-11-07
 
 - Fix — Tournament match score entry: with the secondary score used as a tie-break, both players' fields are now labeled "Secondary score" (the right-hand one was wrongly labeled "Opponent secondary score", even when the signed-in player was on the right).

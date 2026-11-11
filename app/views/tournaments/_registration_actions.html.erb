@@ -1,4 +1,4 @@
-<div style="margin:1rem 0; display:flex; flex-direction:column; gap:0.5rem;">
+<div class="tournament-actions">
   <% if is_registered %>
     <% if tournament.registrations_open? && my_registration && my_registration.status != 'checked_in' %>
       <% if my_registration.awaiting_validation? %>
