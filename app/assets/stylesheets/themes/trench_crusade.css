@@ -1,0 +1,189 @@
+/*
+ * Theme for the Trench Crusade game site (config/game_sites.yml).
+ * Loaded after application.css: override the :root tokens declared there.
+ *
+ * Inspired by the look of https://www.trenchcrusade.fr: black header and hero, light pages,
+ * blood red accent, blackletter titles, Garamond body.
+ * We hold no rights on that site's images and fonts: this theme uses none of them. The hero is
+ * drawn in CSS, the fonts are free Google Fonts (Pirata One, EB Garamond) and the icon in
+ * public/sites/trench_crusade/ is an original drawing. Do not add artwork from the game here.
+ */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pirata+One&display=swap');
+
+:root {
+  color-scheme: light;
+
+  /* Palette of trenchcrusade.fr */
+  --tc-black: #151515;
+  --tc-dark-gray: #252829;
+  --tc-light-gray: #ededed;
+  --tc-blood: #af1f24;
+  --tc-blood-dark: #8f1519;
+  --tc-blood-darker: #721114;
+  --tc-blood-a08: rgba(143, 21, 25, 0.08);
+  --tc-line: #d9d9d9;
+
+  /* Application tokens */
+  --blue-500: var(--tc-blood-dark);
+  --blue-600: var(--tc-blood-darker);
+  --red-500: var(--tc-blood);
+  --green-500: #198754;
+  --gray-100: var(--tc-light-gray);
+  --gray-300: var(--tc-line);
+  --text-strong: var(--tc-black);
+  --text-muted: #5c6063;
+  --warning: #8a5a00;
+
+  --surface: #ffffff;
+  --surface-muted: #f6f6f6;
+  --surface-hover: #f3f3f3;
+  --on-primary: #ffffff;
+  --focus-ring: rgba(143, 21, 25, 0.2);
+  --accent-soft: #f7ebeb;
+  --accent-border: #e9d0d1;
+  --accent-border-strong: #c78a8c;
+  --accent-hover: var(--tc-blood);
+  --highlight-bg: #f5e3e3;
+  --table-line: #ececec;
+
+  --font-body: "EB Garamond", Garamond, Georgia, serif;
+  --font-heading: var(--font-body);
+  --font-display: "Pirata One", "EB Garamond", serif;
+
+  --hero-bg: var(--tc-black);
+  --hero-image: none;
+
+  --chart-axis: #b5b5b5;
+  --chart-grid: #e2e2e2;
+  --chart-primary: var(--tc-blood-dark);
+}
+
+body { font-size: 1.125rem; }
+
+::selection { background: var(--tc-blood-dark); color: #fff; }
+
+a { text-decoration-color: var(--accent-border-strong); text-underline-offset: 2px; }
+a:hover, a:focus { color: var(--tc-blood-dark); }
+
+/***** Headings *****/
+h1, h2 { font-family: var(--font-display); font-weight: 400; line-height: 1.05; letter-spacing: 0.01em; }
+h1 { font-size: 3rem; }
+h2 { font-size: 2rem; }
+h3, h4, h5, h6 { font-family: var(--font-heading); font-weight: 700; }
+
+/* Blood red rule below page titles */
+.page-header h1::after {
+  content: "";
+  display: block;
+  width: 4rem;
+  height: 4px;
+  margin: 0.75rem auto 0;
+  background: var(--tc-blood);
+}
+
+@media (max-width: 640px) {
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.625rem; }
+}
+
+/***** Nav *****/
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  gap: 0.25rem;
+  padding: 0.875rem 1.25rem;
+  background: var(--tc-black);
+  border-bottom: 3px solid var(--tc-blood-dark);
+}
+.site-logo {
+  margin-right: 1rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.75rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.site-logo:hover, .site-logo:focus { color: #e9d0d1; }
+.site-nav .brand {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: #fff;
+  transition: color .15s ease, background-color .15s ease;
+}
+.site-nav .brand:hover, .site-nav .brand:focus { background: var(--tc-dark-gray); color: #fff; }
+.site-nav .user-email { color: #b5b8ba !important; font-weight: 400 !important; }
+
+@media (max-width: 640px) {
+  .site-nav { position: static; padding: 0.625rem 0.75rem; }
+  .site-logo { flex-basis: 100%; font-size: 1.5rem; }
+  .site-nav .brand { padding: 0.25rem 0.5rem; font-size: 1rem; }
+}
+
+/***** Forms & buttons *****/
+input, select, textarea, button { font-family: inherit; }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], select, textarea { border-radius: 0.25rem; font-size: 1.0625rem; }
+
+.btn { border-radius: 0.25rem; font-family: var(--font-body); font-weight: 500; }
+.btn-inverse:hover, .btn-inverse:focus { color: var(--tc-blood-dark); }
+
+/***** Hero (home): drawn in CSS, no artwork *****/
+.hero { min-height: 70vh; place-items: center start; grid-template-columns: minmax(0, 1fr); padding: 2.5rem 1.5rem; border-bottom: 6px solid var(--tc-blood-dark); }
+.hero::before {
+  opacity: 1;
+  background-image:
+    radial-gradient(ellipse 60% 70% at 85% 35%, rgba(175, 31, 36, 0.28), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 70% 90%, rgba(255, 255, 255, 0.07), transparent 70%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 7px),
+    linear-gradient(180deg, #151515 0%, #1f2122 55%, #151515 100%);
+}
+.hero__content { box-sizing: border-box; max-width: 52rem; margin: 0; padding-left: clamp(0rem, 6vw, 5rem); text-align: left; }
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 8vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+  color: #fff;
+  text-shadow: none;
+  margin-bottom: 1.25rem;
+}
+.hero-subtitle { color: #e2e2e2; text-shadow: none; }
+.hero .button-row { justify-content: flex-start; }
+.hero .btn-inverse { background: transparent; border-color: #fff; color: #fff; }
+.hero .btn-inverse:hover, .hero .btn-inverse:focus { background: #fff; color: var(--tc-black); }
+
+/***** Cards *****/
+.card { border-width: 1px; border-radius: 0.375rem; box-shadow: none; }
+.card--win, .card--loss, .card--draw { border-left-width: 4px; }
+.card--win { border-color: var(--gray-300); border-left-color: var(--green-500); }
+.card--loss { border-color: var(--gray-300); border-left-color: var(--tc-blood); }
+.card--draw { border-color: var(--gray-300); border-left-color: #6c757d; }
+
+.modal-card { border-radius: 0.375rem; }
+
+/***** Tables *****/
+.table thead th, .ranking-th { color: var(--tc-black); font-weight: 700; }
+.ranking-th { border-bottom-color: var(--tc-black); }
+
+/***** Footer *****/
+.site-footer { margin-top: 3rem; padding: 1.5rem 1rem; background: var(--tc-black); border-top: 3px solid var(--tc-blood-dark); color: #e2e2e2; }
+.site-footer .footer-content { color: #c9cbcc; }
+.site-footer .footer-link { color: #fff; text-decoration: underline; }
+
+/***** Game site home *****/
+.hero--compact { min-height: 0; padding: 4rem 1.5rem 3.5rem; }
+.site-home__intro { color: #e2e2e2; font-size: 1.1875rem; }
+.site-home__intro a:hover, .site-home__intro a:focus { color: #fff; }
+.event-card, .timeline__card { border-radius: 0.375rem; }
+.event-card:hover, .event-card:focus-visible,
+.timeline__card:hover, .timeline__card:focus-visible { border-color: var(--tc-blood-dark); }
+.event-card__date, .timeline__date { color: var(--tc-blood-dark); font-weight: 700; }
+.leaderboard__rank { color: var(--tc-blood-dark); }
+.timeline-year span { font-size: 1.5rem; color: var(--tc-black); }
+.timeline__dot { border-color: var(--tc-blood-dark); background: var(--tc-light-gray); }

@@ -18,3 +18,35 @@ fr:
           paragraph_1: "Sur Epic League, vous pouvez conserver l'historique de vos parties d'Epic Armageddon, et participer à des tournois."
       game_site_home:
         intro_html: "La communauté EA-FR est particulièrement active en France et à l'international avec l'organisation de nombreux tournois et événements. Vous trouverez ici toutes les rencontres Epic Armageddon. Pour plus de détails, rendez-vous sur notre %{discord}."
+    trench_crusade:
+      app:
+        name: "Trench Crusade League"
+        logo: "Trench Crusade"
+        description: "Tournois, classements et statistiques de la communauté Trench Crusade francophone."
+      auth:
+        signup_subtitle: "Créez votre compte Trench Crusade League"
+      welcome: "Bienvenue sur Trench Crusade League"
+      home:
+        subtitle: "Tournois et statistiques Trench Crusade"
+      dashboard:
+        welcome_box:
+          title: "Bienvenue sur Trench Crusade League 👋"
+          paragraph_1: "Sur Trench Crusade League, vous pouvez conserver l'historique de vos parties de Trench Crusade, et participer à des tournois."
+      game_site_home:
+        intro_html: "Fidèles ou Hérétiques, retrouvez ici les tournois et événements de la communauté Trench Crusade francophone. Pour plus de détails, rendez-vous sur notre %{discord}."
+    confrontation:
+      app:
+        name: "Confrontation League"
+        logo: "Confrontation"
+        description: "Tournois, classements et statistiques de la communauté Confrontation francophone."
+      auth:
+        signup_subtitle: "Créez votre compte Confrontation League"
+      welcome: "Bienvenue sur Confrontation League"
+      home:
+        subtitle: "Tournois et statistiques Confrontation"
+      dashboard:
+        welcome_box:
+          title: "Bienvenue sur Confrontation League 👋"
+          paragraph_1: "Sur Confrontation League, vous pouvez conserver l'historique de vos parties de Confrontation, et participer à des tournois."
+      game_site_home:
+        intro_html: "Retrouvez ici les tournois et événements de Confrontation, le mythique jeu d'escarmouche du continent d'Aarklash, porté par la Confédération du Dragon Rouge Francophone. Pour plus de détails, rendez-vous sur notre %{discord}."
