@@ -590,8 +590,9 @@ class TournamentsControllerTest < ActionDispatch::IntegrationTest
     sign_out @user
     get tournament_path(t, locale: I18n.locale, tab: 1)
     assert_response :success
-    assert_select '#matches-list a[href=?]', tournament_tournament_registration_path(t, reg1, locale: I18n.locale),
-                  text: I18n.t('tournaments.show.view_army_list')
+    assert_select '#matches-list a[href=?][title=?]',
+                  tournament_tournament_registration_path(t, reg1, locale: I18n.locale),
+                  I18n.t('tournaments.show.view_army_list')
     assert_select '#matches-list a[href=?]', tournament_tournament_registration_path(t, reg2, locale: I18n.locale),
                   count: 0
   end
