@@ -283,11 +283,10 @@ module ApplicationHelper
     seeded.to_h { |uid, rating| [uid, seeded.index([uid, rating]) + 1] }
   end
 
-  # Registrations of a tournament indexed by user id, memoized for the current
-  # render (one query per tournament, however many match boxes are drawn).
+  # Registrations of a tournament indexed by user id (memoized on the
+  # tournament: one query however many match boxes are drawn).
   def registrations_by_user_for(tournament)
-    @registrations_by_user ||= {}
-    @registrations_by_user[tournament.id] ||= tournament.registrations.includes(:faction).index_by(&:user_id)
+    tournament.registrations_by_user_id
   end
 
   def faction_label_for_user(tournament, user)
