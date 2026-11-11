@@ -47,6 +47,17 @@ module Tournament
     scope :competitive, -> { where(non_competitive: false) }
     scope :non_competitive, -> { where(non_competitive: true) }
 
+    # Registrations indexed by user id, with their faction preloaded. Memoized
+    # on the instance so a page rendering many matches runs a single query.
+    def registrations_by_user_id
+      @registrations_by_user_id ||= registrations.includes(:faction).index_by(&:user_id)
+    end
+
+    def reload(*)
+      @registrations_by_user_id = nil
+      super
+    end
+
     def registrations_open?
       registration?
     end
