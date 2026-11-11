@@ -18,11 +18,14 @@ class TournamentsController < ApplicationController
     Current.user = current_user
 
     scope = scope_to_game_site(::Tournament::Tournament).includes(:game_system, :creator, :registrations)
-                                                        .order(created_at: :desc)
-    @my_tournaments = Current.user ? scope.where(creator: Current.user) : scope.none
-    @accepting_tournaments = scope.where(state: 'registration')
-    @ongoing_tournaments = scope.where(state: 'running')
-    @closed_tournaments = scope.where(state: 'completed')
+    # Sorted by tournament date: coming tournaments first for the ones to come or being played,
+    # latest first for the past ones. Tournaments without a date go last.
+    upcoming_first = scope.order(Arel.sql('starts_at ASC NULLS LAST'), created_at: :desc)
+    latest_first = scope.order(Arel.sql('starts_at DESC NULLS LAST'), created_at: :desc)
+    @my_tournaments = Current.user ? latest_first.where(creator: Current.user) : scope.none
+    @accepting_tournaments = upcoming_first.where(state: 'registration')
+    @ongoing_tournaments = upcoming_first.where(state: 'running')
+    @closed_tournaments = latest_first.where(state: 'completed')
   end
 
   def show
