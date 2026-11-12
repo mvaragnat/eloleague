@@ -11,33 +11,25 @@ module Game
           []
         end
 
-      render json: scoring_systems
-        .sort_by { |s| s.name.to_s }
-        .map do |s|
-          {
-            id: s.id,
-            name: s.name,
-            is_default: s.is_default,
-            summary: s.summary,
-            description_html: s.description.to_s,
-            max_score_per_player: s.max_score_per_player,
-            fix_total_score: s.fix_total_score,
-            max_total_score: s.max_total_score
-          }
-        end
+      render json: scoring_systems.sort_by { |s| s.name.to_s }.map { |s| scoring_system_json(s) }
     end
 
     def show
-      s = scope_to_game_site(Game::ScoringSystem).find(params[:id])
-      render json: {
-        id: s.id,
-        name: s.name,
-        is_default: s.is_default,
-        summary: s.summary,
-        description_html: s.description.to_s,
-        max_score_per_player: s.max_score_per_player,
-        fix_total_score: s.fix_total_score,
-        max_total_score: s.max_total_score
+      render json: scoring_system_json(scope_to_game_site(Game::ScoringSystem).find(params[:id]))
+    end
+
+    private
+
+    def scoring_system_json(scoring_system)
+      {
+        id: scoring_system.id,
+        name: scoring_system.name,
+        is_default: scoring_system.is_default,
+        summary: scoring_system.summary,
+        description_html: scoring_system.description.to_s,
+        max_score_per_player: scoring_system.max_score_per_player,
+        fix_total_score: scoring_system.fix_total_score,
+        max_total_score: scoring_system.max_total_score
       }
     end
   end
