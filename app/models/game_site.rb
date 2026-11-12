@@ -6,7 +6,7 @@
 class GameSite
   CONFIG_PATH = Rails.root.join('config/game_sites.yml')
 
-  attr_reader :key, :game_system_name, :theme, :icon, :og_image, :parent_url, :default_locale
+  attr_reader :key, :game_system_name, :theme, :icon, :og_image, :theme_color, :parent_url, :default_locale
 
   class << self
     attr_writer :config
@@ -38,6 +38,7 @@ class GameSite
     @theme = attrs['theme'].presence
     @icon = attrs['icon'].presence
     @og_image = attrs['og_image'].presence
+    @theme_color = attrs['theme_color'].presence
     @parent_url = attrs['parent_url'].presence
     @default_locale = attrs['default_locale'].presence&.to_sym
   end

@@ -18,6 +18,9 @@
     <meta name="twitter:title" content="<%= content_for(:title) || t('app.name', default: 'Eloleague') %>">
     <meta name="twitter:description" content="<%= t('app.description') %>">
     <meta name="twitter:image" content="<%= game_site_og_image_url %>">
+    <% if current_game_site&.theme_color %>
+      <meta name="theme-color" content="<%= current_game_site.theme_color %>">
+    <% end %>
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>

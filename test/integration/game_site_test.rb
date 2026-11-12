@@ -8,7 +8,8 @@ class GameSiteTest < ActionDispatch::IntegrationTest
   setup do
     @previous_game_sites = ENV.fetch('GAME_SITES', nil)
     ENV['GAME_SITES'] = "#{SITE_HOST}=chess_site"
-    GameSite.config = { 'chess_site' => { 'game_system' => 'Chess', 'og_image' => '/sites/chess/og.png' } }
+    GameSite.config = { 'chess_site' => { 'game_system' => 'Chess', 'og_image' => '/sites/chess/og.png',
+                                          'theme_color' => '#123456' } }
     I18n.backend.store_translations(:en, game_sites: { chess_site: { app: { name: 'Chess League' } } })
 
     @user = users(:player_one)
@@ -48,6 +49,7 @@ class GameSiteTest < ActionDispatch::IntegrationTest
     assert_select 'title', 'Chess League'
     assert_select 'body[data-game-site=chess_site]'
     assert_select 'meta[property="og:image"][content=?]', "http://#{SITE_HOST}/sites/chess/og.png"
+    assert_select 'meta[name="theme-color"][content=?]', '#123456'
   end
 
   test 'game site logo links to the parent site' do
