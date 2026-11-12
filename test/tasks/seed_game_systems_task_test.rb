@@ -82,8 +82,8 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
 
     scoring = confrontation.scoring_systems.find_by(name: 'Tournoi')
     assert scoring.is_default
-    assert_equal 3, scoring.max_total_score
-    assert_equal 3, scoring.max_score_per_player
+    assert_equal 10, scoring.max_total_score
+    assert_equal 9, scoring.max_score_per_player
     assert_includes scoring.description, '<td>2 – 1</td><td>→</td><td><strong>7</strong></td>'
     assert_not old_default.reload.is_default
   end
