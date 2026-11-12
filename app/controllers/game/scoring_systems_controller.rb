@@ -21,7 +21,8 @@ module Game
             summary: s.summary,
             description_html: s.description.to_s,
             max_score_per_player: s.max_score_per_player,
-            fix_total_score: s.fix_total_score
+            fix_total_score: s.fix_total_score,
+            max_total_score: s.max_total_score
           }
         end
     end
@@ -35,7 +36,8 @@ module Game
         summary: s.summary,
         description_html: s.description.to_s,
         max_score_per_player: s.max_score_per_player,
-        fix_total_score: s.fix_total_score
+        fix_total_score: s.fix_total_score,
+        max_total_score: s.max_total_score
       }
     end
   end

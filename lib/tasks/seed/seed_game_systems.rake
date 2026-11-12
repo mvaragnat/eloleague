@@ -126,6 +126,7 @@ module SeedGameSystemsHelper
         description: nil,
         max_score_per_player: nil,
         fix_total_score: nil,
+        max_total_score: nil,
         min_difference_for_win: nil,
         is_default: true
       )
@@ -146,9 +147,11 @@ module SeedGameSystemsHelper
         description: localized_value(entry['description']),
         max_score_per_player: entry['max_score_per_player'],
         fix_total_score: entry['fix_total_score'],
+        max_total_score: entry['max_total_score'],
         min_difference_for_win: entry['min_difference_for_win'],
         is_default: is_default
       }
+      demote_other_defaults(game_system, name) if entry['is_default']
       row = game_system.scoring_systems.find_or_initialize_by(name: name)
       if row.new_record?
         row.assign_attributes(attrs)
@@ -159,6 +162,12 @@ module SeedGameSystemsHelper
         Rails.logger.info "  → Updated scoring system: #{name}"
       end
     end
+  end
+
+  # A scoring system flagged as default in the YAML replaces the current default
+  # (e.g. the unconstrained "Default" created before the system had its own rules)
+  def self.demote_other_defaults(game_system, name)
+    game_system.scoring_systems.defaults.where.not(name: name).find_each { |s| s.update!(is_default: false) }
   end
 end
 

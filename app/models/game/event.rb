@@ -133,14 +133,21 @@ module Game
         end
       end
 
-      return if scoring_system.fix_total_score.blank?
+      validate_score_total(a + b)
+    end
 
+    def validate_score_total(sum)
       total = scoring_system.fix_total_score
-      return unless (a + b) != total
+      if total.present? && sum != total
+        errors.add(:base, I18n.t('games.errors.total_must_equal',
+                                 total: total,
+                                 default: "Total of both scores must equal #{total}"))
+      end
 
-      errors.add(:base, I18n.t('games.errors.total_must_equal',
-                               total: total,
-                               default: "Total of both scores must equal #{total} (id #{id})"))
+      max_total = scoring_system.max_total_score
+      return if max_total.blank? || sum <= max_total
+
+      errors.add(:base, I18n.t('games.errors.total_exceeds_max', max: max_total))
     end
 
     def assign_scoring_system_default

@@ -50,10 +50,12 @@ Uniladder is a game tracking and ranking app. Players can track their games and 
   - `name` (required), `description` (HTML allowed)
   - `max_score_per_player` (optional, integer)
   - `fix_total_score` (optional, integer)
+  - `max_total_score` (optional, integer; the sum of both scores cannot exceed it, e.g. 3 for Confrontation)
   - `min_difference_for_win` (optional, integer; requires score difference to be strictly greater for a win; otherwise it’s a draw even if scores differ)
   - `is_default` (boolean; at most one default per system)
 - Tournaments and casual games reference a scoring system; if a system has a single scoring system, it is selected automatically. If multiple exist, forms allow selection. Tournament match reporting uses the tournament’s scoring system.
-- Seeds: `config/game_systems.yml` optionally includes a `scoring_systems` array per system; if absent, a “Default” scoring system is created with no constraints. Example entries are provided in the YAML.
+- Seeds: `config/game_systems.yml` optionally includes a `scoring_systems` array per system; if absent, a “Default” scoring system is created with no constraints. Example entries are provided in the YAML. An entry flagged `is_default: true` becomes the system's default, demoting the previous one (e.g. an earlier unconstrained "Default").
+- Confrontation uses the "Tournoi" scoring system: scores from 0 to 3, sum of both scores at most 3; its description shows the score → tournament points table (3–0 = 9, 2–0 = 8, 2–1 = 7, 1–0 = 6, 1–1 = 5, 0–0 = 4, then mirrored). Tournament points are informative only: standings still use win/draw/loss.
 
 ### Tournament Domain
 - `Tournament::Tournament`

@@ -73,4 +73,18 @@ class SeedGameSystemsTaskTest < ActiveSupport::TestCase
     # Verify existing faction was not duplicated
     assert_equal 1, existing_system.factions.where(name: 'Steel Legion').count
   end
+
+  test 'seeds the Confrontation scoring system and makes it the default' do
+    confrontation = Game::System.create!(name: 'Confrontation', description: 'Old description')
+    old_default = confrontation.scoring_systems.create!(name: 'Default', is_default: true)
+
+    Rake::Task['seed:game_systems'].execute
+
+    scoring = confrontation.scoring_systems.find_by(name: 'Tournoi')
+    assert scoring.is_default
+    assert_equal 3, scoring.max_total_score
+    assert_equal 3, scoring.max_score_per_player
+    assert_includes scoring.description, '<td>2 – 1</td><td>→</td><td><strong>7</strong></td>'
+    assert_not old_default.reload.is_default
+  end
 end
