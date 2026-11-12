@@ -470,7 +470,6 @@ fr:
     draw_percent: "% de nuls"
     win_percent: "% de victoire"
     loss_percent: "% de défaites"
-    win_loss_diff: "Diff V-D"
     opponent: "Adversaire"
     games: "Matchs"
     mirrors: "Miroirs"
