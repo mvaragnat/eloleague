@@ -1,3 +1,8 @@
+## 2026-11-12
+
+- Fix — "New game" form: when a game system has several scoring systems, the chosen one now shows its summary and its description (e.g. the Confrontation score → tournament points table). Only its name was shown, and the score checks of the form (max per player, fixed or max total) were not applied.
+- Change — Confrontation: the unconstrained "Default" scoring system is removed; its games and tournaments now use "Tournoi" (results are unchanged). Done by a migration.
+
 ## 2026-11-11
 
 - Feature — Confrontation scoring: Confrontation games and tournaments now use the "Tournoi" scoring system, whose table (score → tournament points, from 3–0 = 9 PT to 0–3 = 0 PT) is shown wherever the scoring system is described. Each score is between 0 and 3 and the sum of both scores cannot exceed 3 (checked in the form and on the server). Scoring systems gain an optional "max total score" option for this. Run `bin/rails db:migrate` then `bin/rails seed:game_systems`; existing Confrontation tournaments keep their previous scoring system.
