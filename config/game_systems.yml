@@ -202,9 +202,9 @@ game_systems:
       fr: "Jeu d'escarmouche med-fan dans l'univers d'Aarklash (édité à l'origine par Rackham)"
     scoring_systems:
       - name: 'Tournoi'
-        description: "<table class='table'><thead><tr><th>Score</th><th></th><th>PT</th></tr></thead><tbody><tr><td>3 – 0</td><td>→</td><td><strong>9</strong></td></tr><tr><td>2 – 0</td><td>→</td><td><strong>8</strong></td></tr><tr><td>2 – 1</td><td>→</td><td><strong>7</strong></td></tr><tr><td>1 – 0</td><td>→</td><td><strong>6</strong></td></tr><tr><td>1 – 1</td><td>→</td><td><strong>5</strong></td></tr><tr><td>0 – 0</td><td>→</td><td><strong>4</strong></td></tr><tr><td>1 – 2</td><td>→</td><td><strong>3</strong></td></tr><tr><td>0 – 1</td><td>→</td><td><strong>2</strong></td></tr><tr><td>0 – 2</td><td>→</td><td><strong>1</strong></td></tr><tr><td>0 – 3</td><td>→</td><td><strong>0</strong></td></tr></tbody></table>"
-        max_score_per_player: 3
-        max_total_score: 3
+        description: "<table class='table'><thead><tr><th>Points de scénario</th><th></th><th>Score</th></tr></thead><tbody><tr><td>3 – 0</td><td>→</td><td><strong>9</strong></td></tr><tr><td>2 – 0</td><td>→</td><td><strong>8</strong></td></tr><tr><td>2 – 1</td><td>→</td><td><strong>7</strong></td></tr><tr><td>1 – 0</td><td>→</td><td><strong>6</strong></td></tr><tr><td>1 – 1</td><td>→</td><td><strong>5</strong></td></tr><tr><td>0 – 0</td><td>→</td><td><strong>4</strong></td></tr><tr><td>1 – 2</td><td>→</td><td><strong>3</strong></td></tr><tr><td>0 – 1</td><td>→</td><td><strong>2</strong></td></tr><tr><td>0 – 2</td><td>→</td><td><strong>1</strong></td></tr><tr><td>0 – 3</td><td>→</td><td><strong>0</strong></td></tr></tbody></table>"
+        max_score_per_player: 9
+        max_total_score: 10
         is_default: true
     factions:
       - fr: "Alchimistes de Dirz"
